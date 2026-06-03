@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kundenportal – KFZ Gorski</title>
+<meta name="description" content="KFZ Gorski Kundenportal – Rechnungen, WhatsApp-Tickets, Termine, Fahrzeuge und Notizen an einem Ort.">
+<meta name="theme-color" content="#0B0D10">
+<script>try{if(localStorage.getItem('kfz_bw')==='1')document.documentElement.classList.add('bw')}catch(e){}</script>
+<meta name="robots" content="noindex">
+<style>
+@font-face{font-family:'Hanken Grotesk';src:url('fonts/HankenGrotesk.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:'Bebas Neue';src:url('fonts/BebasNeue.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+
+/* =========================================================
+   KFZ GORSKI – Kundenportal (Prototyp, Demo-Daten via localStorage)
+   Monochrom; CI-Blau #146DAB als Aktion, Gelb-Orange #FBAF3A als Akzent.
+   Klickbarer Prototyp – kein Backend. Daten liegen im Browser.
+   ========================================================= */
+:root{
+  --ink:#0B0D10;--ink-2:#14171C;--ink-3:#1E232B;
+  --paper:#FFFFFF;--paper-2:#F6F7F8;--paper-3:#ECEEF0;
+  --line:#E4E6E9;--line-2:#D3D6DB;
+  --grau:#565C66;--grau-2:#878D97;--grau-3:#B6BBC3;
+  --blau:#146DAB;--blau-deep:#0E5184;--orange:#FBAF3A;--orange-deep:#9A6410;
+  --radius:16px;--radius-lg:20px;
+  --topbar-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Hanken Grotesk',system-ui,-apple-system,sans-serif;background:var(--paper-2);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;font-variant-numeric:tabular-nums}
+.svg-defs{position:absolute;width:0;height:0;overflow:hidden}
+a{color:var(--blau);text-decoration:none}
+button{font-family:inherit}
+.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:.5px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-weight:700;font-size:14.5px;padding:11px 18px;border-radius:11px;transition:transform .15s,box-shadow .15s,background .15s,border-color .15s;white-space:nowrap}
+.btn svg{width:17px;height:17px}
+.btn-primary{background:var(--blau);color:#fff;box-shadow:0 10px 24px -12px rgba(20,109,171,.7)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px -12px rgba(20,109,171,.8)}
+.btn-ghost{background:var(--paper);color:var(--ink);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--line-2);background:var(--paper-2)}
+.btn-dark{background:var(--ink);color:#fff}
+.btn-dark:hover{transform:translateY(-2px)}
+.btn-sm{padding:8px 13px;font-size:13px;border-radius:9px}
+.btn:focus-visible{outline:2px solid var(--blau);outline-offset:2px}
+.btn-primary:focus-visible,.btn-dark:focus-visible{outline-color:#fff}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:30px;letter-spacing:.2px;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge.warn{background:rgba(251,175,58,.16);color:var(--orange-deep)}
+.badge.info{background:rgba(20,109,171,.12);color:var(--blau-deep)}
+.badge.done{background:var(--ink);color:#fff}
+.badge.muted{background:var(--paper-3);color:var(--grau)}
+
+/* ============ LOGIN ============ */
+.login{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;
+  background:radial-gradient(120% 90% at 80% 10%,#1a1f27 0%,var(--ink) 60%);overflow:auto}
+.login::before{content:"";position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:60px 60px;mask-image:radial-gradient(circle at 75% 25%,#000 0%,transparent 72%);-webkit-mask-image:radial-gradient(circle at 75% 25%,#000 0%,transparent 72%)}
+.login-card{position:relative;z-index:2;width:100%;max-width:400px;background:var(--paper);border-radius:var(--radius-lg);padding:38px 34px;box-shadow:0 50px 100px -40px rgba(0,0,0,.6);overflow:hidden}
+.login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blau),var(--orange))}
+.login-logo{height:34px;width:auto;display:block;margin:0 auto 6px}
+.login-card h1{font-size:23px;font-weight:800;letter-spacing:-.5px;text-align:center;margin-top:18px}
+.login-card .sub{text-align:center;color:var(--grau);font-size:14px;margin:6px 0 26px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--grau);margin-bottom:6px}
+.field input{width:100%;font:inherit;font-size:15px;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;background:var(--paper);color:var(--ink);transition:.15s}
+.field input:focus{outline:none;border-color:var(--blau);box-shadow:0 0 0 3px rgba(20,109,171,.14)}
+.login-card .btn{width:100%;margin-top:6px}
+.login-hint{margin-top:18px;padding:12px 14px;background:var(--paper-2);border:1px solid var(--line);border-radius:11px;font-size:12.5px;color:var(--grau);line-height:1.5}
+.login-hint b{color:var(--ink)}
+.demo-link{display:block;text-align:center;margin-top:14px;font-size:13.5px;font-weight:700;cursor:pointer}
+
+/* ============ APP SHELL ============ */
+.app{display:none}
+.app.on{display:block}
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar-h);z-index:100;background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:space-between;padding:0 22px;gap:16px}
+.topbar .brand{display:flex;align-items:center;gap:14px;min-width:0}
+.topbar .logo{height:30px;width:auto;display:block;flex-shrink:0}
+.topbar .ptag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--grau-3);border-left:1px solid rgba(255,255,255,.16);padding-left:14px}
+.topbar .right{display:flex;align-items:center;gap:14px}
+.who{text-align:right;line-height:1.2}
+.who b{display:block;font-size:14px}
+.who small{font-size:11.5px;color:var(--grau-3)}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(140deg,var(--blau),#0a3a63);display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
+.btn-logout{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.10);color:#fff;border:none;font-weight:700;font-size:13px;padding:9px 14px;border-radius:10px;cursor:pointer;transition:.15s;flex-shrink:0}
+.btn-logout svg{width:16px;height:16px}
+.btn-logout:hover{background:rgba(255,255,255,.18)}
+.bw-toggle{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.10);border:none;color:#fff;cursor:pointer;display:grid;place-items:center;flex-shrink:0;transition:.15s}
+.bw-toggle:hover{background:rgba(255,255,255,.18)}
+.bw-toggle svg{width:19px;height:19px}
+.bw-toggle:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* Dunkelmodus: weiße Flächen dunkel, Schrift hell – CI-AKZENTE BLEIBEN FARBIG */
+html.bw{
+  --paper:#1a1e25;--paper-2:#0f1217;--paper-3:#262b34;--ink-2:#14171c;
+  --line:#2a2f39;--line-2:#39404b;
+  --grau:#b0b6c0;--grau-2:#9298a2;--grau-3:#9aa0ab;
+  --orange-deep:#e0a23a;--blau-deep:#3e87c0;
+}
+html.bw body{background:var(--paper-2);color:#e7e9ee}
+html.bw .bw-toggle{background:rgba(255,255,255,.16)}
+html.bw .field input,html.bw .inp,html.bw .note-form textarea{background:#12151b;color:#e7e9ee}
+html.bw .field input::placeholder,html.bw .note-form textarea::placeholder{color:#7c828c}
+html.bw .btn-ghost,html.bw .sheet-item{color:#e7e9ee}
+html.bw .login-hint b{color:#e7e9ee}
+html.bw .litem .ic svg,html.bw .stat .ic.d{color:#e7e9ee}
+html.bw .stat .ic.d{background:#2a303a}
+html.bw .bubble.werkstatt{color:#e7e9ee}
+html.bw .badge.done{background:#39404b;color:#fff}
+html.bw .badge.muted{background:#262b34;color:#aab0ba}
+html.bw .tabbar{background:rgba(15,18,23,.92)}
+html.bw .doc{background:#12151b}
+.hamb{display:none;background:rgba(255,255,255,.10);border:none;border-radius:10px;width:40px;height:38px;cursor:pointer;flex-direction:column;gap:4px;align-items:center;justify-content:center}
+.hamb span{width:18px;height:2px;background:#fff;border-radius:2px}
+
+.shell{display:grid;grid-template-columns:248px 1fr;min-height:100vh;padding-top:var(--topbar-h)}
+.sidebar{background:var(--paper);border-right:1px solid var(--line);padding:22px 16px;position:sticky;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));overflow:auto}
+.nav-group{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--grau-3);margin:6px 12px 10px}
+.navitem{display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:none;border:none;cursor:pointer;
+  padding:11px 13px;border-radius:11px;font-weight:600;font-size:15px;color:var(--grau);transition:.15s;margin-bottom:3px;position:relative}
+.navitem:hover{background:var(--paper-2);color:var(--ink)}
+.navitem.active{background:var(--ink);color:#fff}
+.navitem svg{width:20px;height:20px;flex-shrink:0}
+.navitem .count{margin-left:auto;font-size:11.5px;font-weight:800;background:var(--orange);color:#231700;padding:1px 8px;border-radius:20px;min-width:20px;text-align:center}
+.navitem.active .count{background:var(--orange)}
+
+.content{padding:30px 34px 60px;max-width:1080px}
+.page{display:none;animation:fade .25s ease}
+.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page-head{margin-bottom:24px}
+.page-head h2{font-size:28px;font-weight:800;letter-spacing:-.8px}
+.page-head p{color:var(--grau);font-size:15px;margin-top:4px}
+
+/* Cards */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.card-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.card-h h3{font-size:17px;font-weight:700;letter-spacing:-.2px}
+.grid{display:grid;gap:18px}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+
+/* Stat cards (Übersicht) */
+.stat{display:flex;flex-direction:column;gap:6px}
+.stat .ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;margin-bottom:8px}
+.stat .ic svg{width:22px;height:22px}
+.stat .ic.b{background:rgba(20,109,171,.10);color:var(--blau)}
+.stat .ic.o{background:rgba(251,175,58,.16);color:var(--orange-deep)}
+.stat .ic.d{background:var(--paper-3);color:var(--ink)}
+.stat .v{font-weight:800;font-size:31px;line-height:1;letter-spacing:-1px}
+.stat .l{color:var(--grau);font-size:13.5px;font-weight:500}
+
+/* Tables */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--grau-2);padding:0 14px 12px;border-bottom:1px solid var(--line)}
+.tbl td{padding:15px 14px;border-bottom:1px solid var(--line);font-size:14.5px;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{cursor:pointer;transition:background .12s}
+.tbl tbody tr:hover{background:var(--paper-2)}
+.tbl .num{font-weight:700;white-space:nowrap}
+.tbl .muted{color:var(--grau)}
+.rowlink{display:flex;align-items:center;gap:6px;color:var(--blau);font-weight:700;font-size:13.5px}
+.amount{font-weight:800;font-variant-numeric:tabular-nums}
+
+/* Listcards (tickets / appointments) */
+.list{display:flex;flex-direction:column;gap:12px}
+.litem{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:16px}
+.litem:hover{border-color:var(--line-2);box-shadow:0 12px 28px -20px rgba(11,13,16,.4);transform:translateY(-1px)}
+.litem .ic{width:44px;height:44px;border-radius:12px;background:var(--paper-2);display:grid;place-items:center;flex-shrink:0}
+.litem .ic svg{width:22px;height:22px;color:var(--ink)}
+.litem .body{min-width:0;flex:1}
+.litem .body b{font-size:15.5px;font-weight:700;display:block}
+.litem .body small{color:var(--grau);font-size:13px}
+.litem .meta{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
+.litem .meta .when{font-size:12.5px;color:var(--grau-2)}
+
+/* Timeline (Historie) */
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:"";position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl{position:relative;padding:0 0 22px}
+.tl:last-child{padding-bottom:0}
+.tl::before{content:"";position:absolute;left:-23px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:3px solid var(--blau)}
+.tl b{font-size:15px;font-weight:700}
+.tl .d{font-size:12.5px;color:var(--grau-2);font-weight:600}
+.tl small{color:var(--grau);font-size:13.5px}
+
+/* Vehicle card */
+.veh{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.veh .plate{display:inline-flex;align-items:stretch;max-width:100%;background:var(--ink);color:#fff;border:2px solid var(--ink);border-radius:8px;overflow:hidden;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px}
+.veh .plate .pd{background:var(--blau);width:20px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:center;font-size:8.5px;letter-spacing:0;padding-bottom:4px;color:#fff}
+.veh .plate .pn{padding:8px 15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:8px 22px;font-size:14.5px;margin-top:4px}
+.kv dt{color:var(--grau);font-weight:600}
+.kv dd{font-weight:600;text-align:right}
+.docs{display:flex;flex-wrap:wrap;gap:9px;margin-top:8px}
+.doc{display:inline-flex;align-items:center;gap:8px;background:var(--paper-2);border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s}
+.doc:hover{border-color:var(--line-2);background:var(--paper-3)}
+.doc svg{width:16px;height:16px;color:var(--blau)}
+
+/* Notizen */
+.note{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--orange);border-radius:12px;padding:15px 17px;display:flex;gap:14px;align-items:flex-start}
+.note .nd{font-size:12px;color:var(--grau-2);font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.note p{font-size:14.5px}
+.note .del{margin-left:auto;background:none;border:none;color:var(--grau-3);cursor:pointer;padding:2px;border-radius:6px;flex-shrink:0}
+.note .del:hover{color:var(--orange-deep);background:var(--paper-2)}
+.note-form{display:flex;gap:10px;margin-bottom:18px}
+.note-form textarea{flex:1;font:inherit;font-size:14.5px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;resize:vertical;min-height:48px;transition:.15s}
+.note-form textarea:focus{outline:none;border-color:var(--blau);box-shadow:0 0 0 3px rgba(20,109,171,.14)}
+
+/* ============ DRAWER (Detail) ============ */
+.overlay{position:fixed;inset:0;z-index:150;background:rgba(11,13,16,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:var(--paper-2);z-index:160;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.7,.2,1);display:flex;flex-direction:column;box-shadow:-30px 0 80px -40px rgba(0,0,0,.5)}
+.drawer.on{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 24px;background:var(--paper);border-bottom:1px solid var(--line);flex-shrink:0}
+.drawer-head h3{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.drawer-close{background:var(--paper-2);border:1px solid var(--line);border-radius:10px;width:38px;height:38px;cursor:pointer;display:grid;place-items:center;color:var(--grau)}
+.drawer-close:hover{background:var(--paper-3);color:var(--ink)}
+.drawer-body{padding:24px;overflow:auto;flex:1}
+.drawer-foot{padding:16px 24px;background:var(--paper);border-top:1px solid var(--line);display:flex;gap:10px;flex-shrink:0;flex-wrap:wrap}
+
+/* Invoice detail */
+.inv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px}
+.inv-top .big{font-weight:800;font-size:25px;line-height:1;letter-spacing:-.5px}
+.inv-meta{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:14px;margin-bottom:20px}
+.inv-meta dt{color:var(--grau);font-weight:600}
+.inv-meta dd{text-align:right;font-weight:600}
+.posten{width:100%;border-collapse:collapse;margin-bottom:8px}
+.posten th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--grau-2);padding-bottom:8px;border-bottom:1px solid var(--line)}
+.posten th.r,.posten td.r{text-align:right}
+.posten td{padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.posten tfoot td{border:none;padding-top:14px;font-weight:800;font-size:15px}
+.posten tfoot .lbl{color:var(--grau);font-weight:700}
+.sum-line{font-size:13px;color:var(--grau);font-weight:600}
+
+/* Ticket thread */
+.thread{display:flex;flex-direction:column;gap:12px}
+.bubble{max-width:80%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.45;position:relative}
+.bubble .t{display:block;font-size:11px;margin-top:5px;opacity:.7}
+.bubble.kunde{align-self:flex-end;background:var(--blau);color:#fff;border-bottom-right-radius:4px}
+.bubble.werkstatt{align-self:flex-start;background:var(--paper);border:1px solid var(--line);border-bottom-left-radius:4px}
+.thread-sep{text-align:center;font-size:12px;color:var(--grau-2);font-weight:600;margin:4px 0}
+
+.empty{text-align:center;color:var(--grau);padding:40px 20px;font-size:14.5px}
+.empty svg{width:40px;height:40px;color:var(--grau-3);margin-bottom:12px}
+
+/* ============ PRINT ============ */
+#printArea{display:none}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{display:block;position:absolute;left:0;top:0;width:100%;padding:0}
+}
+
+/* ============ BOTTOM TAB-BAR (Mobile, Banking-App-Stil) ============ */
+.tabbar{display:none;position:fixed;bottom:0;left:0;right:0;z-index:95;background:rgba(255,255,255,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:7px 6px;padding-bottom:calc(7px + env(safe-area-inset-bottom));justify-content:space-around}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--grau-2);font-size:11px;font-weight:600;padding:6px 4px;border-radius:12px;position:relative;font-family:inherit}
+.tab svg{width:23px;height:23px}
+.tab.active{color:var(--blau)}
+.tab .tbadge{position:absolute;top:1px;left:calc(50% + 7px);background:var(--orange);color:#231700;font-size:9.5px;font-weight:800;min-width:15px;height:15px;border-radius:9px;display:grid;place-items:center;padding:0 3px;line-height:1}
+.tab .tbadge:empty{display:none}
+
+/* Bottom Sheet "Mehr" */
+.sheet-ov{position:fixed;inset:0;background:rgba(11,13,16,.45);z-index:96;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-ov.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:97;background:var(--paper);border-radius:22px 22px 0 0;padding:8px 16px;padding-bottom:calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.7,.2,1);box-shadow:0 -20px 60px -30px rgba(0,0,0,.5)}
+.sheet.on{transform:none}
+.sheet-grip{width:40px;height:5px;border-radius:3px;background:var(--line-2);margin:8px auto 12px}
+.sheet-item{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--line);cursor:pointer;padding:15px 6px;font-size:15.5px;font-weight:600;color:var(--ink);font-family:inherit;text-decoration:none}
+.sheet-item:last-child{border-bottom:none}
+.sheet-item svg{width:22px;height:22px;color:var(--grau);flex-shrink:0}
+.sheet-item .chev{margin-left:auto;color:var(--grau-3)}
+.sheet-item.danger{color:var(--orange-deep)}
+.sheet-item.danger svg{color:var(--orange-deep)}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:860px){
+  .grid-3{grid-template-columns:1fr 1fr}
+  .shell{grid-template-columns:1fr}
+  .sidebar{position:fixed;top:var(--topbar-h);left:0;bottom:0;width:248px;z-index:90;transform:translateX(-100%);transition:transform .25s;box-shadow:20px 0 60px -30px rgba(0,0,0,.4)}
+  .sidebar.open{transform:none}
+  .topbar .ptag{display:none}
+  .tabbar{display:flex}
+  .content{padding:22px 18px 100px}
+}
+@media(max-width:560px){
+  .grid-3,.grid-2{grid-template-columns:1fr}
+  .who,.avatar{display:none}
+  .topbar{padding:0 14px;gap:10px}
+  .topbar .logo{height:25px}
+  .btn-logout{padding:9px 11px}
+  .btn-logout .lo-txt{display:none}
+  .page-head h2{font-size:23px}
+  .tbl .hide-sm{display:none}
+  .drawer-foot{flex-direction:column}
+  .drawer-foot .btn,.drawer-foot a{width:100%}
+}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<!-- Logo 1:1 Vektor (gleiche Pfadgeometrie wie Startseite) -->
+<svg class="svg-defs" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><defs>
+<g id="kfz-logo"><g transform="translate(-443.75 -141.84)">
+<path d="M560.07 176.67L559.95 174.08C559.33 175.18 558.32 176.03 556.93 176.65C555.55 177.26 553.95 177.57 552.14 177.57C550.34 177.57 548.71 177.18 547.26 176.41C545.81 175.64 544.56 174.61 543.53 173.31C542.50 172.02 541.71 170.53 541.16 168.84C540.61 167.15 540.33 165.40 540.33 163.60C540.33 161.69 540.61 159.89 541.16 158.20C541.71 156.52 542.52 155.04 543.59 153.79C544.66 152.53 546.00 151.55 547.59 150.83C549.19 150.11 551.05 149.75 553.17 149.75C554.71 149.75 556.15 149.97 557.50 150.41C558.85 150.86 560.03 151.47 561.03 152.26C562.04 153.04 562.85 153.98 563.47 155.06C564.08 156.15 564.44 157.35 564.55 158.65L559.05 158.65C558.97 158.05 558.76 157.48 558.42 156.95C558.08 156.41 557.65 155.95 557.13 155.55C556.60 155.16 556.00 154.85 555.30 154.61C554.61 154.38 553.90 154.26 553.17 154.26C550.97 154.26 549.21 155.08 547.89 156.71C546.57 158.35 545.91 160.72 545.91 163.83C545.91 164.91 546.04 165.99 546.32 167.07C546.59 168.16 547.02 169.14 547.61 170.02C548.20 170.89 548.95 171.60 549.87 172.15C550.78 172.70 551.87 172.98 553.13 172.98C554.01 172.98 554.85 172.82 555.62 172.51C556.39 172.19 557.06 171.76 557.64 171.21C558.21 170.66 558.67 170.03 558.99 169.31C559.32 168.59 559.48 167.82 559.48 167.01L553.71 167.01L553.71 162.66L564.58 162.66L564.58 176.67L560.07 176.67" fill="#FBAF3A"/>
+<path d="M578.67 177.57C574.64 177.57 571.55 176.39 569.39 174.04C567.23 171.68 566.15 168.29 566.15 163.87C566.15 161.68 566.43 159.70 566.98 157.95C567.53 156.20 568.34 154.71 569.41 153.49C570.48 152.28 571.79 151.35 573.33 150.71C574.88 150.07 576.66 149.75 578.67 149.75C580.66 149.75 582.43 150.07 583.99 150.71C585.54 151.35 586.85 152.28 587.89 153.51C588.94 154.74 589.74 156.24 590.29 158.01C590.84 159.77 591.11 161.77 591.11 163.99C591.11 168.49 590.04 171.88 587.91 174.15C585.78 176.43 582.70 177.57 578.67 177.57M578.67 172.90C579.64 172.90 580.56 172.72 581.42 172.37C582.28 172.02 583.03 171.48 583.67 170.76C584.32 170.04 584.82 169.12 585.19 167.99C585.55 166.87 585.73 165.53 585.73 163.99C585.73 160.90 585.13 158.56 583.93 156.97C582.73 155.37 580.97 154.57 578.67 154.57C576.37 154.57 574.60 155.37 573.37 156.97C572.14 158.56 571.53 160.90 571.53 163.99C571.53 167.08 572.15 169.33 573.39 170.76C574.64 172.19 576.40 172.90 578.67 172.90" fill="#FBAF3A"/>
+<path d="M607.95 176.67L607.95 169.96C607.95 168.70 607.66 167.80 607.08 167.27C606.51 166.73 605.43 166.46 603.86 166.46L598.06 166.46L598.06 176.67L592.76 176.67L592.76 150.61L605.98 150.61C607.19 150.61 608.28 150.80 609.26 151.18C610.24 151.56 611.08 152.08 611.79 152.75C612.50 153.42 613.04 154.21 613.42 155.14C613.80 156.07 613.99 157.07 613.99 158.14C613.99 159.56 613.66 160.81 612.99 161.89C612.32 162.98 611.36 163.74 610.10 164.19C611.25 164.55 612.07 165.12 612.56 165.88C613.04 166.63 613.28 167.77 613.28 169.29L613.28 176.67L607.95 176.67M598.06 155.12L598.06 162.07L604.88 162.07C606.35 162.07 607.38 161.74 607.98 161.09C608.59 160.43 608.89 159.61 608.89 158.62C608.89 157.60 608.59 156.76 608.00 156.10C607.42 155.45 606.44 155.12 605.08 155.12L598.06 155.12" fill="#FBAF3A"/>
+<path d="M629.92 158.30C629.79 156.97 629.31 155.97 628.47 155.32C627.63 154.67 626.39 154.34 624.74 154.34C623.20 154.34 622.03 154.60 621.25 155.12C620.46 155.65 620.07 156.40 620.07 157.40C620.07 158.24 620.38 158.90 620.99 159.40C621.61 159.90 622.65 160.33 624.11 160.69C625.60 161.06 627.02 161.42 628.37 161.77C629.72 162.13 630.88 162.53 631.84 162.97C632.42 163.23 632.95 163.53 633.45 163.87C633.95 164.21 634.38 164.63 634.75 165.13C635.11 165.63 635.40 166.22 635.61 166.90C635.82 167.58 635.92 168.37 635.92 169.29C635.92 170.73 635.67 171.96 635.16 173.00C634.65 174.03 633.93 174.89 633.00 175.57C632.07 176.25 630.97 176.75 629.70 177.08C628.44 177.41 627.04 177.57 625.53 177.57C623.90 177.57 622.43 177.39 621.09 177.04C619.76 176.69 618.61 176.14 617.64 175.41C616.67 174.68 615.91 173.77 615.36 172.68C614.81 171.60 614.52 170.32 614.50 168.86L619.76 168.86C619.81 170.19 620.35 171.24 621.39 172.02C622.42 172.79 623.81 173.17 625.56 173.17C627.19 173.17 628.44 172.85 629.31 172.21C630.19 171.57 630.63 170.66 630.63 169.49C630.63 169.09 630.57 168.74 630.45 168.43C630.33 168.11 630.12 167.82 629.82 167.54C629.52 167.27 629.11 167.02 628.59 166.80C628.06 166.58 627.40 166.37 626.58 166.19C624.96 165.82 623.60 165.50 622.48 165.23C621.37 164.95 620.36 164.61 619.44 164.19C618.03 163.56 616.95 162.74 616.21 161.73C615.46 160.73 615.09 159.40 615.09 157.75C615.09 156.57 615.28 155.50 615.68 154.51C616.07 153.53 616.66 152.69 617.46 151.98C618.26 151.28 619.25 150.73 620.44 150.34C621.63 149.94 623.03 149.75 624.62 149.75C626.27 149.75 627.74 149.96 629.02 150.37C630.30 150.79 631.38 151.38 632.26 152.14C633.13 152.90 633.81 153.80 634.30 154.85C634.78 155.89 635.05 157.05 635.10 158.30L629.92 158.30" fill="#FBAF3A"/>
+<path d="M653.27 176.67L645.54 164.93L642.63 167.80L642.63 176.67L637.26 176.67L637.26 150.61L642.63 150.61L642.63 161.21L652.60 150.61L659.66 150.61L649.38 160.89L659.90 176.67L653.27 176.67" fill="#FBAF3A"/>
+<path d="M660.96 150.61H666.41V176.67H660.96Z" fill="#FBAF3A"/>
+<path d="M473.88 189.07L460.30 168.71L455.20 173.68L455.20 189.07L445.75 189.07L445.75 143.84L455.20 143.84L455.20 162.23L472.71 143.84L485.12 143.84L467.06 161.69L485.54 189.07L473.88 189.07" fill="#146DAB"/>
+<path d="M490.28 170.00L490.28 189.07L480.69 189.07L480.69 143.84L513.31 143.84L513.31 151.75L490.28 151.75L490.28 162.03L510.42 162.03L510.42 170.00L490.28 170.00" fill="#146DAB"/>
+<path d="M503.67 189.07L503.67 181.04L527.46 151.74L504.36 151.74L504.36 143.84L539.46 143.84L539.46 151.27L515.53 181.04L668.77 181.04L668.77 189.07L503.67 189.07" fill="#146DAB"/>
+<path d="M549.00 201.38L549.00 195.71L547.45 201.38L545.73 201.38L544.20 195.74L544.20 201.38L542.60 201.38L542.60 193.11L545.14 193.11L546.63 199.17L548.12 193.11L550.61 193.11L550.61 201.38L549.00 201.38" fill="#146DAB"/>
+<path d="M552.51 201.38L552.51 193.11L558.58 193.11L558.58 194.55L554.19 194.55L554.19 196.32L558.23 196.32L558.23 197.78L554.19 197.78L554.19 199.91L558.78 199.91L558.78 201.38L552.51 201.38" fill="#146DAB"/>
+<path d="M560.39 193.11H562.12V201.38H560.39Z" fill="#146DAB"/>
+<path d="M568.66 195.55C568.61 195.13 568.46 194.81 568.20 194.60C567.93 194.40 567.54 194.29 567.01 194.29C566.52 194.29 566.15 194.37 565.90 194.54C565.66 194.71 565.53 194.95 565.53 195.26C565.53 195.53 565.63 195.74 565.82 195.90C566.02 196.06 566.35 196.19 566.81 196.31C567.29 196.42 567.74 196.54 568.16 196.65C568.59 196.76 568.96 196.89 569.27 197.03C569.45 197.11 569.62 197.21 569.78 197.32C569.93 197.42 570.07 197.56 570.19 197.72C570.30 197.87 570.39 198.06 570.46 198.28C570.53 198.49 570.56 198.75 570.56 199.04C570.56 199.49 570.48 199.88 570.32 200.21C570.16 200.54 569.93 200.81 569.63 201.03C569.34 201.24 568.99 201.40 568.59 201.51C568.18 201.61 567.74 201.66 567.26 201.66C566.75 201.66 566.28 201.61 565.85 201.49C565.43 201.38 565.07 201.21 564.76 200.98C564.45 200.75 564.21 200.46 564.04 200.11C563.86 199.77 563.77 199.36 563.76 198.90L565.43 198.90C565.45 199.32 565.62 199.66 565.95 199.90C566.28 200.15 566.72 200.27 567.27 200.27C567.79 200.27 568.18 200.17 568.46 199.96C568.74 199.76 568.88 199.47 568.88 199.10C568.88 198.97 568.86 198.86 568.82 198.76C568.79 198.66 568.72 198.57 568.62 198.48C568.53 198.39 568.40 198.32 568.23 198.25C568.07 198.17 567.85 198.11 567.60 198.05C567.08 197.94 566.65 197.83 566.30 197.75C565.94 197.66 565.62 197.55 565.33 197.42C564.88 197.22 564.54 196.96 564.30 196.64C564.07 196.32 563.95 195.90 563.95 195.37C563.95 195.00 564.01 194.66 564.14 194.35C564.26 194.04 564.45 193.77 564.70 193.55C564.96 193.32 565.27 193.15 565.65 193.02C566.03 192.90 566.47 192.84 566.97 192.84C567.50 192.84 567.96 192.90 568.37 193.03C568.78 193.17 569.12 193.35 569.40 193.59C569.68 193.84 569.89 194.12 570.04 194.45C570.20 194.79 570.28 195.15 570.30 195.55L568.66 195.55" fill="#146DAB"/>
+<path d="M574.11 201.38L574.11 194.55L571.62 194.55L571.62 193.11L578.34 193.11L578.34 194.55L575.84 194.55L575.84 201.38L574.11 201.38" fill="#146DAB"/>
+<path d="M580.01 201.38L580.01 193.11L586.09 193.11L586.09 194.55L581.69 194.55L581.69 196.32L585.74 196.32L585.74 197.78L581.69 197.78L581.69 199.91L586.29 199.91L586.29 201.38L580.01 201.38" fill="#146DAB"/>
+<path d="M592.71 201.38L592.71 199.25C592.71 198.85 592.62 198.56 592.44 198.39C592.25 198.22 591.91 198.14 591.42 198.14L589.57 198.14L589.57 201.38L587.89 201.38L587.89 193.11L592.09 193.11C592.47 193.11 592.82 193.17 593.13 193.29C593.44 193.41 593.71 193.58 593.93 193.79C594.15 194.00 594.33 194.25 594.45 194.55C594.57 194.84 594.63 195.16 594.63 195.50C594.63 195.95 594.52 196.34 594.31 196.69C594.10 197.03 593.79 197.28 593.40 197.42C593.76 197.53 594.02 197.71 594.17 197.95C594.33 198.19 594.40 198.55 594.40 199.04L594.40 201.38L592.71 201.38M589.57 194.54L589.57 196.74L591.74 196.74C592.20 196.74 592.53 196.64 592.72 196.43C592.91 196.23 593.01 195.96 593.01 195.65C593.01 195.33 592.92 195.06 592.73 194.85C592.54 194.65 592.23 194.54 591.80 194.54L589.57 194.54" fill="#146DAB"/>
+<path d="M602.32 201.38L601.04 196.00L599.73 201.38L598.11 201.38L595.77 193.11L597.62 193.11L598.97 198.46L600.12 193.11L601.94 193.11L603.19 198.46L604.54 193.11L606.31 193.11L603.99 201.38L602.32 201.38" fill="#146DAB"/>
+<path d="M607.94 201.38L607.94 193.11L614.01 193.11L614.01 194.55L609.62 194.55L609.62 196.32L613.66 196.32L613.66 197.78L609.62 197.78L609.62 199.91L614.21 199.91L614.21 201.38L607.94 201.38" fill="#146DAB"/>
+<path d="M620.64 201.38L620.64 199.25C620.64 198.85 620.54 198.56 620.36 198.39C620.18 198.22 619.84 198.14 619.34 198.14L617.50 198.14L617.50 201.38L615.82 201.38L615.82 193.11L620.01 193.11C620.40 193.11 620.74 193.17 621.05 193.29C621.37 193.41 621.63 193.58 621.86 193.79C622.08 194.00 622.25 194.25 622.37 194.55C622.49 194.84 622.55 195.16 622.55 195.50C622.55 195.95 622.45 196.34 622.24 196.69C622.02 197.03 621.72 197.28 621.32 197.42C621.69 197.53 621.95 197.71 622.10 197.95C622.25 198.19 622.33 198.55 622.33 199.04L622.33 201.38L620.64 201.38M617.50 194.54L617.50 196.74L619.67 196.74C620.13 196.74 620.46 196.64 620.65 196.43C620.84 196.23 620.94 195.96 620.94 195.65C620.94 195.33 620.84 195.06 620.66 194.85C620.47 194.65 620.16 194.54 619.73 194.54L617.50 194.54" fill="#146DAB"/>
+<path d="M629.35 201.38L626.90 197.65L625.98 198.56L625.98 201.38L624.27 201.38L624.27 193.11L625.98 193.11L625.98 196.47L629.14 193.11L631.38 193.11L628.12 196.37L631.46 201.38L629.35 201.38" fill="#146DAB"/>
+<path d="M637.25 195.55C637.20 195.13 637.05 194.81 636.79 194.60C636.52 194.40 636.13 194.29 635.60 194.29C635.11 194.29 634.74 194.37 634.49 194.54C634.25 194.71 634.12 194.95 634.12 195.26C634.12 195.53 634.22 195.74 634.41 195.90C634.61 196.06 634.94 196.19 635.40 196.31C635.88 196.42 636.33 196.54 636.75 196.65C637.18 196.76 637.55 196.89 637.86 197.03C638.04 197.11 638.21 197.21 638.37 197.32C638.52 197.42 638.66 197.56 638.78 197.72C638.89 197.87 638.98 198.06 639.05 198.28C639.12 198.49 639.15 198.75 639.15 199.04C639.15 199.49 639.07 199.88 638.91 200.21C638.75 200.54 638.52 200.81 638.22 201.03C637.93 201.24 637.58 201.40 637.18 201.51C636.77 201.61 636.33 201.66 635.85 201.66C635.34 201.66 634.87 201.61 634.44 201.49C634.02 201.38 633.66 201.21 633.35 200.98C633.04 200.75 632.80 200.46 632.63 200.11C632.45 199.77 632.36 199.36 632.35 198.90L634.02 198.90C634.04 199.32 634.21 199.66 634.54 199.90C634.87 200.15 635.31 200.27 635.86 200.27C636.38 200.27 636.77 200.17 637.05 199.96C637.33 199.76 637.47 199.47 637.47 199.10C637.47 198.97 637.45 198.86 637.41 198.76C637.38 198.66 637.31 198.57 637.21 198.48C637.12 198.39 636.99 198.32 636.82 198.25C636.66 198.17 636.44 198.11 636.19 198.05C635.67 197.94 635.24 197.83 634.89 197.75C634.53 197.66 634.21 197.55 633.92 197.42C633.47 197.22 633.13 196.96 632.89 196.64C632.66 196.32 632.54 195.90 632.54 195.37C632.54 195.00 632.60 194.66 632.73 194.35C632.85 194.04 633.04 193.77 633.29 193.55C633.55 193.32 633.86 193.15 634.24 193.02C634.62 192.90 635.06 192.84 635.56 192.84C636.09 192.84 636.55 192.90 636.96 193.03C637.37 193.17 637.71 193.35 637.99 193.59C638.27 193.84 638.48 194.12 638.63 194.45C638.79 194.79 638.87 195.15 638.89 195.55L637.25 195.55" fill="#146DAB"/>
+<path d="M642.70 201.38L642.70 194.55L640.21 194.55L640.21 193.11L646.93 193.11L646.93 194.55L644.43 194.55L644.43 201.38L642.70 201.38" fill="#146DAB"/>
+<path d="M652.19 201.38L651.66 199.67L648.61 199.67L648.03 201.38L646.20 201.38L649.15 193.11L651.15 193.11L654.07 201.38L652.19 201.38M650.13 194.96L650.12 194.96L649.06 198.25L651.17 198.25L650.13 194.96" fill="#146DAB"/>
+<path d="M655.86 201.38L655.86 194.55L653.37 194.55L653.37 193.11L660.09 193.11L660.09 194.55L657.59 194.55L657.59 201.38L655.86 201.38" fill="#146DAB"/>
+<path d="M664.08 201.38L664.08 194.55L661.59 194.55L661.59 193.11L668.31 193.11L668.31 194.55L665.81 194.55L665.81 201.38L664.08 201.38" fill="#146DAB"/>
+</g></g>
+</defs></svg>
+
+<!-- ============ LOGIN ============ -->
+<div class="login" id="login">
+  <form class="login-card" id="loginForm" autocomplete="off">
+    <svg class="login-logo" viewBox="0 0 227.03 61.82" role="img" aria-label="KFZ Gorski Meisterwerkstatt"><use href="#kfz-logo"></use></svg>
+    <h1>Kundenportal</h1>
+    <p class="sub">Ihre Rechnungen, Termine & Anfragen an einem Ort.</p>
+    <div class="field">
+      <label for="kdnr">Kundennummer</label>
+      <input id="kdnr" type="text" value="KD-10428" inputmode="text">
+    </div>
+    <div class="field">
+      <label for="pin">Code / PIN</label>
+      <input id="pin" type="password" value="0000">
+    </div>
+    <button class="btn btn-primary" type="submit">Anmelden</button>
+    <span class="demo-link" id="demoLogin">↪ Direkt als Demo-Kunde ansehen</span>
+    <div class="login-hint">🔒 <b>Prototyp:</b> Demo-Zugang ist vorausgefüllt. Hier kommt später die echte Anmeldung (z. B. Code per WhatsApp/SMS). Daten dieses Prototyps liegen nur in Ihrem Browser.</div>
+  </form>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <button class="hamb" id="hamb" aria-label="Menü"><span></span><span></span><span></span></button>
+      <svg class="logo" viewBox="0 0 227.03 61.82" role="img" aria-label="KFZ Gorski"><use href="#kfz-logo"></use></svg>
+      <span class="ptag">Kundenportal</span>
+    </div>
+    <div class="right">
+      <div class="who"><b id="who-name">Max Mustermann</b><small id="who-nr">KD-10428</small></div>
+      <div class="avatar" id="avatar">MM</div>
+      <button class="bw-toggle" id="bwToggle" type="button" aria-label="Schwarz-Weiß-Modus" title="Schwarz-Weiß-Modus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></button>
+      <button class="btn-logout" id="logout" aria-label="Abmelden"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lo-txt">Abmelden</span></button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="nav-group">Übersicht</div>
+      <button class="navitem active" data-page="uebersicht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Start</button>
+      <div class="nav-group" style="margin-top:18px">Mein Konto</div>
+      <button class="navitem" data-page="rechnungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>Rechnungen<span class="count" id="c-rech"></span></button>
+      <button class="navitem" data-page="tickets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/></svg>WhatsApp-Tickets<span class="count" id="c-tick"></span></button>
+      <button class="navitem" data-page="termine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>Termine & Service</button>
+      <button class="navitem" data-page="fahrzeuge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><path d="M5 11h14v6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><circle cx="7.5" cy="14.5" r="1"/><circle cx="16.5" cy="14.5" r="1"/></svg>Fahrzeuge</button>
+      <button class="navitem" data-page="notizen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h14a1 1 0 0 1 1 1v16l-4-2.5L12 20l-4-2.5L4 20V4a1 1 0 0 1 1-1z"/><path d="M9 8h6M9 12h4"/></svg>Notizen</button>
+      <div style="margin-top:22px;padding:0 4px">
+        <a class="btn btn-ghost btn-sm" href="index.html" style="width:100%">← Zur Website</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <!-- ÜBERSICHT -->
+      <section class="page on" id="page-uebersicht">
+        <div class="page-head"><h2>Hallo <span id="greet">Max</span> 👋</h2><p>Schön, dass Sie da sind. Hier Ihr Überblick.</p></div>
+        <div class="grid grid-3" style="margin-bottom:18px">
+          <div class="card stat"><div class="ic o"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/></svg></div><div class="v" id="s-open-amount">–</div><div class="l"><span id="s-open-count">0</span> offene Rechnung(en)</div></div>
+          <div class="card stat"><div class="ic b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/></svg></div><div class="v" id="s-tickets">0</div><div class="l">offene WhatsApp-Tickets</div></div>
+          <div class="card stat"><div class="ic d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div><div class="v" id="s-next" style="font-size:20px;letter-spacing:-.3px">–</div><div class="l">nächster Termin</div></div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-h"><h3>Letzte Aktivität</h3></div>
+            <div class="list" id="ov-activity"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><h3>Schnellaktionen</h3></div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <a class="btn btn-primary" id="qa-wa" href="#" style="justify-content:flex-start"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>Neue Anfrage per WhatsApp</a>
+              <button class="btn btn-ghost" data-goto="rechnungen" style="justify-content:flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg>Rechnungen ansehen</button>
+              <button class="btn btn-ghost" data-goto="termine" style="justify-content:flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>Termine & Service-Historie</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECHNUNGEN -->
+      <section class="page" id="page-rechnungen">
+        <div class="page-head"><h2>Rechnungen</h2><p>Alle Rechnungen mit Status. Klicken zum Öffnen, Drucken oder als PDF speichern.</p></div>
+        <div class="card" style="padding:14px 8px">
+          <table class="tbl"><thead><tr><th>Nr.</th><th class="hide-sm">Datum</th><th class="hide-sm">Fahrzeug</th><th>Betrag</th><th>Status</th><th></th></tr></thead>
+          <tbody id="rech-body"></tbody></table>
+        </div>
+      </section>
+
+      <!-- TICKETS -->
+      <section class="page" id="page-tickets">
+        <div class="page-head"><h2>WhatsApp-Tickets</h2><p>Ihre Anfragen aus dem Termin-Konfigurator – mit Status und Verlauf.</p></div>
+        <div class="list" id="tick-list"></div>
+      </section>
+
+      <!-- TERMINE -->
+      <section class="page" id="page-termine">
+        <div class="page-head"><h2>Termine & Service</h2><p>Anstehende Termine und Ihre komplette Service-Historie.</p></div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="card-h"><h3>Anstehende Termine</h3></div>
+          <div class="list" id="term-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>Service-Historie</h3></div>
+          <div class="timeline" id="hist-list"></div>
+        </div>
+      </section>
+
+      <!-- FAHRZEUGE -->
+      <section class="page" id="page-fahrzeuge">
+        <div class="page-head"><h2>Fahrzeuge</h2><p>Ihre hinterlegten Fahrzeuge inkl. Dokumenten.</p></div>
+        <div class="grid" id="veh-list" style="gap:18px"></div>
+      </section>
+
+      <!-- NOTIZEN -->
+      <section class="page" id="page-notizen">
+        <div class="page-head"><h2>Notizen</h2><p>Persönliche Notizen zu Ihrem Fahrzeug oder offenen Punkten. Werden im Browser gespeichert.</p></div>
+        <form class="note-form" id="note-form">
+          <textarea id="note-input" placeholder="Neue Notiz … z. B. „Beim nächsten Termin bitte Scheibenwischer prüfen.“"></textarea>
+          <button class="btn btn-primary" type="submit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>Hinzufügen</button>
+        </form>
+        <div class="list" id="note-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Bottom Tab-Bar (Mobile) -->
+  <nav class="tabbar" aria-label="Hauptnavigation">
+    <button class="tab active" data-page="uebersicht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8M5 10v10h14V10" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Start</span></button>
+    <button class="tab" data-page="rechnungen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg><span>Rechnungen</span><span class="tbadge" id="t-rech"></span></button>
+    <button class="tab" data-page="tickets"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/></svg><span>Tickets</span><span class="tbadge" id="t-tick"></span></button>
+    <button class="tab" id="tab-mehr"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg><span>Mehr</span></button>
+  </nav>
+</div>
+
+<!-- Bottom Sheet „Mehr" -->
+<div class="sheet-ov" id="sheetOv"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Weitere Bereiche">
+  <div class="sheet-grip"></div>
+  <button class="sheet-item" data-page="termine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>Termine &amp; Service<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="sheet-item" data-page="fahrzeuge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><path d="M5 11h14v6a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><circle cx="7.5" cy="14.5" r="1"/><circle cx="16.5" cy="14.5" r="1"/></svg>Fahrzeuge<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="sheet-item" data-page="notizen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h14a1 1 0 0 1 1 1v16l-4-2.5L12 20l-4-2.5L4 20V4a1 1 0 0 1 1-1z"/><path d="M9 8h6M9 12h4"/></svg>Notizen<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <a class="sheet-item" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6v6M20 4l-9 9" stroke-linecap="round" stroke-linejoin="round"/></svg>Zur Website</a>
+  <button class="sheet-item danger" id="sheet-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></svg>Abmelden</button>
+</div>
+
+<!-- Drawer + Overlay -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Detailansicht">
+  <div class="drawer-head"><h3 id="drawer-title">Detail</h3><button class="drawer-close" id="drawer-close" aria-label="Schließen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg></button></div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-foot" id="drawer-foot"></div>
+</aside>
+
+<!-- versteckter Druckbereich -->
+<div id="printArea"></div>
+
+<script>
+/* ===== 🔧 anpassen ===== */
+const KONFIG = { whatsappNummer:"491701234567" };
+
+/* ===== Demo-Daten ===== */
+const SEED = {
+  kunde:{ name:"Max Mustermann", nr:"KD-10428", tel:"+49 170 1234567", email:"max.mustermann@example.de", seit:2021 },
+  fahrzeuge:[
+    { marke:"VW Golf 7 1.4 TSI", kennz:"BS-MG 123", bj:2016, km:98230, hu:"05/2027", vin:"WVWZZZ1KZGW••••••",
+      dokumente:["Serviceheft (digital)","HU-Bericht 05/2025","Rechnung R-2026-0142"] },
+    { marke:"VW Golf 7 (Zweitwagen)", kennz:"BS-MG 124", bj:2014, km:142500, hu:"11/2026", vin:"WVWZZZ1KZEW••••••",
+      dokumente:["Serviceheft (digital)"] }
+  ],
+  rechnungen:[
+    { id:"R-2026-0142", datum:"2026-05-20", status:"offen", faellig:"2026-06-03", fahrzeug:"VW Golf 7 (BS-MG 123)",
+      posten:[ {t:"Inspektion nach Herstellervorgabe",m:1,e:189.00},{t:"Longlife-Öl 5W-30 (5 L)",m:1,e:79.50},{t:"Ölfilter + Dichtungen",m:1,e:24.90},{t:"Arbeitslohn (1,2 Std.)",m:1.2,e:65.00} ] },
+    { id:"R-2026-0091", datum:"2026-03-12", status:"bezahlt", faellig:"2026-03-26", fahrzeug:"VW Golf 7 (BS-MG 123)",
+      posten:[ {t:"Klimaservice inkl. Kältemittel R1234yf",m:1,e:119.00},{t:"Innenraumfilter",m:1,e:23.80} ] },
+    { id:"R-2025-0377", datum:"2025-11-02", status:"bezahlt", faellig:"2025-11-16", fahrzeug:"VW Golf 7 (BS-MG 124)",
+      posten:[ {t:"Bremsscheiben hinten (Satz)",m:1,e:198.00},{t:"Bremsbeläge hinten (Satz)",m:1,e:84.50},{t:"Arbeitslohn (2,5 Std.)",m:2.5,e:65.00},{t:"Kleinteile",m:1,e:24.90} ] }
+  ],
+  tickets:[
+    { id:"T-512", betreff:"Klimaservice – Anfrage", status:"neu", erstellt:"2026-06-02", leistung:"Klimaservice", fahrzeug:"VW Golf 7 (BS-MG 123)",
+      verlauf:[ {von:"kunde",zeit:"02.06. 18:22",text:"Hallo, die Klimaanlage kühlt nicht mehr richtig. Können wir einen Klimaservice machen?"} ] },
+    { id:"T-507", betreff:"Bremsen quietschen vorne links", status:"in Arbeit", erstellt:"2026-06-01", leistung:"Bremsen", fahrzeug:"VW Golf 7 (BS-MG 123)",
+      verlauf:[ {von:"kunde",zeit:"01.06. 09:14",text:"Guten Morgen, meine Bremsen quietschen vorne links beim Anhalten."},
+                {von:"werkstatt",zeit:"01.06. 09:41",text:"Moin Herr Mustermann! Klingt nach Belägen. Kommen Sie Di 09.06. zwischen 8–11 Uhr vorbei? Wir schauen direkt drauf."},
+                {von:"kunde",zeit:"01.06. 09:52",text:"Perfekt, dann bis Dienstag. Danke!"},
+                {von:"werkstatt",zeit:"01.06. 09:55",text:"Top, Termin ist notiert. Bis dann 👍"} ] },
+    { id:"T-498", betreff:"Inspektion + Ölwechsel", status:"erledigt", erstellt:"2026-05-14", leistung:"Inspektion, Ölwechsel", fahrzeug:"VW Golf 7 (BS-MG 123)",
+      verlauf:[ {von:"kunde",zeit:"14.05. 11:03",text:"Bräuchte die fällige Inspektion + Ölwechsel."},
+                {von:"werkstatt",zeit:"14.05. 11:20",text:"Klar, passt Ihnen der 20.05. vormittags?"},
+                {von:"kunde",zeit:"14.05. 11:25",text:"Ja, super."},
+                {von:"werkstatt",zeit:"20.05. 16:10",text:"Alles erledigt, Wagen ist fertig & gewaschen. Rechnung R-2026-0142 liegt im Portal. 🙂"} ] }
+  ],
+  termine:[
+    { datum:"2026-06-09", zeit:"08:00 – 11:00", titel:"Bremsen-Check vorne", fahrzeug:"VW Golf 7 (BS-MG 123)", status:"bestätigt" }
+  ],
+  historie:[
+    { datum:"2026-05-20", titel:"Inspektion & Ölwechsel", km:98230 },
+    { datum:"2026-03-12", titel:"Klimaservice", km:95110 },
+    { datum:"2025-11-02", titel:"Bremsen hinten erneuert", km:91020 },
+    { datum:"2025-05-08", titel:"HU/AU + Inspektion", km:84300 }
+  ],
+  notizen:[
+    { id:"seed-n1", datum:"2026-05-21", text:"Beim nächsten Service bitte Winterreifen-Einlagerung anfragen." }
+  ]
+};
+
+/* ===== Persistenz (localStorage) ===== */
+const LS = "kfzgorski_portal_v1";
+function loadStore(){
+  try{ const s = JSON.parse(localStorage.getItem(LS)); if(s) return s; }catch(e){}
+  const init = { notizen: SEED.notizen.slice(), bezahlt: {} };
+  saveStore(init); return init;
+}
+function saveStore(s){ try{ localStorage.setItem(LS, JSON.stringify(s)); }catch(e){} }
+let store = loadStore();
+
+/* effektiver Status einer Rechnung (Demo: „bezahlt markieren" merken) */
+function rechStatus(r){ return store.bezahlt[r.id] ? "bezahlt" : r.status; }
+
+/* ===== Helpers ===== */
+const $ = (s,el)=> (el||document).querySelector(s);
+const $$ = (s,el)=> Array.from((el||document).querySelectorAll(s));
+const eur = n => n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+function dDE(iso){ const d=new Date(iso+"T00:00:00"); if(isNaN(d)) return iso; return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear(); }
+function dShort(iso){ const d=new Date(iso+"T00:00:00"); const W=["So","Mo","Di","Mi","Do","Fr","Sa"]; return W[d.getDay()]+" "+String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0"); }
+function rTotal(r){ return r.posten.reduce((s,p)=> s + p.m*p.e, 0); }
+function esc(t){ const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
+function badge(status){
+  const m = { "offen":"warn","neu":"warn","in Arbeit":"info","bezahlt":"done","erledigt":"done","bestätigt":"info" };
+  return '<span class="badge '+(m[status]||"muted")+'">'+esc(status)+'</span>';
+}
+const waURL = (txt)=> "https://wa.me/"+KONFIG.whatsappNummer+"?text="+encodeURIComponent(txt);
+
+/* ===== LOGIN ===== */
+const loginEl=$("#login"), appEl=$("#app");
+function doLogin(){
+  loginEl.style.display="none"; appEl.classList.add("on");
+  sessionStorage.setItem("kfz_portal_in","1");
+  renderAll();
+}
+$("#loginForm").addEventListener("submit", e=>{ e.preventDefault(); doLogin(); });
+$("#demoLogin").addEventListener("click", doLogin);
+$("#logout").addEventListener("click", ()=>{ sessionStorage.removeItem("kfz_portal_in"); location.reload(); });
+(function(){ const b=$("#bwToggle"); if(!b) return; b.addEventListener("click", ()=>{ const on=!document.documentElement.classList.contains("bw"); document.documentElement.classList.toggle("bw", on); try{ localStorage.setItem("kfz_bw", on?"1":"0"); }catch(e){} }); })();
+if(sessionStorage.getItem("kfz_portal_in")==="1"){ doLogin(); }
+
+/* ===== Navigation ===== */
+const TABPAGES = ["uebersicht","rechnungen","tickets"];
+function goto(page){
+  $$(".navitem").forEach(b=> b.classList.toggle("active", b.dataset.page===page));
+  $$(".page").forEach(p=> p.classList.toggle("on", p.id==="page-"+page));
+  $$(".tab").forEach(t=>{ t.classList.toggle("active", t.dataset.page===page || (t.id==="tab-mehr" && TABPAGES.indexOf(page)<0)); });
+  $("#sidebar").classList.remove("open");
+  closeSheet();
+  document.querySelector(".content").scrollTo?.(0,0);
+  window.scrollTo(0,0);
+}
+$$(".navitem").forEach(b=> b.dataset.page && b.addEventListener("click", ()=> goto(b.dataset.page)));
+$$(".tab[data-page]").forEach(t=> t.addEventListener("click", ()=> goto(t.dataset.page)));
+$$("[data-goto]").forEach(b=> b.addEventListener("click", ()=> goto(b.dataset.goto)));
+const hambBtn=$("#hamb"); if(hambBtn) hambBtn.addEventListener("click", ()=> $("#sidebar").classList.toggle("open"));
+
+/* Bottom-Sheet „Mehr" */
+const sheet=$("#sheet"), sheetOv=$("#sheetOv");
+function openSheet(){ if(sheet){ sheet.classList.add("on"); sheetOv.classList.add("on"); } }
+function closeSheet(){ if(sheet){ sheet.classList.remove("on"); sheetOv.classList.remove("on"); } }
+const mehrBtn=$("#tab-mehr"); if(mehrBtn) mehrBtn.addEventListener("click", openSheet);
+if(sheetOv) sheetOv.addEventListener("click", closeSheet);
+$$(".sheet-item[data-page]").forEach(b=> b.addEventListener("click", ()=> goto(b.dataset.page)));
+const sheetLogout=$("#sheet-logout"); if(sheetLogout) sheetLogout.addEventListener("click", ()=>{ sessionStorage.removeItem("kfz_portal_in"); location.reload(); });
+
+/* ===== Drawer ===== */
+const overlay=$("#overlay"), drawer=$("#drawer");
+function openDrawer(title, bodyHTML, footHTML){
+  $("#drawer-title").textContent=title;
+  $("#drawer-body").innerHTML=bodyHTML;
+  $("#drawer-foot").innerHTML=footHTML||"";
+  overlay.classList.add("on"); drawer.classList.add("on");
+  document.body.style.overflow="hidden";
+}
+function closeDrawer(){ overlay.classList.remove("on"); drawer.classList.remove("on"); document.body.style.overflow=""; }
+overlay.addEventListener("click", closeDrawer);
+$("#drawer-close").addEventListener("click", closeDrawer);
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeDrawer(); $("#sidebar").classList.remove("open"); } });
+
+/* ===== RENDER ===== */
+function renderAll(){
+  const k=SEED.kunde;
+  $("#who-name").textContent=k.name; $("#who-nr").textContent=k.nr;
+  $("#greet").textContent=k.name.split(" ")[0];
+  $("#avatar").textContent=k.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+  $("#qa-wa").href=waURL("Hallo KFZ Gorski, hier "+k.name+" ("+k.nr+"). Ich habe eine Frage:");
+  renderUebersicht(); renderRechnungen(); renderTickets(); renderTermine(); renderFahrzeuge(); renderNotizen();
+  updateCounts();
+}
+function updateCounts(){
+  const offen = SEED.rechnungen.filter(r=> rechStatus(r)==="offen").length;
+  const tOpen = SEED.tickets.filter(t=> t.status!=="erledigt").length;
+  $("#c-rech").textContent = offen||""; $("#c-rech").style.display = offen? "":"none";
+  $("#c-tick").textContent = tOpen||""; $("#c-tick").style.display = tOpen? "":"none";
+  const tr=$("#t-rech"); if(tr) tr.textContent = offen||"";
+  const tt=$("#t-tick"); if(tt) tt.textContent = tOpen||"";
+}
+
+/* — Übersicht — */
+function renderUebersicht(){
+  const offen = SEED.rechnungen.filter(r=> rechStatus(r)==="offen");
+  const sum = offen.reduce((s,r)=> s+rTotal(r),0);
+  $("#s-open-amount").textContent = offen.length? eur(sum) : "0 €";
+  $("#s-open-count").textContent = offen.length;
+  $("#s-tickets").textContent = SEED.tickets.filter(t=> t.status!=="erledigt").length;
+  const next = SEED.termine[0];
+  $("#s-next").textContent = next? dShort(next.datum) : "–";
+  // Aktivität
+  const acts=[];
+  SEED.tickets.forEach(t=> acts.push({d:t.erstellt, t:"Ticket "+t.id+": "+t.betreff, s:t.status, ic:"wa"}));
+  SEED.rechnungen.forEach(r=> acts.push({d:r.datum, t:"Rechnung "+r.id, s:rechStatus(r), ic:"inv"}));
+  acts.sort((a,b)=> b.d.localeCompare(a.d));
+  $("#ov-activity").innerHTML = acts.slice(0,5).map(a=>(
+    '<div class="litem" style="cursor:default"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'+
+    (a.ic==="wa"? '<path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 20l1-3.5A8.4 8.4 0 1 1 21 11.5z"/>' : '<path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/>')+
+    '</svg></div><div class="body"><b style="font-size:14.5px">'+esc(a.t)+'</b><small>'+dDE(a.d)+'</small></div><div class="meta">'+badge(a.s)+'</div></div>'
+  )).join("");
+}
+
+/* — Rechnungen — */
+function renderRechnungen(){
+  $("#rech-body").innerHTML = SEED.rechnungen.map((r,i)=>{
+    const st=rechStatus(r);
+    return '<tr data-i="'+i+'"><td class="num">'+r.id+'</td><td class="hide-sm muted">'+dDE(r.datum)+'</td><td class="hide-sm muted">'+esc(r.fahrzeug)+
+      '</td><td class="amount">'+eur(rTotal(r))+'</td><td>'+badge(st)+'</td><td><span class="rowlink">Öffnen ›</span></td></tr>';
+  }).join("");
+  $$("#rech-body tr").forEach(tr=> tr.addEventListener("click", ()=> openInvoice(+tr.dataset.i)));
+}
+function invoiceHTML(r){
+  const st=rechStatus(r), netto=rTotal(r)/1.19, mwst=rTotal(r)-netto;
+  return '<div class="inv-top"><div><div class="big">'+r.id+'</div><div style="color:var(--grau);font-size:13.5px;margin-top:4px">Rechnungsdatum '+dDE(r.datum)+'</div></div>'+badge(st)+'</div>'+
+  '<dl class="inv-meta"><dt>Fahrzeug</dt><dd>'+esc(r.fahrzeug)+'</dd><dt>Fällig bis</dt><dd>'+dDE(r.faellig)+'</dd><dt>Kunde</dt><dd>'+esc(SEED.kunde.name)+'</dd></dl>'+
+  '<table class="posten"><thead><tr><th>Position</th><th class="r">Menge</th><th class="r">Einzel</th><th class="r">Gesamt</th></tr></thead><tbody>'+
+  r.posten.map(p=> '<tr><td>'+esc(p.t)+'</td><td class="r">'+p.m.toLocaleString("de-DE")+'</td><td class="r">'+eur(p.e)+'</td><td class="r">'+eur(p.m*p.e)+'</td></tr>').join("")+
+  '</tbody><tfoot><tr><td colspan="3" class="r lbl sum-line">Netto</td><td class="r sum-line">'+eur(netto)+'</td></tr>'+
+  '<tr><td colspan="3" class="r lbl sum-line">zzgl. 19 % MwSt.</td><td class="r sum-line">'+eur(mwst)+'</td></tr>'+
+  '<tr><td colspan="3" class="r lbl">Gesamtbetrag</td><td class="r">'+eur(rTotal(r))+'</td></tr></tfoot></table>';
+}
+function openInvoice(i){
+  const r=SEED.rechnungen[i], st=rechStatus(r);
+  const foot = '<button class="btn btn-dark" id="d-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>Drucken / PDF</button>'+
+    (st==="offen"? '<button class="btn btn-primary" id="d-pay">Als bezahlt markieren</button>' : '<span class="badge done" style="align-self:center">✓ bezahlt</span>');
+  openDrawer("Rechnung "+r.id, invoiceHTML(r), foot);
+  $("#d-print").addEventListener("click", ()=> printInvoice(r));
+  const pay=$("#d-pay"); if(pay) pay.addEventListener("click", ()=>{ store.bezahlt[r.id]=true; saveStore(store); renderRechnungen(); renderUebersicht(); updateCounts(); openInvoice(i); });
+}
+function printInvoice(r){
+  const k=SEED.kunde;
+  $("#printArea").innerHTML =
+    '<div style="font-family:Hanken Grotesk,sans-serif;max-width:680px;margin:0 auto;padding:24px;color:#0B0D10">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #146DAB;padding-bottom:14px;margin-bottom:18px">'+
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:30px"><span style="color:#146DAB">KFZ</span> <span style="color:#FBAF3A">GORSKI</span><div style="font-size:11px;letter-spacing:3px;color:#878D97">MEISTERWERKSTATT</div></div>'+
+      '<div style="text-align:right;font-size:12px;color:#565C66">Musterstraße 1 · 38100 Braunschweig<br>'+esc(KONFIG.whatsappNummer)+'</div></div>'+
+    '<h2 style="font-size:20px;margin-bottom:4px">Rechnung '+r.id+'</h2>'+
+    '<div style="font-size:13px;color:#565C66;margin-bottom:16px">Datum '+dDE(r.datum)+' · Fällig '+dDE(r.faellig)+'<br>'+esc(k.name)+' · '+esc(k.nr)+' · '+esc(r.fahrzeug)+'</div>'+
+    invoiceHTML(r).replace(/class="[^"]*"/g,"").replace(/<span[^>]*badge[^>]*>.*?<\/span>/,"")+
+    '<p style="font-size:11px;color:#878D97;margin-top:24px">Prototyp-Beleg · keine gültige Rechnung. Vor Livegang mit echten Steuer-/Pflichtangaben versehen.</p></div>';
+  window.print();
+}
+
+/* — Tickets — */
+function renderTickets(){
+  $("#tick-list").innerHTML = SEED.tickets.map((t,i)=>{
+    const last=t.verlauf[t.verlauf.length-1];
+    return '<div class="litem" data-i="'+i+'"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 20l1-3.5A8.4 8.4 0 1 1 21 11.5z"/></svg></div>'+
+      '<div class="body"><b>'+esc(t.betreff)+'</b><small>'+esc(t.id)+' · '+esc((last.von==="kunde"?"Sie: ":"Werkstatt: ")+last.text)+'</small></div>'+
+      '<div class="meta">'+badge(t.status)+'<span class="when">'+dDE(t.erstellt)+'</span></div></div>';
+  }).join("");
+  $$("#tick-list .litem").forEach(el=> el.addEventListener("click", ()=> openTicket(+el.dataset.i)));
+}
+function openTicket(i){
+  const t=SEED.tickets[i];
+  const body='<div style="margin-bottom:16px;font-size:13.5px;color:var(--grau)">'+badge(t.status)+' &nbsp; '+esc(t.id)+' · '+esc(t.fahrzeug)+'<br><b style="color:var(--ink)">Leistung:</b> '+esc(t.leistung)+'</div>'+
+    '<div class="thread"><div class="thread-sep">erstellt am '+dDE(t.erstellt)+'</div>'+
+    t.verlauf.map(m=> '<div class="bubble '+m.von+'">'+esc(m.text)+'<span class="t">'+esc(m.zeit)+(m.von==="kunde"?" · Sie":" · Werkstatt")+'</span></div>').join("")+'</div>';
+  const foot='<a class="btn btn-primary" target="_blank" rel="noopener" href="'+waURL("Hallo KFZ Gorski, zu meinem Ticket "+t.id+" ("+t.betreff+"):")+'"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2z"/></svg>In WhatsApp fortsetzen</a>';
+  openDrawer("Ticket "+t.id, body, foot);
+}
+
+/* — Termine + Historie — */
+function renderTermine(){
+  const tl=$("#term-list");
+  if(!SEED.termine.length){ tl.innerHTML='<div class="empty">Aktuell keine Termine.</div>'; }
+  else tl.innerHTML = SEED.termine.map(a=>(
+    '<div class="litem" style="cursor:default"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div>'+
+    '<div class="body"><b>'+esc(a.titel)+'</b><small>'+esc(a.fahrzeug)+'</small></div>'+
+    '<div class="meta">'+badge(a.status)+'<span class="when">'+dShort(a.datum)+' · '+esc(a.zeit)+'</span></div></div>'
+  )).join("");
+  $("#hist-list").innerHTML = SEED.historie.map(h=>(
+    '<div class="tl"><div class="d">'+dDE(h.datum)+'</div><b>'+esc(h.titel)+'</b><br><small>Kilometerstand '+h.km.toLocaleString("de-DE")+' km</small></div>'
+  )).join("");
+}
+
+/* — Fahrzeuge — */
+function renderFahrzeuge(){
+  $("#veh-list").innerHTML = SEED.fahrzeuge.map(v=>{
+    const [reg,...rest]=v.kennz.split(" ");
+    return '<div class="card"><div class="veh"><div class="plate"><span class="pd">D</span><span class="pn">'+esc(v.kennz)+'</span></div>'+
+      '<div style="flex:1;min-width:200px"><h3 style="font-size:18px;font-weight:800;margin-bottom:10px">'+esc(v.marke)+'</h3>'+
+      '<dl class="kv"><dt>Baujahr</dt><dd>'+v.bj+'</dd><dt>Kilometerstand</dt><dd>'+v.km.toLocaleString("de-DE")+' km</dd><dt>HU/AU fällig</dt><dd>'+esc(v.hu)+'</dd><dt>FIN</dt><dd>'+esc(v.vin)+'</dd></dl></div></div>'+
+      '<div style="margin-top:16px"><div style="font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--grau-2);margin-bottom:9px">Dokumente</div><div class="docs">'+
+      v.dokumente.map(d=> '<span class="doc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/></svg>'+esc(d)+'</span>').join("")+'</div></div></div>';
+  }).join("");
+  $$(".doc").forEach(d=> d.addEventListener("click", ()=> alert("Prototyp: „"+d.textContent.trim()+"\" würde hier als PDF geöffnet/heruntergeladen.")));
+}
+
+/* — Notizen — */
+function renderNotizen(){
+  const list=$("#note-list");
+  if(!store.notizen.length){ list.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h14a1 1 0 0 1 1 1v16l-4-2.5L12 20l-4-2.5L4 20V4a1 1 0 0 1 1-1z"/></svg><div>Noch keine Notizen. Schreiben Sie oben Ihre erste.</div></div>'; return; }
+  list.innerHTML = store.notizen.slice().reverse().map(n=>(
+    '<div class="note"><div class="nd">'+dDE(n.datum)+'</div><p>'+esc(n.text)+'</p><button class="del" data-id="'+n.id+'" aria-label="Löschen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button></div>'
+  )).join("");
+  $$(".note .del").forEach(b=> b.addEventListener("click", ()=>{ store.notizen=store.notizen.filter(x=>x.id!==b.dataset.id); saveStore(store); renderNotizen(); }));
+}
+$("#note-form").addEventListener("submit", e=>{
+  e.preventDefault();
+  const inp=$("#note-input"), val=inp.value.trim(); if(!val) return;
+  const now=new Date(); const iso=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+  store.notizen.push({ id:"n"+Date.now(), datum:iso, text:val });
+  saveStore(store); inp.value=""; renderNotizen();
+});
+</script>
+</body>
+</html>

@@ -643,6 +643,13 @@ html[data-sidebar="collapsed"] .wl-rail-item .ri-pin { display:none; }
 .wl-lightbox-info .li-mark { width:72px; height:72px; margin:0 auto 14px; border-radius:18px; background:var(--accent-soft); color:var(--accent-soft-text); display:flex; align-items:center; justify-content:center; }
 .wl-lightbox-info .li-name { font-size:16px; font-weight:700; color:var(--text); }
 .wl-lightbox-info .li-meta { font-size:12.5px; margin-top:6px; }
+/* === WERKHOF-Integration Overrides === */
+/* #4 Favoriten-Pins/Sterne entfernen (doppelt/verwirrend) */
+.wl-rail-item .ri-pin, .menu-item .mi-pin { display:none !important; }
+/* #3 Collapsed-Sidebar: Toggle nicht mehr ueber dem Brand-"W" (stapeln statt ueberlappen) */
+html[data-sidebar="collapsed"] .wl-rail-head { flex-direction:column; gap:8px; padding:14px 0 10px; align-items:center; justify-content:center; }
+html[data-sidebar="collapsed"] .wl-rail-toggle { margin-left:0 !important; }
+html[data-sidebar="collapsed"] .wl-rail-brand { justify-content:center; width:100%; }
 </style>
 </head>
 <body>
