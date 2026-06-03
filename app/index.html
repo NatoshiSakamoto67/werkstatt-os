@@ -394,9 +394,13 @@ html.dark .map{background:linear-gradient(160deg,#1a2129,#11161c)}
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grip"></div><div id="sheetC"></div></div>
 <div id="toast"></div>
 
+<script src="tenant.js"></script>
 <script>
 "use strict";
-const BRAND={name:"WERKHOF",tag:"Das Betriebssystem für die Werkstatt",wa:"491701234567",waReady:false};
+/* White-Label: BRAND/TENANTS/Akzentfarben aus tenant.js (window.TENANT_CONFIG) mit Fallback */
+const _TC=(window.TENANT_CONFIG||{});
+try{if(_TC.accent)document.documentElement.style.setProperty('--accent',_TC.accent);if(_TC.accent2)document.documentElement.style.setProperty('--accent-2',_TC.accent2);}catch(e){}
+const BRAND=Object.assign({name:"WERKHOF",tag:"Das Betriebssystem für die Werkstatt",wa:"491701234567",waReady:false},_TC.brand||{});
 /* waReady=false: Platzhalter-Nummer. Erst auf true setzen, wenn echte WhatsApp-Business-Nummer (E.164) hinterlegt ist.
    Solange false: wa.me-Links öffnen NICHT die Fake-Nummer, sondern zeigen einen Demo-Hinweis. */
 /* ---------- helpers ---------- */
@@ -440,7 +444,7 @@ function canWrite(){return ROLE==="tenant_admin"||ROLE==="user";}
 function audit(action,obj){store.audit.unshift({t:new Date().toLocaleString("de-DE"),tenant:TENANT,role:ROLE,action:action,obj:obj});store.audit=store.audit.slice(0,80);save();}
 
 /* ---------- demo data (multi-tenant) ---------- */
-const TENANTS=[{id:"gorski",name:"KFZ Gorski",mark:"G",ort:"Braunschweig"},{id:"astek",name:"KFZ ASTEK",mark:"A",ort:"Wolfsburg"}];
+const TENANTS=_TC.tenants||[{id:"gorski",name:"KFZ Gorski",mark:"G",ort:"Braunschweig"},{id:"astek",name:"KFZ ASTEK",mark:"A",ort:"Wolfsburg"}];
 const DB={
  kunden:[
   {id:"k1",t:"gorski",name:"Max Mustermann",tel:"+49 170 1234567",email:"max.mustermann@example.de",fzg:"VW Golf 7 1.4 TSI",kennz:"BS-MG 123",letzter:"heute",status:"Stammkunde",offen:"Bremsen vorne",hu:"03/2027",service:"12.01.2026",inspektion:"08/2026",km:"78.400"},
@@ -942,6 +946,7 @@ $("#search").addEventListener("input",e=>{const q=e.target.value;if(q&&CUR!=="ku
 
 /* ---------- boot ---------- */
 (function boot(){
+  const pt=$("#ptag");if(pt)pt.textContent=BRAND.name;
   const tn=TENANTS.find(t=>t.id===TENANT)||TENANTS[0];$("#tn").textContent=tn.name;$("#tm").textContent=tn.mark;
   buildSidebar();buildTabs();
   const start=(location.hash||"").slice(1);
