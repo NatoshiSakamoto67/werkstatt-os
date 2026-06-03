@@ -396,7 +396,9 @@ html.dark .map{background:linear-gradient(160deg,#1a2129,#11161c)}
 
 <script>
 "use strict";
-const BRAND={name:"WERKHOF",tag:"Das Betriebssystem für die Werkstatt",wa:"491701234567"};
+const BRAND={name:"WERKHOF",tag:"Das Betriebssystem für die Werkstatt",wa:"491701234567",waReady:false};
+/* waReady=false: Platzhalter-Nummer. Erst auf true setzen, wenn echte WhatsApp-Business-Nummer (E.164) hinterlegt ist.
+   Solange false: wa.me-Links öffnen NICHT die Fake-Nummer, sondern zeigen einen Demo-Hinweis. */
 /* ---------- helpers ---------- */
 const $=(s,e)=>(e||document).querySelector(s),$$=(s,e)=>Array.from((e||document).querySelectorAll(s));
 const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
@@ -404,6 +406,8 @@ function esc(t){const d=document.createElement("div");d.textContent=t==null?"":S
 function ini(n){return (n||"").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();}
 function badge(s){const m={"offen":"warn","neu":"warn","wartet":"warn","angefragt":"warn","Vorschlag":"warn","in Arbeit":"info","in_arbeit":"info","bestätigt":"info","verliehen":"info","erledigt":"done","abgeschlossen":"done","bezahlt":"done","verfügbar":"ok","Stammkunde":"ok"};return '<span class="badge '+(m[s]||"muted")+'">'+esc(s)+'</span>';}
 const waURL=t=>"https://wa.me/"+BRAND.wa+"?text="+encodeURIComponent(t);
+/* Sicherung: solange keine echte Nummer hinterlegt ist, keinen toten wa.me-Link auf die Platzhalter-Nummer öffnen */
+document.addEventListener("click",function(e){var a=e.target&&e.target.closest?e.target.closest('a[href*="wa.me/"]'):null;if(a&&!BRAND.waReady){e.preventDefault();toast("Demo · echte WhatsApp-Business-Nummer wird beim Go-Live hinterlegt");}},true);
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._);t._=setTimeout(()=>t.classList.remove("on"),2400);}
 
 /* ---------- echte Exporte (CSV/Excel/Word/PDF) ---------- */
