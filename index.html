@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>WERKHOF – Das Betriebssystem für die Werkstatt</title>
+<meta name="description" content="WERKHOF bündelt Aufträge, WhatsApp, KI-Assistent Hermes, Werkzeug-Sharing, Rechnungen und Buchhaltung in einem DSGVO-konformen Werkstatt-Betriebssystem.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0B0D10">
+<meta property="og:title" content="WERKHOF – Das Betriebssystem für die Werkstatt">
+<meta property="og:description" content="Aufträge, WhatsApp, KI-Assistent, Werkzeug-Sharing & Buchhaltung – an einem Ort.">
+<link rel="icon" href="app/assets/logo.svg">
+<style>
+@font-face{font-family:'Hanken Grotesk';src:url('app/fonts/HankenGrotesk.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Bebas Neue';src:url('app/fonts/BebasNeue.woff2') format('woff2');font-weight:400;font-display:swap}
+:root{
+  --ink:#0B0D10;--paper:#fff;--paper-2:#F4F7FA;--line:#E3E7EC;--line-2:#D3D8E0;
+  --grau:#565C66;--grau-2:#838B97;--accent:#146DAB;--accent-2:#FBAF3A;--accent-deep:#0F5688;--orange-deep:#9A6410;--gruen:#2E9E5B;--wa:#25D366;
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:.5px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:15px;padding:13px 22px;border-radius:12px;cursor:pointer;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);transition:.18s}
+.btn svg{width:18px;height:18px}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 14px 30px -14px rgba(20,109,171,.7)}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.2)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);background:rgba(20,109,171,.1);padding:6px 13px;border-radius:30px;margin-bottom:18px}
+.eyebrow.o{color:var(--orange-deep);background:rgba(251,175,58,.16)}
+
+/* nav */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(11,13,16,.86);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
+nav .row{display:flex;align-items:center;justify-content:space-between;height:64px}
+nav .brand{display:flex;align-items:center;gap:11px}
+nav .logo{height:26px}
+nav .pt{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--accent-2)}
+nav .links{display:flex;align-items:center;gap:26px}
+nav .links a{color:#cfd3d8;font-size:14px;font-weight:600}
+nav .links a:hover{color:#fff}
+nav .btn{padding:9px 17px;font-size:14px}
+.burger{display:none}
+
+/* hero */
+.hero{background:radial-gradient(120% 90% at 80% -10%,#16314a 0%,var(--ink) 55%);color:#fff;padding:130px 0 70px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-180px;top:60px;width:520px;height:520px;background:radial-gradient(circle,rgba(251,175,58,.16),transparent 65%);pointer-events:none}
+.hero .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.hero h1{font-size:54px;line-height:1.04;letter-spacing:-1.6px;font-weight:800;margin-bottom:20px}
+.hero h1 .hl{background:linear-gradient(100deg,var(--accent-2),#ffd07e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{font-size:18.5px;color:#c2c7cf;max-width:540px;margin-bottom:30px}
+.hero .cta{display:flex;gap:13px;flex-wrap:wrap}
+.hero .mini{display:flex;gap:22px;margin-top:30px;flex-wrap:wrap}
+.hero .mini div{font-size:13px;color:#aeb4be}
+.hero .mini b{display:block;font-size:23px;color:#fff;font-weight:800;letter-spacing:-.5px}
+
+/* phone mock */
+.mock{position:relative;justify-self:center;width:300px;height:610px;background:#0d1015;border:10px solid #23272f;border-radius:46px;box-shadow:0 50px 90px -30px rgba(0,0,0,.7);overflow:hidden}
+.mock .island{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:96px;height:26px;background:#000;border-radius:18px;z-index:3}
+.mock .scr{position:absolute;inset:0;display:flex;flex-direction:column}
+.mock .mtop{background:#0B0D10;color:#fff;padding:40px 16px 12px;display:flex;align-items:center;gap:8px}
+.mock .mtop .l{height:16px}
+.mock .mtag{font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--accent-2)}
+.mock .mbody{flex:1;background:var(--paper-2);padding:14px;overflow:hidden}
+.mock .mcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px}
+.mock .mcard .t{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:5px;margin-bottom:7px}
+.mock .mcard .t .pd{width:6px;height:6px;border-radius:50%;background:var(--gruen)}
+.mock .mr{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;color:#444}
+.mock .mr b{color:var(--ink)}
+.mock .badge{font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(251,175,58,.18);color:var(--orange-deep)}
+.mock .mbtns{display:flex;gap:6px;margin-top:9px}
+.mock .mb{flex:1;text-align:center;font-size:10px;font-weight:700;padding:7px;border-radius:8px}
+.mock .mb.p{background:var(--accent);color:#fff}.mock .mb.s{background:var(--paper-2);border:1px solid var(--line);color:#444}
+.mock .mnav{display:flex;justify-content:space-around;background:#fff;border-top:1px solid var(--line);padding:8px 0 14px}
+.mock .mnav i{width:18px;height:18px;border-radius:5px;background:var(--line-2)}
+.mock .mnav i.a{background:var(--accent)}
+
+/* sections */
+section{padding:78px 0}
+.sec-head{text-align:center;max-width:680px;margin:0 auto 48px}
+.sec-head h2{font-size:38px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.sec-head p{font-size:17px;color:var(--grau);margin-top:14px}
+.alt{background:var(--paper-2)}
+
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.cat{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+.cat .ci{width:46px;height:46px;border-radius:12px;background:var(--ink);color:#fff;display:grid;place-items:center;margin-bottom:16px}
+.cat .ci svg{width:23px;height:23px}
+.cat h3{font-size:19px;font-weight:800;margin-bottom:6px}
+.cat .sub{color:var(--grau);font-size:14px;margin-bottom:14px}
+.cat ul{list-style:none;display:flex;flex-wrap:wrap;gap:7px}
+.cat li{font-size:13px;font-weight:600;background:var(--paper-2);border:1px solid var(--line);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:6px}
+.cat li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.cat:nth-child(2) .ci{background:var(--accent)}.cat:nth-child(3) .ci{background:var(--accent-2);color:#231700}.cat:nth-child(4) .ci{background:#1f2937}
+
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:46px;align-items:center;margin-bottom:18px}
+.feat.rev{direction:rtl}.feat.rev>*{direction:ltr}
+.feat h3{font-size:28px;font-weight:800;letter-spacing:-.6px;margin-bottom:14px}
+.feat p{color:var(--grau);font-size:16px;margin-bottom:16px}
+.feat .pts{list-style:none}
+.feat .pts li{display:flex;gap:11px;align-items:flex-start;padding:7px 0;font-size:15px;font-weight:500}
+.feat .pts li svg{width:20px;height:20px;color:var(--gruen);flex-shrink:0;margin-top:2px}
+.panel-img{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 30px 60px -30px rgba(0,0,0,.18)}
+.hil-card{background:linear-gradient(135deg,var(--ink),#16202c);color:#fff;border-radius:14px;padding:20px}
+.hil-card .lbl{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--accent-2);display:flex;align-items:center;gap:7px;margin-bottom:13px}
+.hil-card .r{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.hil-card .r span{color:#aeb4be}.hil-card .r b{color:#fff;text-align:right}
+.hil-card .acts{display:flex;gap:8px;margin-top:15px}
+.hil-card .a{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:9px;border-radius:9px}
+.hil-card .a.p{background:var(--accent)}.hil-card .a.s{background:rgba(255,255,255,.1)}
+
+.arch{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.acard{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px}
+.acard .ai{width:40px;height:40px;border-radius:10px;background:var(--paper-2);display:grid;place-items:center;margin-bottom:13px}
+.acard .ai svg{width:21px;height:21px;color:var(--accent)}
+.acard b{font-size:16px;display:block;margin-bottom:5px}
+.acard small{color:var(--grau);font-size:13.5px;line-height:1.5}
+.dsgvo-strip{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:30px}
+.dsgvo-strip span{font-size:13px;font-weight:600;background:var(--paper);border:1px solid var(--line);border-radius:30px;padding:8px 15px;display:flex;align-items:center;gap:8px}
+.dsgvo-strip span svg{width:15px;height:15px;color:var(--gruen)}
+
+.cta-band{background:radial-gradient(120% 120% at 20% 0%,#16314a,var(--ink));color:#fff;border-radius:24px;padding:54px 40px;text-align:center}
+.cta-band h2{font-size:34px;font-weight:800;letter-spacing:-.8px;margin-bottom:12px}
+.cta-band p{color:#c2c7cf;font-size:17px;max-width:520px;margin:0 auto 26px}
+.cta-band .cta{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+
+footer{background:var(--ink);color:#aeb4be;padding:40px 0;font-size:14px}
+footer .row{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+footer a{color:#cfd3d8}footer a:hover{color:#fff}
+footer .fl{display:flex;gap:20px;flex-wrap:wrap}
+
+@media(max-width:880px){
+  .hero .grid,.feat,.cats,.arch{grid-template-columns:1fr}
+  .hero{padding:104px 0 50px}.hero h1{font-size:38px}
+  .feat.rev{direction:ltr}.mock{order:-1;width:260px;height:530px}
+  nav .links{display:none}.burger{display:grid}
+  .sec-head h2{font-size:30px}section{padding:56px 0}
+  .arch{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+ <div class="wrap row">
+  <a class="brand" href="#top"><img class="logo" src="app/assets/logo.svg" alt="KFZ Gorski"><span class="pt">WERKHOF</span></a>
+  <div class="links">
+   <a href="#module">Module</a>
+   <a href="#hermes">KI-Assistent</a>
+   <a href="#sharing">Werkzeug-Sharing</a>
+   <a href="#dsgvo">DSGVO</a>
+   <a class="btn btn-primary" href="app/index.html">Live-Demo ↗</a>
+  </div>
+  <a class="btn btn-primary burger" href="app/index.html" style="padding:9px 15px">Demo ↗</a>
+ </div>
+</nav>
+
+<header class="hero" id="top">
+ <div class="wrap grid">
+  <div>
+   <span class="eyebrow">Werkstatt-Betriebssystem · Pilot KFZ Gorski</span>
+   <h1>Das <span class="hl">Betriebssystem</span><br>für die Werkstatt.</h1>
+   <p class="lead">Aufträge, WhatsApp, Termine, Rechnungen, Werkzeug-Sharing und ein KI-Assistent, der über Nacht mitdenkt – an <b>einem</b> Ort. DSGVO-konform, selbst-gehostet, mit Mensch-im-Mittelpunkt.</p>
+   <div class="cta">
+    <a class="btn btn-primary" href="app/index.html">▶ Live-Demo öffnen</a>
+    <a class="btn btn-ghost" href="#module">Alle Module ansehen</a>
+   </div>
+   <div class="mini">
+    <div><b>20</b>Bausteine in einer App</div>
+    <div><b>1</b>Posteingang fürs Team</div>
+    <div><b>0</b>Daten ins Drittland</div>
+   </div>
+  </div>
+  <div class="mock">
+   <div class="island"></div>
+   <div class="scr">
+    <div class="mtop"><img class="l" src="app/assets/logo.svg" alt=""><span class="mtag">WERKHOF</span></div>
+    <div class="mbody">
+     <div class="mcard">
+      <div class="t"><span class="pd"></span>Hermes · KI erkannt</div>
+      <div class="mr"><span>Kunde</span><b>Max Mustermann</b></div>
+      <div class="mr"><span>Bedarf</span><b>Bremsen vorne</b></div>
+      <div class="mr"><span>Teil · Müller</span><b>138,40 €</b></div>
+      <div class="mbtns"><div class="mb s">Verwerfen</div><div class="mb p">Freigeben ✓</div></div>
+     </div>
+     <div class="mcard">
+      <div class="mr" style="font-size:12px"><b>Werkzeug-Sharing</b><span class="badge">verfügbar</span></div>
+      <div class="mr"><span>Arretierwerkzeug N57</span><b>KFZ Gorski</b></div>
+     </div>
+     <div class="mcard" style="margin-bottom:0">
+      <div class="mr" style="font-size:12px"><b>WhatsApp</b><span style="font-size:10px;color:var(--gruen);font-weight:700">2 neu</span></div>
+      <div class="mr"><span>„Klimaanlage kühlt nicht …"</span></div>
+     </div>
+    </div>
+    <div class="mnav"><i class="a"></i><i></i><i></i><i></i><i></i></div>
+   </div>
+  </div>
+ </div>
+</header>
+
+<section id="module">
+ <div class="wrap">
+  <div class="sec-head">
+   <span class="eyebrow o">Alles an einem Ort</span>
+   <h2>Vier Bereiche. Zwanzig Bausteine.</h2>
+   <p>Vom ersten WhatsApp bis zur Buchhaltung – WERKHOF ersetzt den Flickenteppich aus Zetteln, Excel und Einzeltools.</p>
+  </div>
+  <div class="cats">
+   <div class="cat">
+    <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
+    <h3>Werkstatt</h3>
+    <div class="sub">Der Tagesbetrieb – jederzeit im Blick.</div>
+    <ul><li>Dashboard</li><li>Kunden (CRM)</li><li>Auftragsverwaltung</li><li>Terminbuchung</li><li>WhatsApp-Posteingang</li><li>Orchestra (KI)</li><li>Freigaben</li></ul>
+   </div>
+   <div class="cat">
+    <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l-1.5 1.5a3.5 3.5 0 0 1-4.6 4.6L4 17v3h3l3.9-3.9a3.5 3.5 0 0 1 4.6-4.6L17 10l3-3-3-3-3 3z"/></svg></div>
+    <h3>Teile &amp; Werkzeug</h3>
+    <div class="sub">Werkzeug teilen statt doppelt kaufen.</div>
+    <ul><li>Werkzeug-Sharing</li><li>Werkzeug-Bestand</li><li>Fahrzeug-Kompatibilität</li><li>Werkstatt-Karte</li><li>Lieferantenanbindung</li></ul>
+   </div>
+   <div class="cat">
+    <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg></div>
+    <h3>Büro</h3>
+    <div class="sub">Papierkram, der sich selbst erledigt.</div>
+    <ul><li>Rechnungsentwürfe</li><li>Dokumentenverwaltung</li><li>Buchhaltungsanbindung</li><li>Wissen &amp; Leitfäden (RAG)</li><li>Automatisierung</li></ul>
+   </div>
+   <div class="cat">
+    <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
+    <h3>System</h3>
+    <div class="sub">Sicher, mandantenfähig, nachvollziehbar.</div>
+    <ul><li>KI-Assistent Hermes</li><li>Mobile- &amp; Web-App (PWA)</li><li>Multi-Mandanten</li><li>Rollen &amp; Rechte</li><li>DSGVO-Konzept</li><li>Audit-Trail</li></ul>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="alt" id="hermes">
+ <div class="wrap">
+  <div class="feat">
+   <div>
+    <span class="eyebrow">KI-Assistent „Hermes"</span>
+    <h3>Liest die Nacht-Nachrichten. Bereitet alles vor. Wartet auf Ihr OK.</h3>
+    <p>Hermes wertet eingehende WhatsApp-Anfragen aus, erkennt den Teile-Bedarf, schlägt Preise und Termine vor – und legt einen Rechnungsentwurf bereit. Ausgeführt wird nichts ohne Freigabe.</p>
+    <ul class="pts">
+     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg><span><b>Human-in-the-Loop:</b> jede schreibende oder sendende Aktion braucht einen Klick von Ihnen.</span></li>
+     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg><span><b>EU-KI-Gateway:</b> läuft über Bedrock-EU (Frankfurt) – kein Drittland, kein Training mit Ihren Daten.</span></li>
+     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg><span><b>Hermes holt Teile heraus:</b> auch dort, wo Lieferanten keine Schnittstelle haben – per Browser-Worker, mit Freigabe.</span></li>
+    </ul>
+   </div>
+   <div class="hil-card">
+    <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="#FBAF3A" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>Von Hermes vorbereitet</div>
+    <div class="r"><span>Nachricht</span><b>„Bremsen quietschen vorne links"</b></div>
+    <div class="r"><span>Bedarf</span><b>Beläge + Scheiben vorne</b></div>
+    <div class="r"><span>Teil · Wessel+Müller</span><b>138,40 €</b></div>
+    <div class="r"><span>Aktion</span><b>Termin + Teile vormerken</b></div>
+    <div class="acts"><div class="a s">Verwerfen</div><div class="a p">Freigeben &amp; ausführen ✓</div></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="sharing">
+ <div class="wrap">
+  <div class="feat rev">
+   <div>
+    <span class="eyebrow o">Werkzeug-Sharing</span>
+    <h3>Das Spezialwerkzeug steht schon in der Werkstatt nebenan.</h3>
+    <p>Fahrzeug oder Werkzeug eingeben – WERKHOF zeigt, welche Werkstatt im Netzwerk das passende, kalibrierte Spezialwerkzeug verfügbar hat. Anfragen mit einem Klick, mandantenübergreifend.</p>
+    <ul class="pts">
+     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg><span>Karte auf OpenStreetMap-Basis – kein Google, kein IP-Leak.</span></li>
+     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg><span>Kalibrier-Status pro Werkzeug, Verleih-Historie inklusive.</span></li>
+     <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6L9 17l-5-5"/></svg><span>Direkt aus dem Auftrag: „Werkzeug fehlt → anfragen".</span></li>
+    </ul>
+   </div>
+   <div class="panel-img">
+    <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px"><div style="width:44px;height:44px;border-radius:11px;background:var(--ink);color:#fff;display:grid;place-items:center"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 7l-1.5 1.5a3.5 3.5 0 0 1-4.6 4.6L4 17v3h3l3.9-3.9a3.5 3.5 0 0 1 4.6-4.6L17 10l3-3-3-3-3 3z"/></svg></div><div style="flex:1"><b>Arretierwerkzeug N57</b><div style="font-size:12.5px;color:var(--grau)">KFZ Gorski · Braunschweig</div></div><span style="font-size:11px;font-weight:700;color:#1f7a44;background:rgba(46,158,91,.14);padding:4px 10px;border-radius:20px">verfügbar</span></div>
+    <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:14px"><div style="width:44px;height:44px;border-radius:11px;background:var(--ink);color:#fff;display:grid;place-items:center"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 7l-1.5 1.5a3.5 3.5 0 0 1-4.6 4.6L4 17v3h3l3.9-3.9a3.5 3.5 0 0 1 4.6-4.6L17 10l3-3-3-3-3 3z"/></svg></div><div style="flex:1"><b>Klima-Servicegerät R1234yf</b><div style="font-size:12.5px;color:var(--grau)">KFZ ASTEK · Wolfsburg · <span style="color:var(--accent)">anderer Mandant</span></div></div><span style="font-size:11px;font-weight:700;color:#fff;background:var(--accent);padding:6px 12px;border-radius:9px">Anfragen</span></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="alt" id="dsgvo">
+ <div class="wrap">
+  <div class="sec-head">
+   <span class="eyebrow">Architektur &amp; Datenschutz</span>
+   <h2>Gebaut auf einer DSGVO-Architektur.</h2>
+   <p>WERKHOF setzt auf die erprobte XDAB-Plattform: FastAPI, Postgres mit Mandanten-Isolation, ein EU-KI-Gateway und eine eigene, schlanke Workflow-Engine – kein zweites System für Automatisierung nötig.</p>
+  </div>
+  <div class="arch">
+   <div class="acard"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V8a5 5 0 0 1 10 0v3"/></svg></div><b>EU-KI-Gateway</b><small>LiteLLM → AWS Bedrock-EU (Frankfurt). Optional Hermes/Ollama auf lokaler GPU. Kein Drittland.</small></div>
+   <div class="acard"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><b>PII-Maskierung</b><small>E-Mail, Telefon, IBAN werden vor jedem KI-Aufruf tokenisiert – Klartext verlässt das Haus nie.</small></div>
+   <div class="acard"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg></div><b>Multi-Mandant + RLS</b><small>Row-Level-Security in Postgres: jeder Mandant sieht nur seine Daten. Sharing ist die einzige Ausnahme.</small></div>
+   <div class="acard"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg></div><b>Rollen &amp; Rechte</b><small>Meister, Mitarbeiter, Nur-Lesen, Kundenportal. Schreibrechte sauber getrennt.</small></div>
+   <div class="acard"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg></div><b>Eigene Workflow-Engine</b><small>Trigger → Plan → Freigabe-Queue (ARQ-Cron + agent-core). Schlank statt n8n-Overhead.</small></div>
+   <div class="acard"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><b>Audit-Trail</b><small>Jede schreibende Aktion wird protokolliert – nur Metadaten, nie Inhalte.</small></div>
+  </div>
+  <div class="dsgvo-strip">
+   <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Self-Hosting EU-VPS</span>
+   <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>OpenStreetMap statt Google</span>
+   <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Self-hosted Fonts</span>
+   <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Offline-fähige PWA</span>
+  </div>
+ </div>
+</section>
+
+<section>
+ <div class="wrap">
+  <div class="cta-band">
+   <span class="eyebrow o" style="background:rgba(251,175,58,.2)">Prototyp · Demo-Daten</span>
+   <h2>Sehen Sie WERKHOF in Aktion.</h2>
+   <p>Die komplette App läuft im Browser – auf dem Handy genauso wie am Desktop. Demo-Daten, nichts wird gesendet.</p>
+   <div class="cta">
+    <a class="btn btn-primary" href="app/index.html">▶ Live-Demo öffnen</a>
+    <a class="btn btn-ghost" href="app/index.html#hermes">KI-Assistent testen</a>
+   </div>
+  </div>
+ </div>
+</section>
+
+<footer>
+ <div class="wrap row">
+  <div class="brand" style="display:flex;align-items:center;gap:10px"><img class="logo" src="app/assets/logo.svg" alt="" style="height:24px"><span style="font-size:11px;font-weight:800;letter-spacing:2px;color:var(--accent-2)">WERKHOF</span></div>
+  <div class="fl"><a href="app/index.html">App-Demo</a><a href="#module">Module</a><a href="#dsgvo">Datenschutz-Konzept</a></div>
+  <div style="font-size:13px;color:var(--grau-2)">Prototyp · Pilot KFZ Gorski · Braunschweig</div>
+ </div>
+</footer>
+
+</body>
+</html>
