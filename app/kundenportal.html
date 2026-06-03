@@ -265,6 +265,21 @@ html.bw .doc{background:#12151b}
 .tab.active{color:var(--blau)}
 .tab .tbadge{position:absolute;top:1px;left:calc(50% + 7px);background:var(--orange);color:#231700;font-size:9.5px;font-weight:800;min-width:15px;height:15px;border-radius:9px;display:grid;place-items:center;padding:0 3px;line-height:1}
 .tab .tbadge:empty{display:none}
+/* Klickbares, informativeres Dashboard */
+.dstats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:980px){.dstats{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.dstats{grid-template-columns:1fr}}
+.stat{position:relative}
+.stat.clickable{cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.stat.clickable:hover{transform:translateY(-2px);border-color:var(--blau);box-shadow:0 12px 26px -16px rgba(20,109,171,.5)}
+.stat.clickable:focus-visible{outline:2px solid var(--blau);outline-offset:2px}
+.stat .chev{position:absolute;top:14px;right:13px;width:16px;height:16px;color:var(--grau-3)}
+.stat .prev{margin-top:9px;font-size:12px;color:var(--grau);line-height:1.45;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:17px}
+.stat .prev b{font-weight:700}
+.tpill{display:inline-flex;align-items:center;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.tpill.ok{background:rgba(46,158,91,.14);color:#1f7a44}
+.tpill.soon{background:rgba(251,175,58,.18);color:#9A6410}
+.tpill.due{background:rgba(194,69,59,.15);color:#a3382f}
 
 /* Bottom Sheet "Mehr" */
 .sheet-ov{position:fixed;inset:0;background:rgba(11,13,16,.45);z-index:96;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -392,10 +407,11 @@ html.bw .doc{background:#12151b}
       <!-- ÜBERSICHT -->
       <section class="page on" id="page-uebersicht">
         <div class="page-head"><h2>Hallo <span id="greet">Max</span> 👋</h2><p>Schön, dass Sie da sind. Hier Ihr Überblick.</p></div>
-        <div class="grid grid-3" style="margin-bottom:18px">
-          <div class="card stat"><div class="ic o"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/></svg></div><div class="v" id="s-open-amount">–</div><div class="l"><span id="s-open-count">0</span> offene Rechnung(en)</div></div>
-          <div class="card stat"><div class="ic b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/></svg></div><div class="v" id="s-tickets">0</div><div class="l">offene WhatsApp-Tickets</div></div>
-          <div class="card stat"><div class="ic d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div><div class="v" id="s-next" style="font-size:20px;letter-spacing:-.3px">–</div><div class="l">nächster Termin</div></div>
+        <div class="dstats">
+          <div class="card stat clickable" data-goto="rechnungen" role="button" tabindex="0" aria-label="Offene Rechnungen ansehen"><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg><div class="ic o"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/></svg></div><div class="v" id="s-open-amount">–</div><div class="l"><span id="s-open-count">0</span> offene Rechnung(en)</div><div class="prev" id="s-rech-prev"></div></div>
+          <div class="card stat clickable" data-goto="tickets" role="button" tabindex="0" aria-label="WhatsApp-Tickets ansehen"><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg><div class="ic b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/></svg></div><div class="v" id="s-tickets">0</div><div class="l">offene WhatsApp-Tickets</div><div class="prev" id="s-tick-prev"></div></div>
+          <div class="card stat clickable" data-goto="termine" role="button" tabindex="0" aria-label="Termine ansehen"><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg><div class="ic d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></div><div class="v" id="s-next" style="font-size:20px;letter-spacing:-.3px">–</div><div class="l">nächster Termin</div><div class="prev" id="s-next-prev"></div></div>
+          <div class="card stat clickable" data-goto="fahrzeuge" role="button" tabindex="0" aria-label="Fahrzeuge und TÜV ansehen"><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg><div class="ic b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13M5 13h14v4H5zM7.5 17v1.5M16.5 17v1.5"/></svg></div><div class="v" id="s-tuev" style="font-size:20px;letter-spacing:-.3px">–</div><div class="l">nächste HU/TÜV</div><div class="prev" id="s-tuev-prev"></div></div>
         </div>
         <div class="grid grid-2">
           <div class="card">
@@ -593,6 +609,7 @@ function goto(page){
 $$(".navitem").forEach(b=> b.dataset.page && b.addEventListener("click", ()=> goto(b.dataset.page)));
 $$(".tab[data-page]").forEach(t=> t.addEventListener("click", ()=> goto(t.dataset.page)));
 $$("[data-goto]").forEach(b=> b.addEventListener("click", ()=> goto(b.dataset.goto)));
+$$(".stat.clickable").forEach(c=> c.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); goto(c.dataset.goto); } }));
 const hambBtn=$("#hamb"); if(hambBtn) hambBtn.addEventListener("click", ()=> $("#sidebar").classList.toggle("open"));
 
 /* Bottom-Sheet „Mehr" */
@@ -638,6 +655,8 @@ function updateCounts(){
 }
 
 /* — Übersicht — */
+function setHTML(sel,html){ const el=$(sel); if(el) el.innerHTML=html; }
+function huPill(hu){ const m=/(\d{1,2})\/(\d{4})/.exec(hu||""); if(!m) return {cls:"due",label:"prüfen",sort:0}; const d=new Date(+m[2],+m[1]-1,1), now=new Date(2026,5,1), mo=(d-now)/2592000000; if(mo<=0) return {cls:"due",label:"fällig",sort:mo}; if(mo<=3) return {cls:"soon",label:"bald",sort:mo}; return {cls:"ok",label:"ok",sort:mo}; }
 function renderUebersicht(){
   const offen = SEED.rechnungen.filter(r=> rechStatus(r)==="offen");
   const sum = offen.reduce((s,r)=> s+rTotal(r),0);
@@ -646,6 +665,15 @@ function renderUebersicht(){
   $("#s-tickets").textContent = SEED.tickets.filter(t=> t.status!=="erledigt").length;
   const next = SEED.termine[0];
   $("#s-next").textContent = next? dShort(next.datum) : "–";
+  // Vorschau-Infos auf den Karten
+  const oOpen = offen.slice().sort((a,b)=> (a.faellig||"").localeCompare(b.faellig||""))[0];
+  setHTML("#s-rech-prev", oOpen? ('Älteste: <b>'+esc(oOpen.id)+'</b> · fällig '+dShort(oOpen.faellig)) : 'Alles bezahlt ✓');
+  const offT = SEED.tickets.filter(t=> t.status!=="erledigt").slice().sort((a,b)=> b.erstellt.localeCompare(a.erstellt))[0];
+  setHTML("#s-tick-prev", offT? ('<b>'+esc(offT.betreff)+'</b>') : 'Keine offenen Tickets');
+  setHTML("#s-next-prev", next? (esc(next.titel)+' · '+esc(next.zeit||'')) : 'Kein Termin geplant');
+  const huL = SEED.fahrzeuge.map(f=>({f:f, p:huPill(f.hu)})).sort((a,b)=> a.p.sort-b.p.sort)[0];
+  $("#s-tuev").textContent = huL? huL.f.hu : "–";
+  setHTML("#s-tuev-prev", huL? ('<b>'+esc(huL.f.kennz)+'</b> <span class="tpill '+huL.p.cls+'">'+huL.p.label+'</span>') : '');
   // Aktivität
   const acts=[];
   SEED.tickets.forEach(t=> acts.push({d:t.erstellt, t:"Ticket "+t.id+": "+t.betreff, s:t.status, ic:"wa"}));
