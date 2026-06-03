@@ -1,0 +1,11 @@
+/* WERKLEIH self-hosted Fonts — DSGVO-konform (kein Google-CDN, keine US-Anfrage).
+   TTF-Dateien für Prod hier ablegen: inter-400..800.ttf, jbmono-400/500.ttf
+   (z.B. von rsms.me/inter und JetBrains Mono, SIL OFL). Fehlen sie, greift der
+   System-Fallback aus --font-sans/--font-mono → UI sieht trotzdem sauber aus. */
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(inter-400.ttf) format('truetype');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(inter-500.ttf) format('truetype');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url(inter-600.ttf) format('truetype');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url(inter-700.ttf) format('truetype');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url(inter-800.ttf) format('truetype');}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(jbmono-400.ttf) format('truetype');}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(jbmono-500.ttf) format('truetype');}

@@ -1,0 +1,27 @@
+{
+  "name": "WERKLEIH — Werkzeug-Sharing (KFZ Gorski)",
+  "short_name": "WERKLEIH",
+  "description": "Kalibrierte Spezialwerkzeuge zwischen Werkstätten teilen: Fahrzeug eingeben → passendes Werkzeug bei welcher Werkstatt → Karte → KI-Bot.",
+  "lang": "de",
+  "dir": "ltr",
+  "id": "./index.html",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0B0D10",
+  "theme_color": "#146DAB",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Auto-Suche", "short_name": "Auto-Suche", "url": "./index.html?panel=autosuche" },
+    { "name": "KI-Bot", "short_name": "KI-Bot", "url": "./index.html?panel=kibot" },
+    { "name": "Werkzeuge", "short_name": "Werkzeuge", "url": "./index.html?panel=werkzeuge" }
+  ]
+}
