@@ -1,62 +1,58 @@
 # WERKHOF — Das Betriebssystem für die Werkstatt
 
-Einheitliches Werkstatt-OS (Prototyp). Bündelt Aufträge, WhatsApp, KI-Assistent **Hermes**,
-Werkzeug-Sharing, Rechnungen, Buchhaltung, Wissens­basis und mehr in **einer** App.
-Pilot: **KFZ Gorski**, Braunschweig. White-Label-fähig (Multi-Mandant).
+White-Label-Werkstatt-OS (Prototyp). Bündelt Aufträge, WhatsApp, KI-Assistent **Hermes**,
+Werkzeug-Sharing, Rechnungen, Buchhaltung, Wissens­basis und ein **Kundenportal** in einer App.
+Pilot/Erstkunde: **KFZ Gorski**, Braunschweig. Pro Werkstatt umbrandbar (Multi-Tenant).
 
-> Status: **Prototyp mit Demo-Daten** (alles im Browser, localStorage, nichts wird gesendet).
-> Baut konzeptionell auf der XDAB-Plattform + der WERKLEIH-Werkzeug-Sharing-App auf.
+> Repo: `github.com/NatoshiSakamoto67/werkhof` (umbenannt von `werkstatt-os`, lokaler Ordner heißt weiter `werkstatt-os`).
+> Status: **Prototyp mit Demo-Daten** (Browser/localStorage, nichts wird gesendet). `noindex` überall.
 
-## Live ansehen
-- **Landingpage:** `index.html` (Repo-Root)
-- **App-Demo (Handy + Desktop):** [`app/index.html`](app/index.html)
-
-Auf GitHub Pages: Landing unter der Root-URL, App unter `…/app/`.
+## Live
+- **Landing:** https://natoshisakamoto67.github.io/werkhof/
+- **App (Werkstatt-OS):** https://natoshisakamoto67.github.io/werkhof/app/
+- **Kundenportal:** https://natoshisakamoto67.github.io/werkhof/app/kundenportal.html
+- **Onboarding (neue Werkstatt):** https://natoshisakamoto67.github.io/werkhof/onboarding.html
+- **Impressum / Datenschutz:** …/werkhof/impressum.html · …/werkhof/datenschutz.html
 
 ## Struktur
 ```
-werkstatt-os/
-├─ index.html            # Landingpage (Marketing, GitHub-Pages-Einstieg)
+werkhof/
+├─ index.html              # Landingpage (Marketing)
+├─ onboarding.html         # White-Label-Generator: erzeugt app/tenant.js (mit Kontrast-/E.164-Check)
+├─ impressum.html          # Rechtsseiten-Vorlagen (ausfüllbar, vor Go-Live anwaltlich prüfen)
+├─ datenschutz.html
 ├─ app/
-│  ├─ index.html         # WERKHOF-App (Single-File, ~20 Module)
-│  ├─ manifest.json      # PWA-Manifest
-│  ├─ sw.js              # Service Worker (Shell cache-first, DSGVO: keine API/Tiles cachen)
-│  ├─ assets/logo.svg    # 1:1-Vektor-Logo KFZ Gorski
-│  └─ fonts/             # Hanken Grotesk + Bebas Neue (self-hosted, DSGVO)
-├─ docs/ARCHITEKTUR.md   # Bausteine ↔ Plattform-Mapping, v1/später
-├─ robots.txt           # noindex
-└─ verify.mjs           # JS-Syntax-Check aller Inline-Skripte (node verify.mjs)
+│  ├─ index.html           # WERKHOF-App (Single-File, ~20 Module)
+│  ├─ tenant.js            # ►► WHITE-LABEL-KONFIG: Markenname/Farben/WhatsApp/Mandanten ◄◄
+│  ├─ kundenportal.html    # Kundenportal (klickbares Dashboard)
+│  ├─ werkleih/            # eingebettete Werkzeug-Sharing-App (recolored)
+│  ├─ manifest.json · sw.js (network-first) · icons/ · assets/logo.svg · fonts/
+├─ docs/ARCHITEKTUR.md · docs/compliance.md   # Architektur + DSGVO-Entwürfe (AVV/VVT/TOM/Opt-in)
+├─ robots.txt · .nojekyll
+└─ verify.mjs              # JS-Syntax-Check:  node verify.mjs ./app/index.html
 ```
 
-## Die 20 Bausteine (in der App enthalten)
-**Werkstatt:** Dashboard · Kunden (CRM) · Auftragsverwaltung · Terminbuchung ·
-WhatsApp-Posteingang · Orchestra (KI, Human-in-the-Loop) · Freigaben-Queue
-**Teile & Werkzeug:** Werkzeug-Sharing zwischen Werkstätten · Werkzeug-Bestand ·
-Fahrzeug-Kompatibilität · Werkstatt-Karte (OSM) · Lieferantenanbindung
-**Büro:** Rechnungsentwürfe · Dokumentenverwaltung · Buchhaltungsanbindung ·
-Wissen & Reparaturleitfäden (RAG) · Automatisierung (eigene Workflow-Engine)
-**System:** KI-Assistent Hermes · Mobile-/Web-App (PWA) · Multi-Mandanten ·
-Rollen & Rechte · DSGVO-Konzept · Audit-Trail
+## White-Label — neue Werkstatt in 2 Minuten
+1. `onboarding.html` öffnen → Name, Tagline, WhatsApp-Nummer, CI-Farben eingeben (Live-Vorschau + Kontrast-/Nummern-Prüfung).
+2. **tenant.js herunterladen** und als `app/tenant.js` beim Kunden ablegen.
+Fertig — Header-Name, Akzentfarben (`--accent`/`--accent-2`) und Mandanten kommen aus dieser einen Datei. Kein Code, kein Build.
 
 ## Entscheidungen
-- **Workflow-Automation:** eigene schlanke Engine (Trigger → Plan → Freigabe-Queue über
-  ARQ-Cron + agent-core) statt **n8n** — weniger Container, ein Datenpfad, DSGVO-sauberer.
-- **Karten:** Leaflet + OpenStreetMap (lokal/EU), kein Google.
-- **KI:** LiteLLM → AWS Bedrock-EU (Frankfurt); Hermes/Ollama optional auf lokaler GPU.
+- **Workflow-Automation:** eigene schlanke Engine (Trigger → Plan → Freigabe-Queue), kein n8n.
+- **Karten:** Leaflet + OpenStreetMap (EU), kein Google. **KI:** LiteLLM → AWS Bedrock-EU (Frankfurt).
 - **Mensch im Mittelpunkt:** jede schreibende/sendende KI-Aktion braucht eine Freigabe.
+- **PWA:** network-first Service Worker (`werkhof-v3`) → Updates sofort sichtbar; Fallback-URL `…?v=N`.
 
-## Technik
-Reines HTML/CSS/Vanilla-JS, kein Build. Single-File-App, offline-fähig (PWA).
-CI: Blau `#146DAB` (primär) + Gelb-Orange `#FBAF3A` (sekundär), heller + dunkler Modus.
+## Produktiv-Go-Live (Roadmap, Kurzfassung)
+Vor Echtbetrieb mit echten Kundendaten: EU-Server (IONOS/Postgres+RLS+echte Auth statt localStorage/PIN),
+echte Firmendaten in Impressum/`tenant.js`, AVV-Kette + Rechtstexte anwaltlich prüfen, WhatsApp via 360dialog (EU).
+Details: `docs/compliance.md` + `docs/GO-LIVE-CHECKLISTE.md`.
 
 ## Verifizieren
 ```bash
-node verify.mjs        # prüft alle Inline-Skripte mit new Function()
+node verify.mjs ./app/index.html        # prüft Inline-Skripte
+node verify.mjs ./app/werkleih/index.html
 ```
 
-## Nächste Schritte (echtes Backend, „später")
-Termin-/Slot-Backend · WhatsApp Cloud API (Meta/360dialog) · Buchhaltungs-OAuth ·
-echtes pgvector-RAG · SSE-Live-Queue gegen agent-core · PII-Maskierung · JWT-Auth.
-
 ---
-*Demo-Daten sind fiktiv. `noindex` gesetzt. Nicht für Suchmaschinen.*
+*Demo-Daten sind fiktiv. Nicht für Suchmaschinen (noindex).*

@@ -7,6 +7,8 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0B0D10">
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <script>try{if(localStorage.getItem('wh_theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
 <style>
 @font-face{font-family:'Hanken Grotesk';src:url('fonts/HankenGrotesk.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:swap}
@@ -567,7 +569,7 @@ function buildSidebar(){
       h+='<button class="navitem'+(p.id===CUR?' active':'')+'" data-p="'+p.id+'">'+svg(p.icon)+esc(p.label)+'<span class="count'+(p.cb?' b':'')+'">'+(c||"")+'</span></button>';
     });
   });
-  h+='<div style="margin-top:18px;padding:0 4px"><button class="btn btn-sm" style="width:100%" onclick="window.open(\'../../Downloads/kfz-gorski-extracted/kfz-gorski/index.html\')||toast(\'Website-Vorschau\')">↗ Zur Website</button></div>';
+  h+='<div style="margin-top:18px;padding:12px 4px 0;border-top:1px solid var(--line)"><a class="btn btn-sm" style="width:100%;justify-content:center" href="../index.html">↗ Zur Website</a><div style="display:flex;gap:12px;justify-content:center;margin-top:10px;font-size:11.5px"><a href="../impressum.html" style="color:var(--grau);text-decoration:none">Impressum</a><a href="../datenschutz.html" style="color:var(--grau);text-decoration:none">Datenschutz</a></div><div style="text-align:center;font-size:10.5px;color:var(--grau-3);margin-top:8px">Demo · Daten nur im Browser</div></div>';
   $("#sidebar").innerHTML=h;
   $$("#sidebar .navitem").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.p)));
 }

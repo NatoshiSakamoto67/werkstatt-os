@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WERKHOF – Neue Werkstatt einrichten (White-Label)</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0B0D10">
+<style>
+@font-face{font-family:'Hanken Grotesk';src:url('app/fonts/HankenGrotesk.woff2') format('woff2');font-weight:100 900;font-display:swap}
+:root{--ink:#0B0D10;--paper:#fff;--paper-2:#F4F7FA;--line:#E3E7EC;--grau:#565C66;--blau:#146DAB;--orange:#FBAF3A;--gruen:#2E9E5B;--rot:#C2453B;--orange-deep:#9A6410}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--paper-2);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+.bar{background:var(--ink);color:#fff;padding:14px 0}
+.wrap{max-width:1040px;margin:0 auto;padding:0 22px}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between}
+.bar a{color:#cfd3d8;text-decoration:none;font-size:14px;font-weight:600}.bar a:hover{color:#fff}
+.pt{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--orange)}
+h1{font-size:28px;font-weight:800;letter-spacing:-.6px;margin:26px 0 4px}
+.lead{color:var(--grau);margin-bottom:22px;max-width:640px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px}
+.card h2{font-size:16px;font-weight:800;margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:700;margin:14px 0 5px}
+label:first-of-type{margin-top:0}
+input[type=text],input[type=tel]{width:100%;font:inherit;font-size:14.5px;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;outline:none;background:#fff;color:var(--ink)}
+input:focus{border-color:var(--blau)}
+.row{display:flex;gap:12px}.row>div{flex:1}
+.color-row{display:flex;align-items:center;gap:10px}
+.color-row input[type=color]{width:46px;height:40px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;padding:3px}
+.hint{font-size:12px;color:var(--grau);margin-top:5px}
+.warn{font-size:12.5px;font-weight:600;margin-top:6px;padding:7px 10px;border-radius:8px}
+.warn.ok{background:rgba(46,158,91,.12);color:#1f7a44}
+.warn.bad{background:rgba(194,69,59,.12);color:#a3382f}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;padding:12px 18px;border-radius:11px;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--ink)}
+.btn-primary{background:var(--blau);color:#fff;border-color:var(--blau)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+/* live preview */
+.prev{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.prev-top{background:var(--ink);color:#fff;display:flex;align-items:center;gap:11px;padding:13px 16px}
+.prev-mark{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:900;font-size:15px;color:#fff}
+.prev-name{font-weight:800;font-size:15px}.prev-tag{font-size:10px;font-weight:800;letter-spacing:1.5px}
+.prev-body{padding:18px;background:var(--paper-2)}
+.prev-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:12px}
+.prev-btn{display:inline-block;color:#fff;font-weight:700;font-size:13.5px;padding:9px 15px;border-radius:9px}
+.prev-chip{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;margin-right:6px}
+.prev-dark{margin-top:12px;background:#0d1015;border-radius:11px;padding:14px;color:#e7e9ee}
+.prev-dark .lbl{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+pre{background:#0d1015;color:#cfe3f5;border-radius:11px;padding:14px;font-size:12.5px;overflow:auto;font-family:ui-monospace,Menlo,monospace;line-height:1.5;margin-top:12px}
+.steps{font-size:13px;color:var(--grau);margin-top:10px}.steps b{color:var(--ink)}
+footer{text-align:center;color:var(--grau);font-size:13px;padding:24px}
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap"><span class="pt">WERKHOF · ONBOARDING</span><a href="index.html">← Zur Startseite</a></div></div>
+<div class="wrap">
+ <h1>Neue Werkstatt einrichten</h1>
+ <p class="lead">White-Label in 2 Minuten: Daten eingeben → Vorschau prüfen → <b>tenant.js</b> herunterladen und in den App-Ordner des Kunden legen. Kein Code, kein Build. Kontrast &amp; Telefonnummer werden automatisch geprüft.</p>
+ <div class="grid">
+  <div class="card">
+   <h2>1 · Werkstatt-Daten</h2>
+   <label>Werkstatt-/Markenname</label>
+   <input type="text" id="f-name" value="KFZ Gorski" placeholder="z. B. KFZ Gorski">
+   <label>Tagline (Untertitel)</label>
+   <input type="text" id="f-tag" value="Das Betriebssystem für die Werkstatt" placeholder="kurzer Slogan">
+   <label>Mandanten-Kürzel (1 Buchstabe)</label>
+   <input type="text" id="f-mark" value="G" maxlength="2" placeholder="G">
+   <label>Ort</label>
+   <input type="text" id="f-ort" value="Braunschweig" placeholder="Stadt">
+   <label>WhatsApp-Business-Nummer (international, E.164)</label>
+   <input type="tel" id="f-wa" value="" placeholder="+49 170 1234567">
+   <div class="hint" id="wa-hint">Format: +49… — wird zu E.164 normalisiert. Leer lassen = Demo-Hinweis statt toter Link.</div>
+
+   <h2 style="margin-top:22px">2 · Farben (CI)</h2>
+   <label>Primärfarbe</label>
+   <div class="color-row"><input type="color" id="f-c1" value="#146DAB"><input type="text" id="f-c1t" value="#146DAB"></div>
+   <div id="warn1"></div>
+   <label>Sekundärfarbe (Akzent)</label>
+   <div class="color-row"><input type="color" id="f-c2" value="#FBAF3A"><input type="text" id="f-c2t" value="#FBAF3A"></div>
+   <div id="warn2"></div>
+  </div>
+
+  <div class="card">
+   <h2>3 · Live-Vorschau</h2>
+   <div class="prev">
+    <div class="prev-top"><div class="prev-mark" id="p-mark">G</div><div><div class="prev-name" id="p-name">KFZ Gorski</div></div><span class="prev-tag" id="p-tag" style="margin-left:auto">WERKHOF</span></div>
+    <div class="prev-body">
+     <div class="prev-card"><div style="font-size:13px;font-weight:700;margin-bottom:8px">Aktion (Hell-Modus)</div><span class="prev-btn" id="p-btn">Freigeben ✓</span> <span class="prev-chip" id="p-chip">Akzent</span></div>
+     <div class="prev-dark"><div class="lbl" id="p-dlbl" style="margin-bottom:6px">Auto-Suche · Dunkelmodus</div><span class="prev-btn" id="p-dbtn">Senden</span> <span style="font-size:12px" id="p-dtext">Akzent-Text auf Dunkel</span></div>
+    </div>
+   </div>
+   <h2 style="margin-top:22px">4 · tenant.js</h2>
+   <pre id="out"></pre>
+   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+    <button class="btn btn-primary" id="dl">tenant.js herunterladen</button>
+    <button class="btn" id="copy">In Zwischenablage</button>
+   </div>
+   <div class="steps">Danach: Datei als <b>app/tenant.js</b> beim Kunden ablegen (überschreibt die Vorlage). Fertig — der ganze Workspace ist umgebrandet.</div>
+  </div>
+ </div>
+</div>
+<footer>WERKHOF — White-Label-Onboarding · noindex</footer>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+function lum(hex){const c=hex.replace('#','');if(c.length!==6)return 0;const f=i=>{let v=parseInt(c.substr(i,2),16)/255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);};return 0.2126*f(0)+0.7152*f(2)+0.0722*f(4);}
+function ratio(a,b){const l1=lum(a),l2=lum(b);const hi=Math.max(l1,l2),lo=Math.min(l1,l2);return (hi+0.05)/(lo+0.05);}
+function lighten(hex,amt){const c=hex.replace('#','');const r=Math.min(255,Math.round(parseInt(c.substr(0,2),16)+(255-parseInt(c.substr(0,2),16))*amt));const g=Math.min(255,Math.round(parseInt(c.substr(2,2),16)+(255-parseInt(c.substr(2,2),16))*amt));const b=Math.min(255,Math.round(parseInt(c.substr(4,2),16)+(255-parseInt(c.substr(4,2),16))*amt));return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function safeFg(hex){ // hellere Variante fuer Akzent-TEXT auf Dunkel (>=4.5:1 gegen #0d1015)
+  let c=hex;for(let i=0;i<12 && ratio(c,'#0d1015')<4.5;i++){c=lighten(c,0.12);}return c;}
+function normPhone(v){let d=(v||'').replace(/[^\d+]/g,'');if(!d)return '';if(d[0]==='+')d=d.slice(1);d=d.replace(/\D/g,'');if(d.startsWith('00'))d=d.slice(2);if(d.startsWith('0'))d='49'+d.slice(1);return d;}
+function validHex(v){return /^#[0-9A-Fa-f]{6}$/.test(v);}
+
+function build(){
+  const name=$("#f-name").value||"Werkstatt", tag=$("#f-tag").value||"", mark=($("#f-mark").value||name[0]||"W").slice(0,2).toUpperCase(), ort=$("#f-ort").value||"";
+  let c1=$("#f-c1t").value.trim(); if(!validHex(c1))c1="#146DAB";
+  let c2=$("#f-c2t").value.trim(); if(!validHex(c2))c2="#FBAF3A";
+  const waRaw=$("#f-wa").value.trim(); const wa=normPhone(waRaw); const waReady=!!wa;
+
+  // Vorschau
+  $("#p-mark").textContent=mark; $("#p-mark").style.background='linear-gradient(135deg,'+c1+','+c2+')';
+  $("#p-name").textContent=name; $("#p-tag").textContent="WERKHOF"; $("#p-tag").style.color=c2;
+  $("#p-btn").style.background=c1; $("#p-chip").style.background=c1+'22'; $("#p-chip").style.color=c1; $("#p-chip").textContent=ort||"Akzent";
+  const fg=safeFg(c1); $("#p-dbtn").style.background=c1; $("#p-dtext").style.color=fg; $("#p-dlbl").style.color=fg;
+
+  // Kontrast-Checks
+  const rWhiteOnC1=ratio('#ffffff',c1).toFixed(1);
+  const w1=$("#warn1");
+  if(ratio('#ffffff',c1)>=4.5){w1.className="warn ok";w1.textContent="✓ Weißer Text auf Primärfarbe lesbar ("+rWhiteOnC1+":1). Buttons funktionieren.";}
+  else if(ratio('#ffffff',c1)>=3){w1.className="warn ok";w1.textContent="OK für große/fette Schrift ("+rWhiteOnC1+":1). Für Fließtext etwas dunkler wählen.";}
+  else {w1.className="warn bad";w1.textContent="⚠ Zu hell – weißer Button-Text schlecht lesbar ("+rWhiteOnC1+":1). Dunklere Primärfarbe wählen.";}
+  const w2=$("#warn2");
+  if(ratio('#ffffff',c2)<3){w2.className="warn ok";w2.textContent="ℹ Helle Sekundärfarbe – ideal als Flächen/Badge-Akzent, nicht für weißen Text.";}
+  else {w2.className="warn ok";w2.textContent="✓ Sekundärfarbe gesetzt.";}
+
+  // WA-Hinweis
+  const wh=$("#wa-hint");
+  if(!waRaw){wh.textContent="Leer = Demo-Hinweis statt toter Link (waReady=false).";wh.style.color="var(--grau)";}
+  else if(wa.length>=8){wh.textContent="✓ normalisiert: +"+wa;wh.style.color="#1f7a44";}
+  else {wh.textContent="⚠ Nummer sieht unvollständig aus.";wh.style.color="#a3382f";}
+
+  // tenant.js Ausgabe
+  const tenantsLine='[\n    { id: "'+slug(name)+'", name: "'+esc(name)+'", mark: "'+mark+'", ort: "'+esc(ort)+'" }\n  ]';
+  const js='/* tenant.js — White-Label-Konfig für '+esc(name)+' (generiert via Onboarding) */\nwindow.TENANT_CONFIG = {\n  brand: {\n    name:    "'+esc(name)+'",\n    tag:     "'+esc(tag)+'",\n    wa:      "'+wa+'",\n    waReady: '+waReady+'\n  },\n  accent:  "'+c1+'",\n  accent2: "'+c2+'",\n  tenants: '+tenantsLine+'\n};\n';
+  $("#out").textContent=js;
+  return js;
+}
+function slug(s){return (s||'tenant').toLowerCase().replace(/[^\w]+/g,'-').replace(/^-|-$/g,'').slice(0,20)||'tenant';}
+function esc(s){return (s||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"');}
+
+["#f-name","#f-tag","#f-mark","#f-ort","#f-wa","#f-c1t","#f-c2t"].forEach(s=>$(s).addEventListener("input",build));
+$("#f-c1").addEventListener("input",e=>{$("#f-c1t").value=e.target.value.toUpperCase();build();});
+$("#f-c2").addEventListener("input",e=>{$("#f-c2t").value=e.target.value.toUpperCase();build();});
+$("#f-c1t").addEventListener("input",e=>{if(validHex(e.target.value))$("#f-c1").value=e.target.value;});
+$("#f-c2t").addEventListener("input",e=>{if(validHex(e.target.value))$("#f-c2").value=e.target.value;});
+$("#dl").addEventListener("click",()=>{const js=build();const b=new Blob([js],{type:"text/javascript"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="tenant.js";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);});
+$("#copy").addEventListener("click",()=>{const js=build();navigator.clipboard&&navigator.clipboard.writeText(js);$("#copy").textContent="✓ kopiert";setTimeout(()=>$("#copy").textContent="In Zwischenablage",1500);});
+build();
+</script>
+</body>
+</html>
