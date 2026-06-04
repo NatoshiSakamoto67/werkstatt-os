@@ -681,11 +681,13 @@ function renderUebersicht(){
   SEED.tickets.forEach(t=> acts.push({d:t.erstellt, t:"Ticket "+t.id+": "+t.betreff, s:t.status, ic:"wa"}));
   SEED.rechnungen.forEach(r=> acts.push({d:r.datum, t:"Rechnung "+r.id, s:rechStatus(r), ic:"inv"}));
   acts.sort((a,b)=> b.d.localeCompare(a.d));
+  if(!acts.length){ $("#ov-activity").innerHTML='<div style="text-align:center;color:var(--grau);padding:24px 10px;font-size:13.5px">Noch keine Aktivität.</div>'; return; }
   $("#ov-activity").innerHTML = acts.slice(0,5).map(a=>(
-    '<div class="litem" style="cursor:default"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'+
+    '<button class="litem" data-goto="'+(a.ic==="wa"?"tickets":"rechnungen")+'" style="cursor:pointer;width:100%;text-align:left;background:none;border:none;font:inherit;padding:11px 4px"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'+
     (a.ic==="wa"? '<path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 20l1-3.5A8.4 8.4 0 1 1 21 11.5z"/>' : '<path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6"/>')+
-    '</svg></div><div class="body"><b style="font-size:14.5px">'+esc(a.t)+'</b><small>'+dDE(a.d)+'</small></div><div class="meta">'+badge(a.s)+'</div></div>'
+    '</svg></div><div class="body"><b style="font-size:14.5px">'+esc(a.t)+'</b><small>'+dDE(a.d)+'</small></div><div class="meta">'+badge(a.s)+'</div></button>'
   )).join("");
+  $$("#ov-activity [data-goto]").forEach(el=> el.addEventListener("click", ()=> goto(el.dataset.goto)));
 }
 
 /* — Rechnungen — */
