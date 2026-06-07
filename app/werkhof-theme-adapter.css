@@ -1,0 +1,70 @@
+/* werkhof-theme-adapter.css  —  Bruecke: DS-Kontrakt (--ds-*)  ->  WERKHOF-Legacy.
+   Liegt unter ~/werkhof/app/werkhof-theme-adapter.css. KEIN Rewrite des Haupt-<style>.
+   MARKUP-REIHENFOLGE: WERKHOF-<style>  ->  DIESER Adapter (Adapter MUSS NACH dem
+   grossen WERKHOF-Block stehen, sonst gewinnen dessen :root-Defaults via gleicher
+   Spezifitaet + spaeterer Position). */
+
+:root{
+  /* Flaechen / Papier */
+  --paper:    var(--ds-bg);
+  --paper-2:  var(--ds-surface);
+  --paper-3:  var(--ds-surface-2);
+
+  /* WERKHOF-interne Aliase */
+  --bg:       var(--ds-bg);
+  --surface:  var(--ds-surface);
+  --text:     var(--ds-text);
+  --muted:    var(--ds-text-soft);
+
+  /* Tinte / Text */
+  --ink:      var(--ds-text);
+  --ink-2:    var(--ds-bg);
+  --ink-3:    var(--ds-surface-2);
+  --grau:     var(--ds-text-soft);
+  --grau-2:   var(--ds-text-soft);
+  --grau-3:   var(--ds-text-soft);
+
+  /* Linien */
+  --line:     var(--ds-line);
+  --line-2:   var(--ds-line-2);
+
+  /* CI / Akzente — DS leitet die Skala aus EINER Kundenfarbe ab */
+  --accent:        var(--ds-accent);
+  --accent-2:      var(--ds-accent-2);
+  --accent-deep:   var(--ds-accent-hover);
+  --orange:        var(--ds-accent-2);
+  --orange-deep:   var(--ds-accent-2);
+  --wa:            var(--ds-accent);
+
+  /* Schrift */
+  --display:  var(--ds-font-display);
+  --body:     var(--ds-font-body);
+
+  /* Radien */
+  --radius:    var(--ds-radius);
+  --radius-lg: var(--ds-radius-lg);
+
+  /* Schatten */
+  --sh-card:    var(--ds-shadow);
+  --sh-card-lg: var(--ds-shadow);
+}
+
+/* Textur aus dem Theme (background-image ODER none) — ersetzt/abschaltet
+   die fest verdrahtete WERKHOF-Papierfaser ueber den DS-Kontrakt. */
+body{ background-image: var(--ds-texture, none); }
+
+/* ON-ACCENT-LESBARKEIT: WERKHOF schreibt auf akzent-hinterlegten Elementen
+   hart color:#fff. Bei sehr hellen Kundenfarben unlesbar -> gezielt mit
+   --ds-on-accent (contrast-color + #fff-Fallback) ueberschreiben, nur die
+   real akzentgefuellten Selektoren, ohne Layout/Markup zu beruehren. */
+.btn-primary,
+.bub.me, .bub.me b, .bub.me i,
+.wb.out,
+.chat-input .send,
+.kpill.on,
+.navitem .count.b{
+  color: var(--ds-on-accent, #fff);
+}
+
+/* Fokus-Ring braucht KEINE Extra-Regel: WERKHOF liest :focus-visible{outline:
+   var(--accent)}, und --accent ist jetzt = var(--ds-accent). */

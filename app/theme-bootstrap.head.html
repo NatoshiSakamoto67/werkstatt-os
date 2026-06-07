@@ -1,0 +1,54 @@
+<!-- =============================================================================
+     theme-bootstrap (INLINE, synchron, VOR dem ersten Paint)
+     -----------------------------------------------------------------------------
+     Diese drei Zeilen-Bloecke gehoeren als INLINE-Snippets in den <head> von
+     WERKHOF/index.html — siehe exakte Position in headTags. Sie laufen, BEVOR
+     der grosse WERKHOF-<style>-Block paintet, und vermeiden FOUC:
+
+       1) liest window.TENANT_CONFIG (aus tenant.js, das DAVOR geladen wird),
+       2) setzt data-theme am <html> (Allowlist, Default "papier"),
+       3) setzt --cust-accent / --cust-accent2 (DS leitet die Palette ab) und
+          optional --cust-font aus der Font-Registry,
+       4) setzt den Dark-Mode (html.dark) aus wh_theme — wie gehabt.
+
+     contrast-color/color-mix-Ableitungen kommen aus werkstatt.theme.css; hier
+     wird NUR die EINE Kundenfarbe gesetzt, nicht die abgeleitete Skala.
+     ========================================================================== -->
+
+<!-- (A) Dark-Mode-Bootstrap — bleibt unveraendert, MUSS ganz oben stehen. -->
+<script>try{if(localStorage.getItem('wh_theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
+
+<!-- (B) Theme + Kundenfarbe + Font-Bootstrap — NACH <script src="tenant.js">. -->
+<script src="tenant.js"></script>
+<script>
+(function(){
+  "use strict";
+  var root = document.documentElement;
+  var TC = (window.TENANT_CONFIG || {});
+  var ALLOWED_THEMES = ["papier","stahl","glas","edel","minimal"];
+  var ALLOWED_FONTS  = ["fraunces","playfair","space","inter","oswald"];
+  var FONT_VAR = {
+    fraunces:"--font-fraunces", playfair:"--font-playfair",
+    space:"--font-space", inter:"--font-inter", oswald:"--font-oswald"
+  };
+
+  function safe(v){ return (typeof v==="string" && v && !/[<>{};]/.test(v)) ? v.trim() : ""; }
+  function setVar(n,v){ if(v) try{ root.style.setProperty(n,String(v)); }catch(e){} }
+
+  /* 1) Theme -> data-theme (papier = :root-Default der werkstatt.theme.css). */
+  var theme = String(TC.theme || "papier").toLowerCase();
+  if (ALLOWED_THEMES.indexOf(theme) === -1) theme = "papier";
+  root.setAttribute("data-theme", theme);
+
+  /* 2) EINE Kundenfarbe -> --cust-accent; DS leitet hover/soft/on-accent ab.
+   *    accent2 -> --cust-accent2/--ds-accent-2-Hook. Fallback bleibt Theme-CI. */
+  setVar("--cust-accent",  safe(TC.accent));
+  setVar("--cust-accent2", safe(TC.accent2));
+
+  /* 3) Optionaler Headline-Font -> --cust-font (DS: --ds-font-display liest das). */
+  var font = String(TC.font || "").toLowerCase();
+  if (font && ALLOWED_FONTS.indexOf(font) !== -1) {
+    setVar("--cust-font", "var(" + FONT_VAR[font] + ")");
+  }
+})();
+</script>

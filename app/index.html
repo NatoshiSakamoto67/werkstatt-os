@@ -10,6 +10,21 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <script>try{if(localStorage.getItem('wh_theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}</script>
+<!-- ===== WHITE-LABEL: Tenant + Theme/Font/CI vor Paint, dann DS-Tokens + Fonts ===== -->
+<script src="tenant.js"></script>
+<script>
+(function(){var r=document.documentElement,T=window.TENANT_CONFIG||{},
+  A={papier:1,stahl:1,glas:1,edel:1,minimal:1},F={fraunces:1,playfair:1,space:1,inter:1,oswald:1},
+  t=String(T.theme||"papier").toLowerCase(),
+  c=String(T.accent||"").trim(),c2=String(T.accent2||"").trim(),f=String(T.font||"").toLowerCase(),
+  ok=function(v){return /^#(?:[0-9a-f]{3,8})$/i.test(v)||/^(?:rgb|rgba|oklch|oklab)\(/i.test(v);};
+  r.setAttribute("data-theme",A[t]?t:"papier");
+  if(ok(c))r.style.setProperty("--cust-accent",c);
+  if(ok(c2))r.style.setProperty("--cust-accent2",c2);
+  if(F[f])r.style.setProperty("--cust-font","var(--font-"+f+")");})();
+</script>
+<link rel="stylesheet" href="werkstatt.theme.css">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
 /* =============================================================================
  *  WERKHOF · Werkstatt-OS  —  Re-Skin auf Werkstatt-Design-System
@@ -918,6 +933,8 @@ html:not(.dark) .tabbar{background:rgba(252,251,248,.86)}
 }
 
 </style>
+<!-- White-Label-Adapter NACH dem grossen WERKHOF-<style> (gewinnt per Source-Order) -->
+<link rel="stylesheet" href="werkhof-theme-adapter.css">
 </head>
 <body>
 
