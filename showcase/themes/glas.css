@@ -1,0 +1,574 @@
+/* ============================================================
+   Glas · Glassmorphism — eigenstaendiges Theme
+   Klassen-Kontrakt: :root, body, .pv*, CI-Akzent via --cust-accent
+   Keine externen Fonts/CDNs. Animationen nur transform/opacity.
+   ============================================================ */
+
+:root {
+  /* CI-Akzent: Kunde ueberschreibt nur --cust-accent. Alles andere leitet ab. */
+  --cust-accent: #4f7cff;
+  --accent: var(--cust-accent);
+  --accent-soft: color-mix(in oklab, var(--accent) 22%, white);
+  --accent-deep: color-mix(in oklab, var(--accent) 70%, #0b1230);
+  --accent-ink: color-mix(in oklab, var(--accent) 30%, #0a0f24);
+
+  /* Glas-Flaechen */
+  --glass-bg: rgba(255, 255, 255, 0.42);
+  --glass-bg-strong: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.62);
+  --glass-edge: rgba(255, 255, 255, 0.9);   /* Glanzkante / inset highlight */
+  --glass-shadow: 0 18px 50px -16px rgba(20, 28, 64, 0.32);
+  --glass-shadow-soft: 0 8px 28px -14px rgba(20, 28, 64, 0.26);
+  --blur: 20px;
+  --blur-strong: 30px;
+
+  /* Text */
+  --ink: #161a2b;
+  --ink-soft: #424a66;
+  --ink-faint: #6a7290;
+
+  /* Radien (weiche grosse Radien) */
+  --r-sm: 14px;
+  --r-md: 20px;
+  --r-lg: 28px;
+  --r-xl: 36px;
+
+  /* Rhythmus */
+  --pad: clamp(1.1rem, 0.7rem + 1.6vw, 1.9rem);
+  --gap: clamp(1rem, 0.6rem + 1.4vw, 1.6rem);
+  --section-y: clamp(3.5rem, 2.2rem + 5vw, 7rem);
+
+  /* Typo-Charakter ueber System-Stacks */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-display: ui-rounded, "SF Pro Rounded", system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+
+  --dur: 320ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  letter-spacing: 0.002em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* Lebendiger, dezenter Farbverlauf-Hintergrund mit weichen Lichtflecken */
+  background-color: #eef2fb;
+  background-image:
+    radial-gradient(42rem 42rem at 12% -8%,
+      color-mix(in oklab, var(--accent) 34%, transparent), transparent 60%),
+    radial-gradient(38rem 38rem at 92% 6%,
+      rgba(255, 138, 196, 0.42), transparent 58%),
+    radial-gradient(46rem 46rem at 78% 104%,
+      color-mix(in oklab, var(--accent) 26%, transparent), transparent 60%),
+    radial-gradient(34rem 34rem at 4% 92%,
+      rgba(120, 224, 210, 0.4), transparent 60%),
+    linear-gradient(180deg, #f4f7ff 0%, #e9eefb 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Feine Atmosphaere/Koernung ueber Pseudo-Layer, ohne Bilddatei */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1.4px);
+  background-size: 4px 4px;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+
+/* ---------- Wrapper ---------- */
+.pv {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(1rem, 0.5rem + 2vw, 2rem);
+}
+
+/* ---------- Navigation ---------- */
+.pv-nav {
+  position: sticky;
+  top: clamp(0.6rem, 0.3rem + 1vw, 1rem);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem clamp(0.9rem, 0.6rem + 1vw, 1.3rem);
+  border-radius: var(--r-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  box-shadow: var(--glass-shadow-soft),
+    inset 0 1px 0 var(--glass-edge);
+}
+
+.pv-nav .pv-brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.18rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.pv-nav .pv-brand::before {
+  content: "";
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 9px;
+  background:
+    linear-gradient(150deg, var(--accent-soft), var(--accent) 70%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.85),
+    0 4px 12px -4px var(--accent);
+}
+
+.pv-nav .pv-links {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.pv-nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.94rem;
+  letter-spacing: 0.005em;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  transition: color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.pv-nav a:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1px);
+}
+
+/* ---------- Hero ---------- */
+.pv-hero {
+  position: relative;
+  margin-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+  padding: clamp(2rem, 1.2rem + 4vw, 4rem);
+  border-radius: var(--r-xl);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--blur-strong)) saturate(180%);
+  backdrop-filter: blur(var(--blur-strong)) saturate(180%);
+  box-shadow: var(--glass-shadow),
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+/* Diagonaler Glanz ueber die Glaskarte (rein dekorativ) */
+.pv-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 32%,
+    rgba(255, 255, 255, 0) 70%,
+    rgba(255, 255, 255, 0.18) 100%);
+}
+
+.pv-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 16%, white);
+  border: 1px solid color-mix(in oklab, var(--accent) 26%, white);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.pv-title {
+  font-family: var(--font-display);
+  margin: 1.1rem 0 0;
+  font-weight: 800;
+  font-size: clamp(2.4rem, 1.2rem + 5.6vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  max-width: 16ch;
+}
+
+.pv-sub {
+  margin: 1.1rem 0 0;
+  font-size: clamp(1.05rem, 1rem + 0.5vw, 1.3rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.pv-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.2rem);
+}
+
+/* ---------- Buttons ---------- */
+.pv-btn {
+  --btn-grad-a: var(--accent-soft);
+  --btn-grad-b: var(--accent);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--accent) 55%, white);
+  color: #fff;
+  background: linear-gradient(160deg, var(--btn-grad-a), var(--btn-grad-b) 78%);
+  box-shadow: 0 12px 28px -12px var(--accent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    filter var(--dur) var(--ease);
+}
+
+.pv-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px -12px var(--accent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  filter: saturate(112%);
+}
+
+.pv-btn:active { transform: translateY(0); }
+
+.pv-btn.ghost {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: var(--glass-shadow-soft),
+    inset 0 1px 0 var(--glass-edge);
+}
+
+.pv-btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.7);
+  filter: none;
+}
+
+/* ---------- Stats-Band ---------- */
+.pv-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--gap);
+  margin-top: clamp(1.5rem, 1rem + 1.5vw, 2.2rem);
+}
+
+.pv-stat {
+  text-align: center;
+  padding: clamp(1.1rem, 0.8rem + 1vw, 1.6rem) 1rem;
+  border-radius: var(--r-md);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(170%);
+  backdrop-filter: blur(var(--blur)) saturate(170%);
+  box-shadow: var(--glass-shadow-soft),
+    inset 0 1px 0 var(--glass-edge);
+  transition: transform var(--dur) var(--ease);
+}
+
+.pv-stat:hover { transform: translateY(-3px); }
+
+.pv-stat-num {
+  font-family: var(--font-display);
+  display: block;
+  font-weight: 800;
+  font-size: clamp(1.9rem, 1.2rem + 2.4vw, 2.9rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(150deg, var(--accent-ink), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pv-stat-lbl {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---------- Sections ---------- */
+.pv-section { margin-top: var(--section-y); }
+
+.pv-section-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 1.1rem + 2vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0 0 clamp(1.2rem, 0.8rem + 1.5vw, 2rem);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pv-section-title::before {
+  content: "";
+  width: 0.55rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background: linear-gradient(var(--accent-soft), var(--accent));
+  box-shadow: 0 3px 10px -4px var(--accent);
+}
+
+/* ---------- Cards (Bento-Anmutung durch erste, breite Karte) ---------- */
+.pv-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--gap);
+}
+
+.pv-card {
+  position: relative;
+  padding: var(--pad);
+  border-radius: var(--r-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(175%);
+  backdrop-filter: blur(var(--blur)) saturate(175%);
+  box-shadow: var(--glass-shadow-soft),
+    inset 0 1px 0 var(--glass-edge);
+  overflow: hidden;
+  transition: transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.pv-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(20rem 12rem at 100% 0%,
+    color-mix(in oklab, var(--accent) 14%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.pv-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-edge);
+}
+
+.pv-card:hover::after { opacity: 1; }
+
+/* Erste Karte als groesseres Bento-Element auf breiten Viewports */
+@media (min-width: 720px) {
+  .pv-cards { grid-template-columns: repeat(3, 1fr); }
+  .pv-card:first-child { grid-column: span 2; }
+}
+
+.pv-card-t {
+  font-family: var(--font-display);
+  margin: 0.6rem 0 0;
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.pv-card-d {
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.pv-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 14%, white);
+  border: 1px solid color-mix(in oklab, var(--accent) 24%, white);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ---------- Formular ---------- */
+.pv-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: var(--gap);
+  padding: clamp(1.4rem, 1rem + 2vw, 2.4rem);
+  border-radius: var(--r-xl);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--blur-strong)) saturate(180%);
+  backdrop-filter: blur(var(--blur-strong)) saturate(180%);
+  box-shadow: var(--glass-shadow),
+    inset 0 1px 0 var(--glass-edge);
+}
+
+.pv-field { display: flex; flex-direction: column; gap: 0.4rem; }
+
+/* Volle Breite fuer ein evtl. Textarea/Submit-Feld erlauben */
+.pv-field.full { grid-column: 1 / -1; }
+
+.pv-field label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.pv-field input,
+.pv-field select {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--ink);
+  padding: 0.8rem 1rem;
+  border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 2px rgba(20, 28, 64, 0.06);
+  transition: border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.pv-field select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+    linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+  background-position: calc(100% - 19px) 53%, calc(100% - 14px) 53%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.4rem;
+}
+
+.pv-field input::placeholder { color: var(--ink-faint); opacity: 0.8; }
+
+.pv-field input:hover,
+.pv-field select:hover { background: rgba(255, 255, 255, 0.68); }
+
+.pv-field input:focus,
+.pv-field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 32%, transparent),
+    inset 0 1px 2px rgba(20, 28, 64, 0.05);
+}
+
+/* ---------- Footer ---------- */
+.pv-footer {
+  margin-top: var(--section-y);
+  padding: clamp(1.4rem, 1rem + 1.5vw, 2rem);
+  border-radius: var(--r-lg);
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(170%);
+  backdrop-filter: blur(var(--blur)) saturate(170%);
+  box-shadow: var(--glass-shadow-soft),
+    inset 0 1px 0 var(--glass-edge);
+}
+
+.pv-footer a { color: var(--accent-ink); text-decoration: none; font-weight: 600; }
+.pv-footer a:hover { text-decoration: underline; }
+
+/* ---------- a11y: sichtbarer Fokus ---------- */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.pv-nav a:focus-visible,
+.pv-btn:focus-visible {
+  outline: 3px solid var(--accent-ink);
+  outline-offset: 3px;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  body { background-attachment: scroll; }
+}
+
+/* ---------- Fallback ohne backdrop-filter (Lesbarkeit sichern) ---------- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .pv-nav,
+  .pv-hero,
+  .pv-stat,
+  .pv-card,
+  .pv-form,
+  .pv-footer,
+  .pv-btn.ghost { background: rgba(255, 255, 255, 0.85); }
+  .pv-field input,
+  .pv-field select { background: rgba(255, 255, 255, 0.92); }
+}
+
+/* ---------- Kleinere Viewports ---------- */
+@media (max-width: 540px) {
+  .pv-nav { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+  .pv-nav .pv-links { justify-content: center; }
+}

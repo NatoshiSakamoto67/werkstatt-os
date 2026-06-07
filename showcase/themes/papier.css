@@ -1,0 +1,496 @@
+/* ============================================================
+   Papier · Werkstatt-Editorial  (slug: papier)
+   Eigenstaendiges Theme. Keine externen Fonts/CDNs.
+   CI-Akzent ueber --cust-accent ueberschreibbar.
+   ============================================================ */
+
+:root {
+  /* ---- Kunden-Akzent (per --cust-accent ueberschreibbar) ---- */
+  --cust-accent: #146DAB;          /* CI Blau, Default */
+  --pp-orange: #FBAF3A;            /* CI Orange */
+
+  /* ---- Papier-Palette ---- */
+  --pp-paper:   #FCFBF8;           /* warmes Off-White */
+  --pp-paper-2: #F6F3EC;           /* tieferes Papier (Karten/Bänder) */
+  --pp-ink:     #1C1A16;           /* fast-schwarze Tinte */
+  --pp-ink-2:   #5A554B;           /* gedämpfte Tinte (Subtext) */
+  --pp-line:    #DED7C8;           /* Faser-Linie / Rahmen */
+  --pp-line-2:  #CFC6B2;           /* kräftigere Linie */
+  --pp-orange-soft: #FCEFD2;       /* Orange-Wash für Flächen */
+
+  /* ---- Typo ---- */
+  --pp-serif: Georgia, "Times New Roman", "Times", "Liberation Serif", serif;
+  --pp-mono:  "SFMono-Regular", ui-monospace, "Menlo", "Consolas", "Liberation Mono", monospace;
+  --pp-sans:  -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+  --pp-title: clamp(2.75rem, 1.2rem + 6.4vw, 6.25rem);
+  --pp-sec:   clamp(1.6rem, 1rem + 2.4vw, 2.6rem);
+
+  /* ---- Maße / Motion ---- */
+  --pp-radius: 5px;                /* leicht eckig */
+  --pp-radius-pill: 2px;
+  --pp-maxw: 1100px;
+  --pp-gutter: clamp(1.1rem, 0.6rem + 2vw, 2rem);
+  --pp-section: clamp(3.5rem, 2.5rem + 5vw, 7rem);
+  --pp-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --pp-dur: 240ms;
+  --pp-shadow: 0 1px 0 var(--pp-line), 0 18px 40px -28px rgba(28, 26, 22, 0.45);
+}
+
+/* ---- Papier-Faser-Textur: feines Doppel-Raster, sehr subtil ---- */
+body {
+  margin: 0;
+  background-color: var(--pp-paper);
+  background-image:
+    radial-gradient(rgba(28, 26, 22, 0.035) 0.5px, transparent 0.6px),
+    radial-gradient(rgba(28, 26, 22, 0.022) 0.5px, transparent 0.6px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 1px 2px;
+  color: var(--pp-ink);
+  font-family: var(--pp-serif);
+  font-size: 18px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ---- a11y: sichtbarer Fokus ---- */
+:where(a, button, input, select):focus-visible {
+  outline: 2px solid var(--cust-accent);
+  outline-offset: 3px;
+  border-radius: var(--pp-radius);
+}
+
+/* ============================================================
+   Wrapper
+   ============================================================ */
+.pv {
+  max-width: var(--pp-maxw);
+  margin-inline: auto;
+  padding-inline: var(--pp-gutter);
+}
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+.pv-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.4rem;
+  border-bottom: 1px solid var(--pp-line);
+  flex-wrap: wrap;
+}
+
+.pv-nav .pv-brand {
+  font-family: var(--pp-serif);
+  font-weight: 700;
+  font-size: 1.32rem;
+  letter-spacing: -0.01em;
+  color: var(--pp-ink);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5ch;
+}
+.pv-nav .pv-brand::before {
+  content: "//";
+  font-family: var(--pp-mono);
+  font-size: 0.78em;
+  font-weight: 600;
+  color: var(--pp-orange);
+  letter-spacing: 0;
+}
+
+.pv-nav .pv-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.9rem, 0.4rem + 1.6vw, 2rem);
+  flex-wrap: wrap;
+}
+
+.pv-nav a {
+  font-family: var(--pp-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--pp-ink-2);
+  text-decoration: none;
+  position: relative;
+  padding-block: 0.2rem;
+  transition: color var(--pp-dur) var(--pp-ease);
+}
+.pv-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1.5px;
+  background: var(--cust-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--pp-dur) var(--pp-ease);
+}
+.pv-nav a:hover { color: var(--pp-ink); }
+.pv-nav a:hover::after { transform: scaleX(1); }
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.pv-hero {
+  padding-block: clamp(3rem, 2rem + 6vw, 6.5rem) var(--pp-section);
+  border-bottom: 1px solid var(--pp-line);
+  position: relative;
+}
+
+.pv-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6ch;
+  font-family: var(--pp-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pp-orange);
+  margin: 0 0 1.4rem;
+}
+.pv-eyebrow::before {
+  content: "//";
+  font-weight: 600;
+}
+
+.pv-title {
+  font-family: var(--pp-serif);
+  font-weight: 700;
+  font-size: var(--pp-title);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  margin: 0 0 1.4rem;
+  max-width: 16ch;
+  text-wrap: balance;
+}
+.pv-title em {
+  font-style: italic;
+  color: var(--cust-accent);
+}
+
+.pv-sub {
+  font-family: var(--pp-serif);
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.35rem);
+  line-height: 1.55;
+  color: var(--pp-ink-2);
+  max-width: 56ch;
+  margin: 0 0 2.2rem;
+}
+
+.pv-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.pv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6ch;
+  font-family: var(--pp-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--pp-paper);
+  background: var(--cust-accent);
+  border: 1.5px solid var(--cust-accent);
+  border-radius: var(--pp-radius);
+  padding: 0.85rem 1.5rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--pp-dur) var(--pp-ease),
+              box-shadow var(--pp-dur) var(--pp-ease),
+              background-color var(--pp-dur) var(--pp-ease);
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--cust-accent) 60%, black);
+}
+.pv-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 color-mix(in oklab, var(--cust-accent) 60%, black);
+}
+.pv-btn:active { transform: translateY(0); }
+
+.pv-btn.ghost {
+  color: var(--pp-ink);
+  background: transparent;
+  border-color: var(--pp-line-2);
+  box-shadow: none;
+}
+.pv-btn.ghost::after {
+  content: "→";
+  font-family: var(--pp-serif);
+  transition: transform var(--pp-dur) var(--pp-ease);
+}
+.pv-btn.ghost:hover {
+  border-color: var(--pp-ink);
+  background: var(--pp-paper-2);
+  transform: translateY(-2px);
+  box-shadow: none;
+}
+.pv-btn.ghost:hover::after { transform: translateX(3px); }
+
+/* ============================================================
+   Stats-Band
+   ============================================================ */
+.pv-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--pp-line);
+  border: 1px solid var(--pp-line);
+  border-radius: var(--pp-radius);
+  overflow: hidden;
+  margin-block: var(--pp-section);
+}
+
+.pv-stat {
+  background: var(--pp-paper);
+  padding: 1.7rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pv-stat-num {
+  font-family: var(--pp-serif);
+  font-weight: 700;
+  font-size: clamp(2rem, 1.4rem + 1.8vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--pp-ink);
+}
+.pv-stat-num::first-letter { color: var(--cust-accent); }
+
+.pv-stat-lbl {
+  font-family: var(--pp-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pp-ink-2);
+}
+
+/* ============================================================
+   Sektion
+   ============================================================ */
+.pv-section {
+  padding-block: var(--pp-section);
+  border-bottom: 1px solid var(--pp-line);
+}
+
+.pv-section-title {
+  font-family: var(--pp-serif);
+  font-weight: 700;
+  font-size: var(--pp-sec);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 2rem;
+  position: relative;
+  padding-top: 1.1rem;
+}
+.pv-section-title::before {
+  content: "//";
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--pp-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pp-orange);
+  letter-spacing: 0;
+}
+
+/* ============================================================
+   Karten (Beleg/Docket-Stil)
+   ============================================================ */
+.pv-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1.3rem;
+}
+
+.pv-card {
+  background: var(--pp-paper-2);
+  border: 1px solid var(--pp-line);
+  border-radius: var(--pp-radius);
+  padding: 1.6rem 1.5rem 1.7rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--pp-shadow);
+  transition: transform var(--pp-dur) var(--pp-ease),
+              box-shadow var(--pp-dur) var(--pp-ease);
+}
+/* Docket-Kante: Akzentstreifen + gestrichelte Perforation oben */
+.pv-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--cust-accent);
+}
+.pv-card::after {
+  content: "";
+  position: absolute;
+  top: 14px; left: 0; right: 0;
+  border-top: 1px dashed var(--pp-line-2);
+}
+.pv-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 1px 0 var(--pp-line), 0 26px 50px -26px rgba(28, 26, 22, 0.5);
+}
+
+.pv-card-t {
+  font-family: var(--pp-serif);
+  font-weight: 700;
+  font-size: 1.32rem;
+  letter-spacing: -0.01em;
+  margin: 1rem 0 0.55rem;
+  color: var(--pp-ink);
+}
+
+.pv-card-d {
+  font-family: var(--pp-serif);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--pp-ink-2);
+  margin: 0;
+}
+
+.pv-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--pp-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pp-ink);
+  background: var(--pp-orange-soft);
+  border: 1px solid color-mix(in oklab, var(--pp-orange) 55%, var(--pp-line));
+  border-radius: var(--pp-radius-pill);
+  padding: 0.28rem 0.6rem;
+  margin-top: 1.1rem;
+}
+
+/* ============================================================
+   Formular
+   ============================================================ */
+.pv-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem 1.3rem;
+  background: var(--pp-paper-2);
+  border: 1px solid var(--pp-line);
+  border-radius: var(--pp-radius);
+  padding: clamp(1.4rem, 1rem + 2vw, 2.4rem);
+  box-shadow: var(--pp-shadow);
+}
+
+.pv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pv-field:last-of-type,
+.pv-field.full { grid-column: 1 / -1; }
+
+.pv-field label {
+  font-family: var(--pp-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pp-ink-2);
+}
+
+.pv-field input,
+.pv-field select {
+  font-family: var(--pp-serif);
+  font-size: 1rem;
+  color: var(--pp-ink);
+  background: var(--pp-paper);
+  border: 1px solid var(--pp-line-2);
+  border-radius: var(--pp-radius);
+  padding: 0.8rem 0.9rem;
+  width: 100%;
+  transition: border-color var(--pp-dur) var(--pp-ease),
+              box-shadow var(--pp-dur) var(--pp-ease);
+}
+.pv-field select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--pp-ink-2) 50%),
+    linear-gradient(135deg, var(--pp-ink-2) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 13px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.4rem;
+}
+.pv-field input::placeholder { color: color-mix(in oklab, var(--pp-ink-2) 65%, transparent); }
+.pv-field input:focus,
+.pv-field select:focus {
+  outline: none;
+  border-color: var(--cust-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--cust-accent) 18%, transparent);
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.pv-footer {
+  padding-block: 2.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--pp-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pp-ink-2);
+}
+.pv-footer a {
+  color: var(--pp-ink-2);
+  text-decoration: none;
+  transition: color var(--pp-dur) var(--pp-ease);
+}
+.pv-footer a:hover { color: var(--cust-accent); }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .pv-form { grid-template-columns: 1fr; }
+  .pv-nav { gap: 0.75rem; }
+  .pv-footer { flex-direction: column; align-items: flex-start; }
+}
+
+/* ============================================================
+   Reduced Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .pv-btn:hover,
+  .pv-card:hover,
+  .pv-btn.ghost:hover { transform: none; }
+}

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design-Pakete &middot; Vorschau &amp; Auswahl</title>
+<meta name="description" content="Theme-Vorschau fuer Meisterwerkstatt-Websites: Papier, Stahl, Glas, Edel und Minimal im direkten Vergleich.">
+
+<!-- AKTIVES THEME-STYLESHEET (wird per JS umgeschaltet) -->
+<link id="theme" rel="stylesheet" href="papier.css">
+
+<!-- MINIMALES EIGEN-CSS: nur fuer die Umschalter-Leiste. Der Rest kommt aus dem Theme. -->
+<style>
+  /* Reset / Grundlagen, damit die Picker-Leiste unabhaengig vom Theme stabil ist */
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; }
+
+  /* ----- Picker-Leiste (themenneutral, dunkles Tool-Chrome) ----- */
+  .pk {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #0d0f12;
+    color: #e9eaec;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .pk-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: .85rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 1rem;
+  }
+  .pk-label {
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #7e828b;
+    margin-right: .25rem;
+    flex: 0 0 auto;
+  }
+  .pk-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    flex: 1 1 auto;
+  }
+  .pk-tab {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,.16);
+    background: #16191e;
+    color: #cfd2d8;
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+    padding: .5rem .85rem;
+    border-radius: 7px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    transition: transform .18s ease, background-color .18s ease, border-color .18s ease, color .18s ease;
+  }
+  .pk-tab .pk-dot {
+    width: .7rem;
+    height: .7rem;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .pk-tab:hover { background: #20242b; border-color: rgba(255,255,255,.3); transform: translateY(-1px); }
+  .pk-tab:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+  .pk-tab[aria-pressed="true"] {
+    background: #f4f5f7;
+    color: #14171c;
+    border-color: #f4f5f7;
+  }
+
+  /* Swatch-Farben je Paket auf der Picker-Leiste */
+  .pk-tab[data-slug="papier"]  .pk-dot { background: #e8732a; }
+  .pk-tab[data-slug="stahl"]   .pk-dot { background: #ff7a18; }
+  .pk-tab[data-slug="glas"]    .pk-dot { background: #4f86ff; }
+  .pk-tab[data-slug="edel"]    .pk-dot { background: #c8a24a; }
+  .pk-tab[data-slug="minimal"] .pk-dot { background: #111111; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+
+  /* ----- Info-Zeile zum aktiven Paket ----- */
+  .pk-info {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: .9rem 1.25rem 1.05rem;
+    border-top: 1px solid rgba(255,255,255,.07);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .35rem .5rem;
+  }
+  .pk-info-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .55rem;
+  }
+  .pk-info-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+  .pk-info-tagline {
+    font-size: .8rem;
+    color: #9aa7c0;
+    letter-spacing: .02em;
+  }
+  .pk-info-desc {
+    font-size: .85rem;
+    line-height: 1.55;
+    color: #b7bbc4;
+    max-width: 78ch;
+    margin: 0;
+  }
+  .pk-info-best {
+    font-size: .78rem;
+    color: #8a8f99;
+  }
+  .pk-info-best strong {
+    color: #d6d9df;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-size: .68rem;
+    margin-right: .35rem;
+  }
+
+  /* ----- CI-Akzent-Picker (Kunde kann --cust-accent live testen) ----- */
+  .pk-accent {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    flex: 0 0 auto;
+    font-size: .75rem;
+    color: #9aa0aa;
+  }
+  .pk-accent label { letter-spacing: .04em; }
+  .pk-accent input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+  }
+  .pk-accent input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+  .pk-accent input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
+  .pk-accent input[type="color"]:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+  .pk-accent button {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,.16);
+    background: transparent;
+    color: #9aa0aa;
+    font: inherit;
+    font-size: .72rem;
+    padding: .3rem .55rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .pk-accent button:hover { color: #e9eaec; border-color: rgba(255,255,255,.3); }
+  .pk-accent button:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+
+  /* Smooth Theme-Wechsel, aber Reduced-Motion respektieren */
+  @media (prefers-reduced-motion: reduce) {
+    .pk-tab { transition: none; }
+  }
+
+  @media (max-width: 560px) {
+    .pk-label { width: 100%; }
+    .pk-accent { width: 100%; justify-content: flex-start; padding-top: .25rem; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ============ THEME-PICKER (eigenes Tool-Chrome, nicht Teil des Themes) ============ -->
+<header class="pk" aria-label="Theme-Auswahl">
+  <div class="pk-inner">
+    <span class="pk-label" id="pk-label">Design-Paket</span>
+    <div class="pk-tabs" role="group" aria-labelledby="pk-label" id="pk-tabs">
+      <button class="pk-tab" type="button" data-slug="papier"  aria-pressed="true"><span class="pk-dot" aria-hidden="true"></span>Papier</button>
+      <button class="pk-tab" type="button" data-slug="stahl"   aria-pressed="false"><span class="pk-dot" aria-hidden="true"></span>Stahl</button>
+      <button class="pk-tab" type="button" data-slug="glas"    aria-pressed="false"><span class="pk-dot" aria-hidden="true"></span>Glas</button>
+      <button class="pk-tab" type="button" data-slug="edel"    aria-pressed="false"><span class="pk-dot" aria-hidden="true"></span>Edel</button>
+      <button class="pk-tab" type="button" data-slug="minimal" aria-pressed="false"><span class="pk-dot" aria-hidden="true"></span>Minimal</button>
+    </div>
+    <div class="pk-accent">
+      <label for="pk-accent-input">CI-Akzent</label>
+      <input type="color" id="pk-accent-input" value="#e8732a" title="Kundenfarbe (--cust-accent) live testen">
+      <button type="button" id="pk-accent-reset">Reset</button>
+    </div>
+  </div>
+  <div class="pk-info" aria-live="polite">
+    <div class="pk-info-head">
+      <p class="pk-info-name" id="pk-info-name">Papier</p>
+      <span class="pk-info-tagline" id="pk-info-tagline">Werkstatt-Editorial</span>
+    </div>
+    <p class="pk-info-desc" id="pk-info-desc">Warmes, handwerklich-editoriales Theme auf cremigem Off-White mit feiner Papier-Faser-Textur, kraeftigen Serif-Headlines und Mono-//-Labels in Orange. Beleg- und Docket-Karten mit leicht eckigen Kanten geben jedem Abschnitt das Gefuehl eines sauber dokumentierten Auftrags.</p>
+    <p class="pk-info-best"><strong>Best for</strong><span id="pk-info-best">Klassische Familien- und Meisterbetriebe, die Vertrauen, Sorgfalt und handwerkliche Tradition ausstrahlen wollen.</span></p>
+  </div>
+</header>
+
+<!-- ============ LIVE-VORSCHAU: fiktive Meisterwerkstatt, kleidet sich per Theme neu ein ============ -->
+<div class="pv">
+
+  <!-- NAV -->
+  <nav class="pv-nav" aria-label="Hauptnavigation">
+    <a class="pv-brand" href="#">Muster Werkstatt</a>
+    <div class="pv-links">
+      <a href="#leistungen">Leistungen</a>
+      <a href="#zahlen">Betrieb</a>
+      <a href="#termin">Termin</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="pv-hero" aria-labelledby="pv-title">
+    <p class="pv-eyebrow">// MEISTERBETRIEB</p>
+    <h1 class="pv-title" id="pv-title">Ihr Auto in den Haenden, die es verdient.</h1>
+    <p class="pv-sub">Seit 1986 schrauben wir mit Diagnose-Technik von heute und der Sorgfalt von gestern. Von der Inspektion bis zur Unfallinstandsetzung &mdash; transparent, termintreu, ohne Ueberraschungen auf der Rechnung.</p>
+    <div class="pv-cta">
+      <a class="pv-btn" href="#termin">Termin anfragen</a>
+      <a class="pv-btn ghost" href="#leistungen">Leistungen ansehen</a>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="pv-stats" id="zahlen" aria-label="Kennzahlen">
+    <div class="pv-stat">
+      <span class="pv-stat-num">38</span>
+      <span class="pv-stat-lbl">Jahre Erfahrung</span>
+    </div>
+    <div class="pv-stat">
+      <span class="pv-stat-num">12.400</span>
+      <span class="pv-stat-lbl">Reparaturen erledigt</span>
+    </div>
+    <div class="pv-stat">
+      <span class="pv-stat-num">4,9</span>
+      <span class="pv-stat-lbl">Sterne Kundenbewertung</span>
+    </div>
+    <div class="pv-stat">
+      <span class="pv-stat-num">48&nbsp;h</span>
+      <span class="pv-stat-lbl">Ø Durchlaufzeit</span>
+    </div>
+  </section>
+
+  <!-- LEISTUNGEN -->
+  <section class="pv-section" id="leistungen" aria-labelledby="pv-leistungen-title">
+    <h2 class="pv-section-title" id="pv-leistungen-title">Was wir machen</h2>
+    <div class="pv-cards">
+      <article class="pv-card">
+        <span class="pv-tag">Wartung</span>
+        <h3 class="pv-card-t">Inspektion &amp; Service</h3>
+        <p class="pv-card-d">Herstellervorgaben, ohne die Garantie zu verlieren. Inklusive ehrlichem Foto-Befund vor jeder Freigabe und Festpreis nach Voranschlag.</p>
+      </article>
+      <article class="pv-card">
+        <span class="pv-tag">Diagnose</span>
+        <h3 class="pv-card-t">Fehlersuche &amp; Elektronik</h3>
+        <p class="pv-card-d">Steuergeraet-Auslese, Sensorik und Bordnetz. Wir finden die Ursache statt Teile zu tauschen, bis das Symptom verschwindet.</p>
+      </article>
+      <article class="pv-card">
+        <span class="pv-tag">Karosserie</span>
+        <h3 class="pv-card-t">Unfall &amp; Lack</h3>
+        <p class="pv-card-d">Direkte Abwicklung mit Ihrer Versicherung, Ersatzwagen inklusive. Spaltmasse und Farbton wie ab Werk &mdash; geprueft, nicht geschaetzt.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- TERMINFORMULAR -->
+  <section class="pv-section" id="termin" aria-labelledby="pv-termin-title">
+    <h2 class="pv-section-title" id="pv-termin-title">Termin anfragen</h2>
+    <form class="pv-form" aria-label="Terminanfrage" onsubmit="return false;">
+      <div class="pv-field">
+        <label for="f-name">Name</label>
+        <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Max Mustermann">
+      </div>
+      <div class="pv-field">
+        <label for="f-service">Leistung</label>
+        <select id="f-service" name="service">
+          <option>Inspektion &amp; Service</option>
+          <option>Fehlersuche &amp; Elektronik</option>
+          <option>Unfall &amp; Lack</option>
+          <option>Reifen &amp; Raeder</option>
+        </select>
+      </div>
+      <div class="pv-field">
+        <label for="f-date">Wunschtermin</label>
+        <input id="f-date" name="date" type="date">
+      </div>
+      <button class="pv-btn" type="submit">Anfrage senden</button>
+    </form>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="pv-footer">
+    <p>Muster Werkstatt GmbH &middot; Industriestrasse 12 &middot; 44801 Bochum &middot; Mo&ndash;Fr 7:30&ndash;18:00</p>
+    <p>Dies ist eine Design-Vorschau mit fiktiven Inhalten. Kein echter Betrieb.</p>
+  </footer>
+
+</div>
+
+<!-- ============ UMSCHALT-LOGIK ============ -->
+<script>
+(function () {
+  "use strict";
+
+  // Theme-Metadaten (slug, name, tagline, beschreibung, best_for, default-akzent)
+  var THEMES = {
+    papier: {
+      name: "Papier",
+      tagline: "Werkstatt-Editorial",
+      desc: "Warmes, handwerklich-editoriales Theme auf cremigem Off-White mit feiner Papier-Faser-Textur, kraeftigen Serif-Headlines und Mono-//-Labels in Orange. Beleg- und Docket-Karten mit leicht eckigen Kanten geben jedem Abschnitt das Gefuehl eines sauber dokumentierten Auftrags.",
+      best: "Klassische Familien- und Meisterbetriebe, die Vertrauen, Sorgfalt und handwerkliche Tradition ausstrahlen wollen.",
+      accent: "#e8732a"
+    },
+    stahl: {
+      name: "Stahl",
+      tagline: "Industrial",
+      desc: "Ein roher Werkstatt-Hallen-Look in kuehlem Anthrazit und gebuerstetem Stahl, mit technischer Schmal-Grotesk, Gitterlinien und sparsam gesetzten Gefahrenstreifen in Signal-Orange. Wirkt robust, praezise und unverkennbar nach Maschinenbau.",
+      best: "Technik-getriebene Betriebe, Tuning, Nutzfahrzeuge und Werkstaetten, die Praezision und Kraft betonen wollen.",
+      accent: "#ff7a18"
+    },
+    glas: {
+      name: "Glas",
+      tagline: "Glassmorphism",
+      desc: "Ein hochmodernes, durchscheinendes Theme im Apple-Liquid-Glass-Stil: milchige Glaskarten mit Blur, Saettigung und feinen Glanzkanten, weiche grosse Radien und ein dezent lebendiger Farbverlauf-Hintergrund schaffen Tiefe durch Layering. Trotz Transparenz bleibt der Text dank kraeftiger Kontraste und Fallbacks jederzeit klar lesbar.",
+      best: "Moderne, premium-orientierte Betriebe mit E-Mobilitaet, Hochvolt oder jungem Publikum.",
+      accent: "#4f86ff"
+    },
+    edel: {
+      name: "Edel",
+      tagline: "Luxury",
+      desc: "Ein dunkles Luxus-Theme in tiefem Anthrazit mit warmem Gold-/Messing-Akzent, eleganten Serif-Headlines, viel Negativraum und feinen Haarlinien. Dezente Hover-Glows und disziplinierter Kontrast geben jeder Seite eine Premium-Marken-Anmutung.",
+      best: "Sport- und Oldtimer-Spezialisten, Aufbereitung und Werkstaetten mit gehobener, exklusiver Klientel.",
+      accent: "#c8a24a"
+    },
+    minimal: {
+      name: "Minimal",
+      tagline: "Basic S/W",
+      desc: "Ein radikal reduziertes Schwarz-Weiss-Theme: reines Weiss, sehr duenne Systemschrift, viel Weissraum und nur ein winziger Akzent. Schweizer Basic-Anmutung mit maximaler Ruhe und Klarheit.",
+      best: "Betriebe, die Klarheit und Schnelligkeit ueber alles stellen &mdash; oder einen neutralen Rahmen fuer starke Bilder wollen.",
+      accent: "#111111"
+    }
+  };
+
+  var linkEl   = document.getElementById("theme");
+  var tabsWrap = document.getElementById("pk-tabs");
+  var tabs     = Array.prototype.slice.call(tabsWrap.querySelectorAll(".pk-tab"));
+  var rootEl   = document.documentElement;
+
+  var nameEl   = document.getElementById("pk-info-name");
+  var tagEl    = document.getElementById("pk-info-tagline");
+  var descEl   = document.getElementById("pk-info-desc");
+  var bestEl   = document.getElementById("pk-info-best");
+
+  var accentInput = document.getElementById("pk-accent-input");
+  var accentReset = document.getElementById("pk-accent-reset");
+
+  var current = "papier";
+  var customAccent = null; // null => Theme-Default verwenden
+
+  function applyAccent(slug) {
+    // Wenn Kunde eine Farbe gesetzt hat, gewinnt diese. Sonst Theme-Default.
+    if (customAccent) {
+      rootEl.style.setProperty("--cust-accent", customAccent);
+      accentInput.value = customAccent;
+    } else {
+      rootEl.style.removeProperty("--cust-accent");
+      accentInput.value = THEMES[slug].accent;
+    }
+  }
+
+  function setTheme(slug) {
+    if (!THEMES[slug] || slug === current) {
+      // trotzdem Akzent aktualisieren, falls nur die Farbe geaendert wurde
+      applyAccent(slug);
+      return;
+    }
+    current = slug;
+
+    // Stylesheet umschalten (Datei liegt im selben Ordner)
+    linkEl.setAttribute("href", slug + ".css");
+
+    // Tabs-Status
+    tabs.forEach(function (t) {
+      t.setAttribute("aria-pressed", String(t.dataset.slug === slug));
+    });
+
+    // Info-Panel fuellen
+    var meta = THEMES[slug];
+    nameEl.textContent = meta.name;
+    tagEl.textContent  = meta.tagline;
+    descEl.textContent = meta.desc;
+    bestEl.innerHTML   = meta.best;
+
+    applyAccent(slug);
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () { setTheme(t.dataset.slug); });
+  });
+
+  accentInput.addEventListener("input", function () {
+    customAccent = accentInput.value;
+    rootEl.style.setProperty("--cust-accent", customAccent);
+  });
+
+  accentReset.addEventListener("click", function () {
+    customAccent = null;
+    applyAccent(current);
+  });
+
+  // Initialzustand
+  applyAccent(current);
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Werkstatt Design-System — Showcase</title>
+    <meta
+      name="description"
+      content="Showcase aller Komponenten des Werkstatt-Design-Systems: Buttons, Belege, Cards, Chips, Nav, Form, Stats, Tabelle, Typo-Skala, Farb-Swatches."
+    />
+    <!-- Beide CSS-Dateien relativ laden. werkstatt.css importiert die Tokens. -->
+    <link rel="stylesheet" href="werkstatt.tokens.css" />
+    <link rel="stylesheet" href="werkstatt.css" />
+    <style>
+      /* Showcase-eigene Hilfsklassen — nicht Teil des Systems. */
+      .sc-section { padding-block: 64px; }
+      .sc-section + .sc-section { border-top: 1px solid var(--line); }
+      .sc-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+      .sc-stack { display: grid; gap: 14px; }
+      .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+      .sw { border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+      .sw .chipcol { height: 64px; }
+      .sw .meta { padding: 8px 10px; font-family: var(--mono); font-size: 11px; letter-spacing: .4px; }
+      .sw .meta b { display: block; font-size: 12px; letter-spacing: 0; font-family: var(--body); }
+      .type-row { display: grid; grid-template-columns: 110px 1fr; gap: 18px; align-items: baseline; padding-block: 10px; border-bottom: 1px dashed var(--line); }
+      .type-row .tag { font-family: var(--mono); font-size: 11px; color: var(--grau-2); letter-spacing: .6px; }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Zum Inhalt springen</a>
+    <hr class="ci-strip" aria-hidden="true" />
+
+    <!-- ============================================================ NAV -->
+    <div class="wrap" style="padding-top: 14px">
+      <header>
+        <nav class="nav-bar" aria-label="Hauptnavigation">
+          <span class="brand">KFZ&nbsp;Gorski</span>
+          <div class="nav-links">
+            <a href="#typo" aria-current="page">Typo</a>
+            <a href="#buttons">Buttons</a>
+            <a href="#belege">Belege</a>
+            <a href="#cards">Cards</a>
+            <a href="#chips">Chips</a>
+            <a href="#form">Form</a>
+          </div>
+          <span class="nav-sep" aria-hidden="true"></span>
+          <a class="nav-tile" href="#standort">Standort</a>
+          <button class="bw-toggle" type="button" aria-pressed="false" aria-label="Dark-Mode umschalten" onclick="document.documentElement.classList.toggle('bw'); this.setAttribute('aria-pressed', document.documentElement.classList.contains('bw'));">
+            ◐
+          </button>
+        </nav>
+      </header>
+    </div>
+
+    <main id="main">
+      <div class="wrap">
+        <!-- ===================================================== TYPO -->
+        <section class="sc-section" id="typo" aria-labelledby="typo-h">
+          <p class="overline">Foundations</p>
+          <h2 id="typo-h">Typo-Skala</h2>
+          <p class="lead" style="margin-top: 10px; max-width: 56ch">
+            Editoriale Serif-Headlines (Fraunces) gegen schlichte Grotesk-Lauftexte
+            (Hanken). Mono-//-Labels als wiederkehrendes Docket-Signal.
+          </p>
+
+          <div style="margin-top: 28px">
+            <div class="type-row">
+              <span class="tag">Hero H1</span>
+              <h1>Werkstatt <span class="thin">die laeuft.</span></h1>
+            </div>
+            <div class="type-row">
+              <span class="tag">Section H2</span>
+              <h2>Alles aus einer Hand</h2>
+            </div>
+            <div class="type-row">
+              <span class="tag">Statement</span>
+              <h2 class="h2-statement">Termin in 60 Sekunden.</h2>
+            </div>
+            <div class="type-row">
+              <span class="tag">H3</span>
+              <h3>Hauptuntersuchung &amp; AU</h3>
+            </div>
+            <div class="type-row">
+              <span class="tag">Lead</span>
+              <p class="lead">Meisterbetrieb fuer alle Marken in Braunschweig.</p>
+            </div>
+            <div class="type-row">
+              <span class="tag">Body</span>
+              <p>Schneller, transparenter Service — und ein Beleg, der wie ein Beleg aussieht.</p>
+            </div>
+            <div class="type-row">
+              <span class="tag">Overline</span>
+              <p class="overline">Leistungen</p>
+            </div>
+            <div class="type-row">
+              <span class="tag">Spec/Mono</span>
+              <p class="spec">Mo–Fr · 07:30–18:00</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================== SWATCHES -->
+        <section class="sc-section" id="farben" aria-labelledby="farben-h">
+          <p class="overline">Foundations</p>
+          <h2 id="farben-h">Farb-Swatches</h2>
+          <div class="swatches" style="margin-top: 24px">
+            <div class="sw"><div class="chipcol" style="background: var(--blau)"></div><div class="meta"><b>CI-Blau</b>--blau · #146DAB</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--orange)"></div><div class="meta"><b>CI-Orange</b>--orange · #FBAF3A</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--orange-deep)"></div><div class="meta"><b>Orange-Deep</b>--orange-deep · #9A6410</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--ink)"></div><div class="meta"><b>Ink</b>--ink · #0B0D10</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--ink-2)"></div><div class="meta"><b>Ink-2</b>--ink-2 · #14171C</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--paper); border-bottom: 1px solid var(--line)"></div><div class="meta"><b>Paper</b>--paper · #FCFBF8</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--paper-2)"></div><div class="meta"><b>Paper-2</b>--paper-2 · #F3F0EA</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--paper-3)"></div><div class="meta"><b>Paper-3</b>--paper-3 · #E9E4DB</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--grau)"></div><div class="meta"><b>Grau</b>--grau · #565C66</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--grad-ci)"></div><div class="meta"><b>CI-Verlauf</b>Blau → Orange</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--wa-green)"></div><div class="meta"><b>WhatsApp</b>#25D366</div></div>
+            <div class="sw"><div class="chipcol" style="background: var(--glow-sign)"></div><div class="meta"><b>Glow-Sign</b>--glow-sign</div></div>
+          </div>
+        </section>
+
+        <!-- ================================================ BUTTONS -->
+        <section class="sc-section" id="buttons" aria-labelledby="btn-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="btn-h">Buttons</h2>
+          <div class="sc-row" style="margin-top: 24px">
+            <a class="btn-prim" href="#">Termin buchen</a>
+            <a class="btn-ghost" href="#">Mehr erfahren</a>
+            <a class="btn-mail" href="#">E-Mail schreiben</a>
+            <button class="btn-prim btn-sm" type="button">Klein</button>
+          </div>
+        </section>
+
+        <!-- ================================================= BELEGE -->
+        <section class="sc-section" id="belege" aria-labelledby="beleg-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="beleg-h">Beleg- / Docket-Karten</h2>
+          <p class="lead" style="margin-top: 8px; max-width: 56ch">
+            Liniertes Papier, eckige Radien, leicht schief gelegt, perforierte
+            Abrisskante. Belegnummer mit 0-Praefix in Orange.
+          </p>
+          <div class="grid-ablauf" style="margin-top: 26px">
+            <article class="astep">
+              <span class="anr">1</span>
+              <h3>Termin waehlen</h3>
+              <p>Datum, Uhrzeit und Leistung in unter einer Minute.</p>
+            </article>
+            <article class="astep">
+              <span class="anr">2</span>
+              <h3>Fahrzeug bringen</h3>
+              <p>Schluessel abgeben — oder Hol- &amp; Bringservice nutzen.</p>
+            </article>
+            <article class="astep">
+              <span class="anr">3</span>
+              <h3>Fertig melden</h3>
+              <p>Transparenter Beleg, freigegebene Arbeiten, klarer Preis.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- ================================================== CARDS -->
+        <section class="sc-section" id="cards" aria-labelledby="cards-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="cards-h">Surface-Cards &amp; Vorteile</h2>
+          <div class="grid-vor" style="margin-top: 26px">
+            <article class="vor">
+              <span class="vic" aria-hidden="true">★</span>
+              <h3 style="margin-top: 14px">Meisterqualitaet</h3>
+              <p class="muted" style="margin-top: 8px">Alle Marken, geprueft und dokumentiert.</p>
+            </article>
+            <article class="surface-card">
+              <span class="status blue">Termin</span>
+              <h3 style="margin-top: 12px">Standard-Karte</h3>
+              <p class="muted" style="margin-top: 8px">Helle Papier-Flaeche, Hover-Lift.</p>
+            </article>
+            <article class="surface-card dark lg">
+              <span class="overline" style="color: var(--grau-3)">Featured</span>
+              <h3 style="margin-top: 12px; color: var(--paper)">Ink-Karte</h3>
+              <p style="margin-top: 8px">Dunkle Insel zwischen hellen Sektionen.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- ================================================== CHIPS -->
+        <section class="sc-section" id="chips" aria-labelledby="chips-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="chips-h">Status-Chips &amp; Leistungs-Chips</h2>
+          <div class="sc-row" style="margin-top: 24px">
+            <span class="status green">Erledigt</span>
+            <span class="status amber">In Arbeit</span>
+            <span class="status red">Dringend</span>
+            <span class="status blue">Termin</span>
+            <span class="status neutral">Offen</span>
+          </div>
+          <div class="sc-row" style="margin-top: 18px">
+            <button class="chip on" type="button" aria-pressed="true"><span class="ci" aria-hidden="true">✓</span>Inspektion</button>
+            <button class="chip" type="button" aria-pressed="false"><span class="ci" aria-hidden="true">+</span>Reifenwechsel</button>
+            <button class="chip" type="button" aria-pressed="false"><span class="ci" aria-hidden="true">+</span>HU / AU</button>
+            <button class="chip" type="button" aria-pressed="false"><span class="ci" aria-hidden="true">+</span>Klimaservice</button>
+          </div>
+        </section>
+
+        <!-- =================================================== FORM -->
+        <section class="sc-section" id="form" aria-labelledby="form-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="form-h">Formfelder</h2>
+          <form class="glassbox" style="margin-top: 24px; padding: 28px; max-width: 560px" onsubmit="return false">
+            <div class="fld">
+              <label for="f-name">Name</label>
+              <input class="inp" id="f-name" type="text" placeholder="Max Mustermann" />
+            </div>
+            <div class="inrow">
+              <div class="fld">
+                <label for="f-date">Datum</label>
+                <input class="inp" id="f-date" type="date" />
+              </div>
+              <div class="fld">
+                <label for="f-svc">Leistung</label>
+                <select class="inp" id="f-svc">
+                  <option>Inspektion</option>
+                  <option>HU / AU</option>
+                  <option>Reifenwechsel</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-prim" type="submit" style="margin-top: 6px">Anfrage senden</button>
+          </form>
+        </section>
+
+        <!-- ================================================== STATS -->
+        <section class="sc-section" aria-labelledby="stats-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="stats-h">Stat-Band</h2>
+          <div class="ink-island" style="border-radius: var(--radius-lg); padding: 8px; margin-top: 24px">
+            <div class="stats">
+              <div class="stat"><div class="num">25<span class="o">+</span></div><div class="lbl">Jahre</div></div>
+              <div class="stat"><div class="num">12<span class="o">k</span></div><div class="lbl">Kunden</div></div>
+              <div class="stat"><div class="num">4.9</div><div class="lbl">Bewertung</div></div>
+              <div class="stat"><div class="num">48<span class="o">h</span></div><div class="lbl">Express</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================ TABELLE -->
+        <section class="sc-section" aria-labelledby="tbl-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="tbl-h">Tabelle</h2>
+          <div class="wt-table-wrap" style="margin-top: 24px">
+            <table class="wt-table">
+              <caption>Auftraege // aktuell</caption>
+              <thead>
+                <tr><th>Auftrag</th><th>Fahrzeug</th><th>Status</th><th class="num">Summe</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>#A-1042</td><td>VW Golf VII</td><td><span class="status green">Erledigt</span></td><td class="num">389,00 €</td></tr>
+                <tr><td>#A-1043</td><td>BMW 320d</td><td><span class="status amber">In Arbeit</span></td><td class="num">512,50 €</td></tr>
+                <tr><td>#A-1044</td><td>Audi A4</td><td><span class="status red">Dringend</span></td><td class="num">1.240,00 €</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============================================== AKKORDEON -->
+        <section class="sc-section" aria-labelledby="acc-h">
+          <p class="overline">Komponenten</p>
+          <h2 id="acc-h">Akkordeon &amp; Unfall-Alert</h2>
+          <div class="acc" style="margin-top: 24px; max-width: 720px">
+            <details class="acc-item" open>
+              <summary class="acc-head"><span class="acc-ic" aria-hidden="true">?</span>Wie buche ich einen Termin?<span class="acc-chev" aria-hidden="true">⌄</span></summary>
+              <div class="acc-body">Ueber den Konfigurator in unter 60 Sekunden — oder per Anruf.</div>
+            </details>
+            <details class="acc-item">
+              <summary class="acc-head"><span class="acc-ic" aria-hidden="true">?</span>Bietet ihr einen Hol- &amp; Bringservice?<span class="acc-chev" aria-hidden="true">⌄</span></summary>
+              <div class="acc-body">Ja, im Stadtgebiet Braunschweig kostenfrei.</div>
+            </details>
+          </div>
+          <div class="uf-alert" style="margin-top: 22px; max-width: 720px" role="note">
+            <span class="ua-ic" aria-hidden="true">!</span>
+            <div>
+              <strong>Unfall gehabt?</strong>
+              <p class="muted" style="margin-top: 4px">Rufen Sie uns sofort an — wir uebernehmen Abschleppen und Schadensabwicklung.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- =============================================== FOOTER -->
+      <footer class="foot">
+        <div class="wrap">
+          <div class="foot-top">
+            <div>
+              <span class="brand" style="font-family: var(--display); font-size: 1.3rem">KFZ Gorski</span>
+              <p style="color: var(--grau-3); margin-top: 10px; max-width: 36ch">
+                Meisterbetrieb fuer alle Marken. Werkstatt-Design-System Showcase.
+              </p>
+            </div>
+            <nav aria-label="Footer Leistungen">
+              <p class="overline" style="color: var(--grau-3)">Leistungen</p>
+              <a class="flink" href="#">Inspektion</a>
+              <a class="flink" href="#">HU / AU</a>
+              <a class="flink" href="#">Reifenservice</a>
+            </nav>
+            <nav aria-label="Footer Kontakt">
+              <p class="overline" style="color: var(--grau-3)">Kontakt</p>
+              <a class="flink" href="#">Braunschweig</a>
+              <a class="flink" href="#">0531 / 000000</a>
+            </nav>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <a class="wa-float" href="#" aria-label="WhatsApp Kontakt">✆</a>
+  </body>
+</html>

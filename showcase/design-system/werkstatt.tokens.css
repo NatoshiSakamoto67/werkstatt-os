@@ -1,0 +1,260 @@
+/* =============================================================================
+ *  werkstatt.tokens.css — Design-Tokens des Werkstatt-Design-Systems
+ * -----------------------------------------------------------------------------
+ *  Gemeinsames Fundament fuer Werkhof, Kundenportal und Landing-Template.
+ *
+ *  - Reines CSS. KEINE externen CDNs, KEIN @font-face-Laden, KEIN Google-Fonts.
+ *    Fonts werden nur als font-family-Stacks mit System-Fallback referenziert.
+ *    (Self-hosted Webfonts sind erlaubt, werden aber NICHT hier geladen — die
+ *     konsumierende Seite kann eigene @font-face-Regeln ergaenzen.)
+ *  - Alle Tokens als CSS Custom Properties unter :root.
+ *  - Dark-Mode kippt das Papier dunkel (html.bw), CI-Akzente bleiben farbig.
+ *  - Aesthetik: Werkstatt-Editorial / Beleg-Papier, warmes Off-White,
+ *    editoriale Serif-Headlines, Mono-//-Labels, Schild-Lichtsprache (Glow).
+ * ========================================================================== */
+
+:root {
+  /* ===========================================================================
+   *  FARBEN — CI
+   *  Semantisch: Blau = Aktion/Links, Orange = Akzent/Highlight/Glow.
+   *  Niemals dekorativ-flaechig.
+   * ========================================================================= */
+  --blau: #146dab;          /* CI-Blau: Aktion, Links, Primary-Button         */
+  --blau-deep: #0e5183;     /* dunkleres Blau fuer Hover/Tiefe                 */
+  --orange: #fbaf3a;        /* CI-Orange: Akzent, Glow, //-Signal             */
+  --orange-deep: #9a6410;   /* lesbares Orange auf Hell (>=4.5:1 auf Weiss)   */
+
+  /* Aktions-Farbe — ersetzt frueheres WhatsApp-Gruen durch CI-Blau */
+  --wa: #146dab;            /* primaere Aktions-Farbe = CI-Blau               */
+  --wa-green: #25d366;      /* echtes Gruen: nur fuer den WhatsApp-Float       */
+
+  /* CI-Verlauf — Klammer: Body-Top, Footer-Bottom, Konfigurator-Top */
+  --grad-ci: linear-gradient(90deg, #146dab, #fbaf3a);
+
+  /* ===========================================================================
+   *  FARBEN — Ink (dunkle Flaechen / Basis-Text)
+   * ========================================================================= */
+  --ink: #0b0d10;           /* near-black: Basis-Text, dunkle Inseln          */
+  --ink-2: #14171c;         /* Stat-Band, leicht heller                       */
+  --ink-3: #1e232b;         /* Featured-Karten-Border / Text                  */
+
+  /* ===========================================================================
+   *  FARBEN — Paper (warmes Off-White Fundament)
+   * ========================================================================= */
+  --paper: #fcfbf8;         /* warmes Off-White, Body-BG                      */
+  --paper-2: #f3f0ea;       /* warmes Papier: weiche Sektionen, Icon-Flaechen */
+  --paper-3: #e9e4db;       /* tieferes Papier: Step-Chips, Quote-Marks       */
+
+  /* ===========================================================================
+   *  FARBEN — Linien / Borders
+   * ========================================================================= */
+  --line: #e6e1d8;          /* feine Trennlinie / Border                      */
+  --line-2: #d6d0c5;        /* kraeftigere Border / Hover                     */
+
+  /* ===========================================================================
+   *  FARBEN — Grau (Text-Sekundaer / Meta)
+   * ========================================================================= */
+  --grau: #565c66;          /* Body-Sekundaer                                 */
+  --grau-2: #6b7280;        /* WCAG >=4.5:1 auf Weiss                         */
+  --grau-3: #b6bbc3;        /* Labels auf Dunkel / Meta                       */
+  --grau-thin: #aeb4be;     /* .thin Headline-Anteil auf Hell                 */
+  --grau-sub: #a7adb8;      /* Hero-Sub auf Dunkel                            */
+
+  /* ===========================================================================
+   *  FARBEN — Status (semantisch: Chips/Belege)
+   * ========================================================================= */
+  --status-green: #1f8a4c;  /* erledigt / OK                                  */
+  --status-green-bg: #e7f4ec;
+  --status-amber: #9a6410;  /* in Bearbeitung / Wartung (orange-deep)         */
+  --status-amber-bg: #fbf1dd;
+  --status-red: #b3261e;    /* dringend / Fehler                             */
+  --status-red-bg: #fbe9e7;
+  --status-blue: #146dab;   /* Info / Termin (CI-Blau)                        */
+  --status-blue-bg: #e6f0f8;
+  --status-neutral: #565c66;/* neutral / offen                               */
+  --status-neutral-bg: #f0ede7;
+
+  /* ===========================================================================
+   *  SCHILD-LICHTSPRACHE — Glow (Werkstatt-Schild in der Daemmerung)
+   * ========================================================================= */
+  --glow-sign: rgba(251, 175, 58, 0.5);     /* orange Leucht-Glow            */
+  --glow-sign-soft: rgba(251, 175, 58, 0.28);/* aktiver Step-Ring            */
+
+  /* ===========================================================================
+   *  TYPOGRAFIE — Font-Stacks (nur Stacks, kein Laden)
+   * ========================================================================= */
+  /* Display/Serif — Fraunces, falls vorhanden, sonst System-Serif */
+  --display: "Fraunces", "Georgia", "Times New Roman", serif;
+  /* Body/Sans — Hanken Grotesk, sonst System-Sans */
+  --body: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  /* Mono — reiner System-Stack fuer //-Labels (KEIN Webfont) */
+  --mono: ui-monospace, "SF Mono", "Roboto Mono", "JetBrains Mono", Menlo,
+    Consolas, monospace;
+  /* Bebas — Plate/Kennzeichen-Optik (Sub-Seiten); Landing nutzt --display */
+  --bebas: "Bebas Neue", "Oswald", "Arial Narrow", sans-serif;
+
+  /* ===========================================================================
+   *  TYPOGRAFIE — Type-Scale (clamp, echte Werte)
+   * ========================================================================= */
+  --t-hero: clamp(44px, 7.4vw, 88px);   /* Hero H1     — Fraunces 630         */
+  --t-h2: clamp(34px, 5.6vw, 60px);     /* Section H2  — Fraunces 600         */
+  --t-statement: clamp(29px, 5.2vw, 56px);/* Statement H2 — Fraunces 620      */
+  --t-about: clamp(29px, 4.5vw, 46px);  /* About H2    — Fraunces 620         */
+  --t-stat: clamp(40px, 4.6vw, 60px);   /* Stat-Zahl   — Fraunces lh 1        */
+  --t-faq-num: clamp(58px, 9vw, 104px); /* FAQ-Riesenzahl — Fraunces lh .86   */
+  --t-rv-score: clamp(54px, 8vw, 76px); /* Review-Score — Fraunces lh .82     */
+  --t-anr: 64px;                        /* Astep-Nummer — Fraunces lh .8      */
+  --t-quote: 96px;                      /* Quote-Mark                         */
+  --t-quote-feat: 150px;                /* Quote-Mark Featured                */
+  --t-hero-sub: clamp(17px, 2vw, 21px); /* Hero-Sub — Hanken                  */
+  --t-sec-p: 18px;                      /* Sec-Head P                         */
+  --t-body-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* Body            */
+  --t-small: 0.8125rem;
+  --t-overline: 12px;                   /* Mono //-Label                      */
+  --t-spec: 11.5px;                     /* Mono Spec                          */
+
+  /* Weights (Fraunces) */
+  --w-hero: 630;
+  --w-h2: 600;
+  --w-statement: 620;
+  --w-thin: 340;
+
+  /* Letter-spacing */
+  --ls-hero: -1px;
+  --ls-h2: -0.6px;
+  --ls-about: -0.5px;
+  --ls-overline: 1.4px;
+  --ls-eyebrow: 1.2px;
+  --ls-spec: 2px;
+
+  /* Line-heights */
+  --lh-hero: 0.95;
+  --lh-h2: 1;
+  --lh-statement: 1.05;
+  --lh-body: 1.6;
+
+  /* ===========================================================================
+   *  SPACING — Layout-Rhythmus (echte Werte)
+   * ========================================================================= */
+  --maxw: 1180px;                       /* Container .wrap max-width           */
+  --pad-x: 28px;                        /* Container-Padding desktop           */
+  --pad-x-mob: 20px;                    /* Container-Padding mobil             */
+  --space-block: 110px;                 /* Section .block (vertikal)           */
+  --space-block-mob: 74px;              /* Section <680px                      */
+  --space-statement: 130px;             /* Statement-Band                     */
+  --space-hero: 140px;                  /* Hero top                           */
+  --space-hero-bot: 90px;               /* Hero bottom                        */
+  --space-foot: 72px;                   /* Footer top                         */
+  --space-foot-bot: 34px;               /* Footer bottom                      */
+  --scroll-offset: 90px;                /* scroll-padding/margin fuer Header   */
+  --sec-head-gap: 50px;                 /* sec-head margin-bottom             */
+
+  /* Karten-Padding */
+  --pad-card: 24px;                     /* .vor                               */
+  --pad-card-lg: 30px 28px 26px;        /* .rv-card                           */
+  --pad-info: 38px;                     /* .info-card                         */
+  --pad-konf-main: 42px 44px;
+  --pad-konf-side: 42px 38px;
+  --pad-stat: 34px 24px;
+
+  /* Grid-Gaps */
+  --gap-vor: 18px;
+  --gap-ablauf: 22px;
+  --gap-rv: 18px;
+  --gap-team: 22px;
+  --gap-about: 64px;
+  --gap-kontakt: 32px;
+  --gap-faq: clamp(28px, 4vw, 64px);
+
+  /* ===========================================================================
+   *  RADII
+   * ========================================================================= */
+  --radius: 16px;          /* Standard-Karten, Nav-Bar, acc-item             */
+  --radius-lg: 22px;       /* grosse Flaechen: konf, info-card, rv-card, ...  */
+  --radius-sm: 12px;       /* Inputs, Chips                                  */
+  --radius-btn: 14px;      /* Buttons                                        */
+  --radius-ic: 11px;       /* Icon-Flaechen                                  */
+  --radius-docket: 3px;    /* Beleg/Docket-Karten (bewusst eckig)            */
+  --radius-pill: 999px;    /* Pills, Tags, voll-rund                         */
+
+  /* ===========================================================================
+   *  SCHATTEN
+   * ========================================================================= */
+  --sh-card: 0 18px 40px -28px rgba(11, 13, 16, 0.4);          /* Hover std   */
+  --sh-card-lg: 0 26px 56px -32px rgba(11, 13, 16, 0.48);      /* Hover gross */
+  --sh-konf: 0 40px 90px -50px rgba(11, 13, 16, 0.5);          /* Konf-Karte  */
+  --sh-acc-open: 0 24px 56px -38px rgba(11, 13, 16, 0.55);     /* Akk offen   */
+  --sh-visual: 0 38px 80px -38px rgba(11, 13, 16, 0.55);       /* About/Oel   */
+  --sh-docket: 0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 16px 34px -24px rgba(11, 13, 16, 0.5);                   /* Beleg-Karte */
+  --sh-prim: 0 16px 36px -14px rgba(20, 109, 171, 0.7);        /* Blau-Btn    */
+  --sh-prim-hover: 0 22px 44px -14px rgba(20, 109, 171, 0.8),
+    0 0 30px -6px var(--glow-sign);                            /* Btn Glow    */
+  --sh-glass: inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 16px 40px -16px rgba(0, 0, 0, 0.6);                      /* Glass-Nav   */
+  --sh-phone: 0 60px 120px -42px rgba(0, 0, 0, 0.9);           /* iPhone-Mock */
+  --sh-stamp: drop-shadow(0 0 14px var(--glow-sign));         /* Stempel-Glow */
+  --sh-step-active: 0 0 0 4px var(--glow-sign-soft);          /* aktiver Step */
+  --sh-wa: 0 12px 30px -10px rgba(37, 211, 102, 0.6),
+    0 0 0 3px rgba(255, 255, 255, 0.85);                       /* wa-float    */
+
+  /* ===========================================================================
+   *  MOTION
+   * ========================================================================= */
+  --dur-fast: 150ms;
+  --dur: 300ms;
+  --dur-slow: 520ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);  /* ease-out-expo                    */
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ===========================================================================
+   *  GLASS / BLUR
+   * ========================================================================= */
+  --glass-blur: 24px;
+  --glass-sat: 170%;
+  --glass-bg: rgba(252, 251, 248, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.35);
+}
+
+/* =============================================================================
+ *  DARK-MODE — html.bw
+ *  Papier kippt dunkel, CI-Akzente (Blau/Orange) bleiben farbig.
+ * ========================================================================== */
+html.bw {
+  --paper: #1a1e25;
+  --paper-2: #0f1217;
+  --paper-3: #262b34;
+  --ink: #e7e9ee;          /* Text wird hell (Basis-Text auf dunklem Papier) */
+  --ink-2: #0f1217;
+  --ink-3: #2a2f39;
+  --line: #2a2f39;
+  --line-2: #39404b;
+  --grau: #b6bbc3;
+  --grau-2: #9aa0a8;
+  --grau-3: #8b919b;
+  --orange-deep: #e0a23a;  /* lesbar auf Dunkel                              */
+
+  /* Status-Hintergruende dunkel, Vordergrundfarben heller */
+  --status-green-bg: rgba(31, 138, 76, 0.16);
+  --status-amber-bg: rgba(224, 162, 58, 0.16);
+  --status-red-bg: rgba(179, 38, 30, 0.18);
+  --status-blue-bg: rgba(20, 109, 171, 0.18);
+  --status-neutral-bg: rgba(255, 255, 255, 0.06);
+  --status-green: #4cc585;
+  --status-amber: #e0a23a;
+  --status-red: #f08a82;
+  --status-blue: #5fa8df;
+  --status-neutral: #b6bbc3;
+
+  --glass-bg: rgba(26, 30, 37, 0.62);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Schatten kraeftiger auf dunklem Grund */
+  --sh-card: 0 18px 40px -28px rgba(0, 0, 0, 0.7);
+  --sh-card-lg: 0 26px 56px -32px rgba(0, 0, 0, 0.7);
+  --sh-visual: 0 38px 80px -38px rgba(0, 0, 0, 0.7);
+  --sh-docket: 0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 16px 34px -24px rgba(0, 0, 0, 0.7);
+}

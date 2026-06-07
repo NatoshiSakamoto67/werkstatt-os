@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>XDAB · Operations-Atlas</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS — Werkstatt-Editorial
+   ============================================================ */
+:root {
+  /* Warme Papierpalette */
+  --paper:    #FCFBF8;
+  --paper-2:  #F3F0EA;
+  --paper-3:  #E9E4DB;
+  --line:     #E6E1D8;
+  --line-2:   #D7D0C4;
+  --ink:      #0B0D10;
+  --ink-2:    #3A3D42;
+  --ink-3:    #6A6D74;
+  --ink-4:    #94918A;
+
+  /* CI-Akzente */
+  --blau:     #146DAB;
+  --blau-d:   #0E527F;
+  --blau-soft:#E3EEF6;
+  --orange:   #FBAF3A;
+  --orange-d: #D98A12;
+  --orange-soft:#FBF1DE;
+
+  /* Status-Farben */
+  --st-live:  #2F8F4E;
+  --st-live-bg:#E4F2E8;
+  --st-skel:  #C8851A;
+  --st-skel-bg:#FBF0D9;
+  --st-todo:  #6A6D74;
+  --st-todo-bg:#ECE9E2;
+  --st-repo:  #146DAB;
+  --st-repo-bg:#E3EEF6;
+  --st-ext:   #5B5E66;
+  --st-ext-bg:#EAE7E0;
+
+  /* Typografie */
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --body:  system-ui, -apple-system, "Hanken Grotesk", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono:  ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+
+  --text-xs:  0.72rem;
+  --text-sm:  0.82rem;
+  --text-base: clamp(0.94rem, 0.9rem + 0.2vw, 1.02rem);
+  --text-lg:  clamp(1.1rem, 1rem + 0.4vw, 1.35rem);
+  --text-xl:  clamp(1.4rem, 1.1rem + 1vw, 2rem);
+  --text-hero: clamp(2.4rem, 1.2rem + 5vw, 5.2rem);
+
+  /* Raum */
+  --gap:      clamp(1rem, 0.6rem + 1.4vw, 2rem);
+  --section:  clamp(3rem, 2rem + 4vw, 6rem);
+  --radius:   14px;
+  --radius-sm: 9px;
+
+  /* Motion */
+  --dur-fast: 140ms;
+  --dur:      280ms;
+  --ease:     cubic-bezier(0.16, 1, 0.3, 1);
+
+  --shadow-sm: 0 1px 2px rgba(11,13,16,.05), 0 2px 6px rgba(11,13,16,.04);
+  --shadow:    0 4px 12px rgba(11,13,16,.07), 0 12px 32px rgba(11,13,16,.06);
+  --shadow-lg: 0 18px 48px rgba(11,13,16,.16), 0 4px 12px rgba(11,13,16,.08);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+body {
+  margin: 0;
+  font-family: var(--body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(11,13,16,.018) 27px, rgba(11,13,16,.018) 28px),
+    repeating-linear-gradient(90deg, transparent, transparent 7px, rgba(11,13,16,.008) 7px, rgba(11,13,16,.008) 8px);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.08; margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
+a { color: var(--blau); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; }
+:focus-visible { outline: 2.5px solid var(--blau); outline-offset: 2px; border-radius: 4px; }
+
+.wrap { width: min(1320px, 100% - clamp(1.4rem, 5vw, 6rem)); margin-inline: auto; }
+
+/* Mono label */
+.mono {
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.mono-slash::before { content: "// "; color: var(--orange-d); font-weight: 600; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-head {
+  position: relative;
+  padding-block: clamp(2.4rem, 1.5rem + 3vw, 4.4rem) clamp(1.6rem, 1rem + 2vw, 2.8rem);
+  border-bottom: 1.5px solid var(--line);
+  overflow: hidden;
+}
+.site-head::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 120% at 88% -10%, rgba(20,109,171,.10), transparent 60%),
+    radial-gradient(50% 100% at 8% 120%, rgba(251,175,58,.12), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+.site-head > .wrap { position: relative; z-index: 1; }
+.head-top {
+  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+  margin-bottom: clamp(1.2rem, 2vw, 2rem);
+}
+.brand-mark {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  display: inline-flex; align-items: center; gap: .55rem;
+}
+.brand-mark .dot {
+  width: 11px; height: 11px; border-radius: 3px;
+  background: linear-gradient(135deg, var(--blau), var(--orange));
+  box-shadow: 0 0 0 4px var(--blau-soft);
+}
+.head-meta { margin-left: auto; display: flex; gap: 1.4rem; align-items: baseline; flex-wrap: wrap; }
+.head-meta .stat { display: flex; flex-direction: column; line-height: 1.1; }
+.head-meta .stat b { font-family: var(--serif); font-size: 1.5rem; color: var(--ink); }
+.head-meta .stat span { font-size: var(--text-xs); color: var(--ink-3); letter-spacing: .04em; }
+
+h1.hero {
+  font-size: var(--text-hero);
+  font-weight: 600;
+  max-width: 16ch;
+  margin-bottom: .8rem;
+}
+h1.hero em { font-style: italic; color: var(--blau-d); }
+.hero-sub {
+  max-width: 62ch;
+  color: var(--ink-2);
+  font-size: var(--text-lg);
+  line-height: 1.5;
+}
+.head-date {
+  display: inline-flex; align-items: center; gap: .5rem;
+  margin-top: 1rem;
+  padding: .35rem .7rem;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 100px;
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  color: var(--ink-2);
+}
+.head-date .pulse {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--st-live);
+  box-shadow: 0 0 0 0 rgba(47,143,78,.5);
+  animation: pulse 2.6s var(--ease) infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(47,143,78,.45); }
+  70% { box-shadow: 0 0 0 7px rgba(47,143,78,0); }
+  100% { box-shadow: 0 0 0 0 rgba(47,143,78,0); }
+}
+
+/* Status-Legende */
+.legend {
+  display: flex; flex-wrap: wrap; gap: .55rem;
+  margin-top: clamp(1.4rem, 2vw, 2.2rem);
+}
+.legend .lbl { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-3); align-self: center; margin-right: .3rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .3rem .65rem;
+  border-radius: 100px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: .03em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.chip .glyph { width: 8px; height: 8px; border-radius: 2px; }
+.chip[data-st="LIVE"]    { color: var(--st-live); background: var(--st-live-bg); border-color: rgba(47,143,78,.25); }
+.chip[data-st="LIVE"] .glyph { background: var(--st-live); }
+.chip[data-st="SKELETT"] { color: var(--st-skel); background: var(--st-skel-bg); border-color: rgba(200,133,26,.3); }
+.chip[data-st="SKELETT"] .glyph { background: var(--st-skel); }
+.chip[data-st="TODO"]    { color: var(--st-todo); background: var(--st-todo-bg); border-color: rgba(106,109,116,.25); }
+.chip[data-st="TODO"] .glyph { background: var(--st-todo); }
+.chip[data-st="REPO?"]   { color: var(--st-repo); background: var(--st-repo-bg); border-color: rgba(20,109,171,.25); }
+.chip[data-st="REPO?"] .glyph { background: var(--st-repo); }
+.chip[data-st="EXT"]     { color: var(--st-ext); background: var(--st-ext-bg); border-color: rgba(91,94,102,.25); }
+.chip[data-st="EXT"] .glyph { background: var(--st-ext); border-radius: 50%; }
+
+/* ============================================================
+   SECTION SCAFFOLD
+   ============================================================ */
+section { padding-block: var(--section); position: relative; }
+section + section { border-top: 1px solid var(--line); }
+.sec-head { margin-bottom: clamp(1.6rem, 3vw, 2.6rem); max-width: 76ch; }
+.sec-head .kicker {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-family: var(--mono); font-size: var(--text-xs); letter-spacing: .12em;
+  color: var(--orange-d); text-transform: uppercase; font-weight: 600;
+  margin-bottom: .7rem;
+}
+.sec-head .kicker .num {
+  font-variant-numeric: tabular-nums;
+  background: var(--ink); color: var(--paper);
+  padding: .1rem .45rem; border-radius: 5px; font-size: .68rem;
+}
+.sec-head h2 { font-size: var(--text-xl); margin-bottom: .5rem; }
+.sec-head p { color: var(--ink-2); font-size: var(--text-base); max-width: 70ch; }
+
+/* ============================================================
+   TOPOLOGY — layered bands
+   ============================================================ */
+.topo { display: flex; flex-direction: column; gap: clamp(1.4rem, 2.4vw, 2.6rem); }
+.layer-band {
+  position: relative;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(1rem, 1.6vw, 1.6rem);
+  box-shadow: var(--shadow-sm);
+}
+.layer-band::before {
+  content: "";
+  position: absolute; left: 0; top: 14px; bottom: 14px;
+  width: 4px; border-radius: 4px;
+  background: linear-gradient(180deg, var(--blau), var(--orange));
+}
+.layer-band[data-li="0"]::before { background: linear-gradient(180deg, #2F8F4E, #6BBF8A); }
+.layer-band[data-li="1"]::before { background: linear-gradient(180deg, var(--blau), #4F9BD4); }
+.layer-band[data-li="2"]::before { background: linear-gradient(180deg, #7C3AED, var(--blau)); }
+.layer-band[data-li="3"]::before { background: linear-gradient(180deg, var(--orange-d), var(--orange)); }
+.layer-band[data-li="4"]::before { background: linear-gradient(180deg, #5B5E66, #94918A); }
+.layer-band[data-li="5"]::before { background: linear-gradient(180deg, #B8456B, #E08FA8); }
+.layer-band[data-li="6"]::before { background: linear-gradient(180deg, #146DAB, #FBAF3A); }
+
+.layer-head {
+  display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap;
+  margin-bottom: 1rem; padding-left: .8rem;
+}
+.layer-head .l-idx {
+  font-family: var(--serif); font-size: 1.7rem; font-weight: 700;
+  color: var(--ink-4); line-height: 1; min-width: 1.6ch;
+}
+.layer-head h3 { font-size: var(--text-lg); }
+.layer-head .l-count {
+  margin-left: auto; font-family: var(--mono); font-size: var(--text-xs);
+  color: var(--ink-3); background: var(--paper); border: 1px solid var(--line-2);
+  padding: .2rem .55rem; border-radius: 100px;
+}
+.flow-down {
+  display: flex; justify-content: center; align-items: center;
+  height: 26px; margin: -.6rem 0;
+  color: var(--line-2);
+}
+.flow-down svg { width: 22px; height: 26px; }
+
+/* Node grid */
+.node-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+  gap: .7rem;
+  padding-left: .8rem;
+}
+.node {
+  position: relative;
+  text-align: left;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  padding: .8rem .85rem .75rem;
+  display: flex; flex-direction: column; gap: .45rem;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  width: 100%;
+  overflow: hidden;
+}
+.node::after {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--line-2); transition: background var(--dur) var(--ease);
+}
+.node[data-st="LIVE"]::after    { background: var(--st-live); }
+.node[data-st="SKELETT"]::after { background: var(--st-skel); }
+.node[data-st="TODO"]::after    { background: var(--st-todo); }
+.node[data-st="REPO?"]::after   { background: var(--st-repo); }
+.node[data-st="EXT"]::after     { background: var(--st-ext); }
+.node:hover, .node:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--blau);
+}
+.node:active { transform: translateY(-1px); }
+.node-top { display: flex; align-items: flex-start; gap: .5rem; }
+.node-name {
+  font-family: var(--serif); font-weight: 600; font-size: .96rem;
+  line-height: 1.2; color: var(--ink); flex: 1; letter-spacing: -.005em;
+}
+.node-meta { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.badge-prio {
+  font-family: var(--mono); font-size: .64rem; font-weight: 700;
+  padding: .12rem .38rem; border-radius: 4px; letter-spacing: .03em;
+}
+.badge-prio[data-p="P0"] { background: var(--ink); color: var(--paper); }
+.badge-prio[data-p="P1"] { background: var(--orange-soft); color: var(--orange-d); border: 1px solid rgba(217,138,18,.35); }
+.badge-prio[data-p="P2"] { background: var(--paper-3); color: var(--ink-3); border: 1px solid var(--line-2); }
+.badge-prio[data-p="-"]  { background: transparent; color: var(--ink-4); border: 1px dashed var(--line-2); }
+.node-type {
+  font-family: var(--mono); font-size: .64rem; color: var(--ink-4);
+  letter-spacing: .04em; text-transform: lowercase;
+}
+.chip-sm {
+  display: inline-flex; align-items: center; gap: .3rem;
+  padding: .15rem .45rem; border-radius: 100px;
+  font-size: .62rem; font-weight: 700; letter-spacing: .04em;
+}
+.chip-sm .glyph { width: 6px; height: 6px; border-radius: 2px; }
+.chip-sm[data-st="LIVE"]    { color: var(--st-live); background: var(--st-live-bg); }
+.chip-sm[data-st="LIVE"] .glyph { background: var(--st-live); }
+.chip-sm[data-st="SKELETT"] { color: var(--st-skel); background: var(--st-skel-bg); }
+.chip-sm[data-st="SKELETT"] .glyph { background: var(--st-skel); }
+.chip-sm[data-st="TODO"]    { color: var(--st-todo); background: var(--st-todo-bg); }
+.chip-sm[data-st="TODO"] .glyph { background: var(--st-todo); }
+.chip-sm[data-st="REPO?"]   { color: var(--st-repo); background: var(--st-repo-bg); }
+.chip-sm[data-st="REPO?"] .glyph { background: var(--st-repo); }
+.chip-sm[data-st="EXT"]     { color: var(--st-ext); background: var(--st-ext-bg); }
+.chip-sm[data-st="EXT"] .glyph { background: var(--st-ext); border-radius: 50%; }
+
+/* dimming for connection-hover */
+.topo.is-focusing .node:not(.is-rel):not(.is-active) { opacity: .32; }
+.node.is-active { border-color: var(--blau); box-shadow: var(--shadow); }
+.node.is-rel { border-color: var(--orange); }
+.node.is-rel::after { background: var(--orange) !important; }
+
+/* ============================================================
+   INVENTORY TABLE
+   ============================================================ */
+.inv-controls {
+  display: flex; flex-wrap: wrap; gap: .9rem; align-items: center;
+  margin-bottom: 1.4rem;
+}
+.search-box {
+  position: relative; flex: 1 1 240px; min-width: 200px; max-width: 420px;
+}
+.search-box input {
+  width: 100%;
+  font-family: var(--body); font-size: var(--text-sm);
+  padding: .65rem .9rem .65rem 2.3rem;
+  border: 1.5px solid var(--line-2);
+  border-radius: 100px;
+  background: var(--paper);
+  color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+.search-box input:focus { outline: none; border-color: var(--blau); box-shadow: 0 0 0 4px var(--blau-soft); }
+.search-box svg { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); color: var(--ink-4); width: 16px; height: 16px; }
+.filter-group { display: flex; gap: .4rem; flex-wrap: wrap; align-items: center; }
+.filter-group .fg-lbl { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-3); margin-right: .15rem; }
+.fbtn {
+  font-family: var(--mono); font-size: var(--text-xs); font-weight: 600;
+  letter-spacing: .03em;
+  padding: .4rem .7rem;
+  border: 1.5px solid var(--line-2);
+  border-radius: 100px;
+  background: var(--paper);
+  color: var(--ink-2);
+  transition: all var(--dur-fast) var(--ease);
+  display: inline-flex; align-items: center; gap: .35rem;
+}
+.fbtn .glyph { width: 7px; height: 7px; border-radius: 2px; }
+.fbtn:hover { border-color: var(--ink-3); color: var(--ink); }
+.fbtn[aria-pressed="true"] {
+  background: var(--ink); color: var(--paper); border-color: var(--ink);
+}
+.fbtn[aria-pressed="true"][data-st] .glyph { box-shadow: 0 0 0 2px rgba(255,255,255,.25); }
+
+.inv-count { margin-left: auto; font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-3); }
+
+.table-shell {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow-sm); background: var(--paper);
+}
+.table-scroll { overflow-x: auto; }
+table.inv { width: 100%; border-collapse: collapse; min-width: 760px; }
+table.inv thead th {
+  text-align: left;
+  font-family: var(--mono); font-size: var(--text-xs); font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3);
+  padding: .8rem 1rem; background: var(--paper-2);
+  border-bottom: 1.5px solid var(--line);
+  position: sticky; top: 0; z-index: 2;
+  white-space: nowrap;
+}
+table.inv tbody td { padding: .7rem 1rem; border-bottom: 1px solid var(--line); vertical-align: middle; font-size: var(--text-sm); }
+table.inv tbody tr { transition: background var(--dur-fast) var(--ease); cursor: pointer; }
+table.inv tbody tr:hover { background: var(--blau-soft); }
+table.inv tbody tr:last-child td { border-bottom: none; }
+.td-name { font-family: var(--serif); font-weight: 600; font-size: .94rem; color: var(--ink); }
+.td-type { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-4); }
+.td-repo { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-2); }
+.td-notes { color: var(--ink-2); max-width: 38ch; font-size: var(--text-xs); line-height: 1.45; }
+.no-results { padding: 2.4rem 1rem; text-align: center; color: var(--ink-3); font-family: var(--mono); font-size: var(--text-sm); }
+
+/* ============================================================
+   SUBSYSTEM CARDS (bento)
+   ============================================================ */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap);
+}
+.scard {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(1.1rem, 2vw, 1.7rem);
+  box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: .7rem;
+  position: relative; overflow: hidden;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  grid-column: span 4;
+}
+.scard:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.scard.span-6 { grid-column: span 6; }
+.scard.span-8 { grid-column: span 8; }
+.scard.span-12 { grid-column: span 12; }
+.scard::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: linear-gradient(90deg, var(--blau), var(--orange));
+}
+.scard h3 { font-size: var(--text-lg); }
+.scard .s-tag {
+  font-family: var(--mono); font-size: var(--text-xs); color: var(--orange-d);
+  letter-spacing: .08em; text-transform: uppercase; font-weight: 600;
+}
+.scard p { color: var(--ink-2); font-size: var(--text-sm); line-height: 1.55; }
+.scard ul { margin: 0; padding-left: 1.1rem; color: var(--ink-2); font-size: var(--text-sm); display: flex; flex-direction: column; gap: .3rem; }
+.scard ul li::marker { color: var(--orange-d); }
+.s-stack { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: auto; padding-top: .4rem; }
+.s-pill { font-family: var(--mono); font-size: .64rem; background: var(--paper-2); border: 1px solid var(--line-2); color: var(--ink-2); padding: .18rem .5rem; border-radius: 100px; letter-spacing: .02em; }
+.s-pill.hi { background: var(--orange-soft); border-color: rgba(217,138,18,.35); color: var(--orange-d); }
+.s-pill.blu { background: var(--blau-soft); border-color: rgba(20,109,171,.3); color: var(--blau-d); }
+
+/* ============================================================
+   tmERIK / TOPMOTIVE LANE
+   ============================================================ */
+.lane {
+  background: linear-gradient(135deg, var(--ink) 0%, #15181d 100%);
+  border-radius: var(--radius);
+  padding: clamp(1.4rem, 3vw, 2.6rem);
+  color: var(--paper-2);
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.lane::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(50% 90% at 100% 0%, rgba(20,109,171,.22), transparent 60%),
+              radial-gradient(40% 80% at 0% 100%, rgba(251,175,58,.16), transparent 60%);
+  pointer-events: none;
+}
+.lane > * { position: relative; z-index: 1; }
+.lane h3 { color: var(--paper); font-size: var(--text-xl); margin-bottom: .4rem; }
+.lane .lane-sub { color: rgba(252,251,248,.66); font-size: var(--text-sm); max-width: 64ch; margin-bottom: 1.6rem; }
+.lane-flow {
+  display: flex; flex-wrap: wrap; align-items: stretch; gap: .5rem;
+}
+.lane-step {
+  flex: 1 1 150px; min-width: 140px;
+  background: rgba(252,251,248,.05);
+  border: 1px solid rgba(252,251,248,.12);
+  border-radius: var(--radius-sm);
+  padding: .85rem .9rem;
+  display: flex; flex-direction: column; gap: .35rem;
+  backdrop-filter: blur(2px);
+}
+.lane-step .ls-n { font-family: var(--mono); font-size: .64rem; color: var(--orange); letter-spacing: .1em; }
+.lane-step .ls-t { font-family: var(--serif); font-weight: 600; font-size: .98rem; color: var(--paper); }
+.lane-step .ls-d { font-size: var(--text-xs); color: rgba(252,251,248,.6); line-height: 1.45; }
+.lane-step .chip-sm { align-self: flex-start; margin-top: .2rem; }
+.lane-arrow { align-self: center; color: rgba(252,251,248,.3); flex: 0 0 auto; }
+.lane-note {
+  margin-top: 1.4rem; padding: .9rem 1.1rem;
+  border-left: 3px solid var(--orange);
+  background: rgba(251,175,58,.08);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: var(--text-sm); color: rgba(252,251,248,.82);
+}
+.lane-note b { color: var(--orange); }
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.phase {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(.9rem, 2vw, 1.6rem);
+  position: relative;
+}
+.phase-rail { display: flex; flex-direction: column; align-items: center; }
+.phase-node {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--serif); font-weight: 700; font-size: 1rem;
+  background: var(--paper); border: 2px solid var(--line-2); color: var(--ink-3);
+  flex: 0 0 auto; z-index: 1;
+  transition: transform var(--dur) var(--ease);
+}
+.phase[data-done="true"] .phase-node {
+  background: var(--st-live); border-color: var(--st-live); color: #fff;
+}
+.phase[data-done="partial"] .phase-node {
+  background: var(--orange); border-color: var(--orange-d); color: var(--ink);
+}
+.phase-line { width: 2px; flex: 1; background: var(--line-2); min-height: 28px; }
+.phase:last-child .phase-line { display: none; }
+.phase-body { padding-bottom: clamp(1.2rem, 2.4vw, 2rem); padding-top: .2rem; }
+.phase-body h3 { font-size: var(--text-lg); display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.phase-state {
+  font-family: var(--mono); font-size: .64rem; font-weight: 700; letter-spacing: .05em;
+  padding: .15rem .5rem; border-radius: 100px;
+}
+.phase-state.done { background: var(--st-live-bg); color: var(--st-live); }
+.phase-state.part { background: var(--st-skel-bg); color: var(--st-skel); }
+.phase-state.todo { background: var(--st-todo-bg); color: var(--st-todo); }
+.phase-body p { color: var(--ink-2); font-size: var(--text-sm); margin-top: .35rem; max-width: 70ch; line-height: 1.55; }
+
+/* ============================================================
+   BLOCKER
+   ============================================================ */
+.blockers { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--gap); }
+.blocker {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--orange-d);
+  border-radius: var(--radius-sm);
+  padding: 1.2rem 1.3rem;
+  box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: .5rem;
+  position: relative;
+  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.blocker:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.blocker .b-num {
+  font-family: var(--serif); font-weight: 700; font-size: 2.4rem; line-height: 1;
+  color: var(--orange-d); opacity: .25; position: absolute; top: .6rem; right: 1rem;
+}
+.blocker .b-cat { font-family: var(--mono); font-size: var(--text-xs); color: var(--orange-d); letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+.blocker h3 { font-size: 1.08rem; max-width: 22ch; }
+.blocker p { color: var(--ink-2); font-size: var(--text-sm); line-height: 1.5; }
+
+/* ============================================================
+   DETAIL PANEL (drawer)
+   ============================================================ */
+.scrim {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(11,13,16,.42);
+  backdrop-filter: blur(3px);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--dur) var(--ease), visibility var(--dur) var(--ease);
+}
+.scrim.open { opacity: 1; visibility: visible; }
+.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 61;
+  width: min(440px, 92vw);
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(102%);
+  transition: transform var(--dur) var(--ease);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-head {
+  padding: 1.4rem 1.5rem 1.1rem;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+  position: relative;
+}
+.drawer-head::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--line-2);
+}
+.drawer[data-st="LIVE"] .drawer-head::before { background: var(--st-live); }
+.drawer[data-st="SKELETT"] .drawer-head::before { background: var(--st-skel); }
+.drawer[data-st="TODO"] .drawer-head::before { background: var(--st-todo); }
+.drawer[data-st="REPO?"] .drawer-head::before { background: var(--st-repo); }
+.drawer[data-st="EXT"] .drawer-head::before { background: var(--st-ext); }
+.drawer-close {
+  position: absolute; top: 1rem; right: 1rem;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--line-2); background: var(--paper);
+  display: grid; place-items: center; color: var(--ink-2);
+  transition: all var(--dur-fast) var(--ease);
+}
+.drawer-close:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); transform: rotate(90deg); }
+.drawer-kicker { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-3); letter-spacing: .08em; margin-bottom: .4rem; }
+.drawer-head h3 { font-size: 1.45rem; padding-right: 2.6rem; line-height: 1.12; }
+.drawer-chips { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .9rem; }
+.drawer-body { padding: 1.4rem 1.5rem; overflow-y: auto; flex: 1; }
+.dl-row {
+  display: grid; grid-template-columns: 92px 1fr; gap: .8rem;
+  padding: .7rem 0; border-bottom: 1px dashed var(--line);
+}
+.dl-row dt { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; padding-top: .1rem; }
+.dl-row dd { margin: 0; font-size: var(--text-sm); color: var(--ink); }
+.dl-row dd.mono-val { font-family: var(--mono); font-size: var(--text-xs); }
+.drawer-notes-head { font-family: var(--mono); font-size: var(--text-xs); color: var(--orange-d); letter-spacing: .08em; text-transform: uppercase; font-weight: 600; margin: 1.4rem 0 .6rem; }
+.drawer-notes { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.6; }
+.conn-block { margin-top: 1.4rem; }
+.conn-block h4 { font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; font-weight: 700; margin-bottom: .6rem; display: flex; align-items: center; gap: .4rem; }
+.conn-list { display: flex; flex-direction: column; gap: .5rem; }
+.conn-item {
+  background: var(--paper-2); border: 1px solid var(--line-2); border-radius: var(--radius-sm);
+  padding: .6rem .75rem; font-size: var(--text-xs); cursor: pointer; text-align: left; width: 100%;
+  transition: all var(--dur-fast) var(--ease); display: flex; flex-direction: column; gap: .2rem;
+}
+.conn-item:hover { border-color: var(--blau); background: var(--blau-soft); }
+.conn-item .ci-rel { font-family: var(--mono); color: var(--blau-d); font-weight: 600; }
+.conn-item .ci-rel .arr { color: var(--orange-d); }
+.conn-item .ci-flow { color: var(--ink-2); line-height: 1.4; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-foot {
+  border-top: 1.5px solid var(--line);
+  padding-block: clamp(2rem, 4vw, 3.4rem) 2rem;
+  background: var(--paper-2);
+}
+.foot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--gap); }
+.foot-grid h4 { font-family: var(--mono); font-size: var(--text-xs); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: .7rem; font-weight: 700; }
+.foot-grid p, .foot-grid li { font-size: var(--text-sm); color: var(--ink-2); line-height: 1.5; }
+.foot-grid ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .35rem; }
+.foot-grid code { font-family: var(--mono); font-size: var(--text-xs); background: var(--paper-3); padding: .1rem .35rem; border-radius: 4px; }
+.foot-base { margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-family: var(--mono); font-size: var(--text-xs); color: var(--ink-4); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 880px) {
+  .bento { grid-template-columns: repeat(6, 1fr); }
+  .scard, .scard.span-6, .scard.span-8 { grid-column: span 6; }
+  .head-meta { width: 100%; margin-left: 0; }
+}
+@media (max-width: 560px) {
+  .node-grid { grid-template-columns: 1fr; }
+  .bento { grid-template-columns: 1fr; }
+  .scard, .scard.span-6, .scard.span-8, .scard.span-12 { grid-column: 1 / -1; }
+  .head-meta { gap: 1rem; }
+  .head-meta .stat b { font-size: 1.25rem; }
+  .inv-count { margin-left: 0; width: 100%; }
+  .lane-arrow { display: none; }
+}
+
+/* reveal-on-scroll */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="site-head">
+  <div class="wrap">
+    <div class="head-top">
+      <span class="brand-mark"><span class="dot" aria-hidden="true"></span>XDAB</span>
+      <div class="head-meta">
+        <div class="stat"><b id="stat-layers">7</b><span>Ebenen</span></div>
+        <div class="stat"><b id="stat-nodes">49</b><span>Knoten</span></div>
+        <div class="stat"><b id="stat-edges">65</b><span>Kanten</span></div>
+        <div class="stat"><b id="stat-live">11</b><span>Live</span></div>
+      </div>
+    </div>
+
+    <p class="mono mono-slash" style="margin-bottom:.6rem">Single Source of Truth · System-Topologie</p>
+    <h1 class="hero">XDAB · <em>Operations</em>-Atlas</h1>
+    <p class="hero-sub">Die vollstaendige Plattform-Topologie als verbindliche Uebersicht: ein gebendes DSGVO-KI-Fundament, drei Frontends, ein serverseitiger Werkhof-Orchestrator als einziger Token-Halter &mdash; gegen den echten Dateisystem-Stand verifiziert.</p>
+
+    <div class="head-date">
+      <span class="pulse" aria-hidden="true"></span>
+      <span>Stand 2026-06-07</span>
+    </div>
+
+    <div class="legend" role="group" aria-label="Status-Legende">
+      <span class="lbl">Status</span>
+      <span class="chip" data-st="LIVE"><span class="glyph" aria-hidden="true"></span>LIVE</span>
+      <span class="chip" data-st="SKELETT"><span class="glyph" aria-hidden="true"></span>SKELETT</span>
+      <span class="chip" data-st="TODO"><span class="glyph" aria-hidden="true"></span>TODO</span>
+      <span class="chip" data-st="REPO?"><span class="glyph" aria-hidden="true"></span>REPO?</span>
+      <span class="chip" data-st="EXT"><span class="glyph" aria-hidden="true"></span>EXT</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= TOPOLOGY ================= -->
+<section id="topologie" aria-labelledby="topo-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker"><span class="num">01</span> Layered Topology</span>
+      <h2 id="topo-h">Sieben Ebenen, von Hand bis Maschine</h2>
+      <p>Jede Ebene ist ein Band, jeder Knoten eine Karte mit Status und Prioritaet. Datenfluss zwischen den Ebenen laeuft von oben (Browser) nach unten (Externe Dienste). Klick auf einen Knoten oeffnet das Detail-Panel samt aller ein- und ausgehenden Verbindungen.</p>
+    </div>
+    <div class="topo" id="topo"><!-- bands injected --></div>
+  </div>
+</section>
+
+<!-- ================= INVENTORY ================= -->
+<section id="inventar" aria-labelledby="inv-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker"><span class="num">02</span> App-Inventar</span>
+      <h2 id="inv-h">Filterbares Komplett-Inventar</h2>
+      <p>Volltextsuche ueber Name, Repo und Notizen. Filter nach Status und Prioritaet kombinierbar. Klick auf eine Zeile oeffnet das Detail-Panel.</p>
+    </div>
+
+    <div class="inv-controls reveal">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="inv-search" placeholder="Suche Name, Repo, Notiz…" aria-label="Inventar durchsuchen" autocomplete="off">
+      </div>
+      <div class="filter-group" role="group" aria-label="Filter nach Status">
+        <span class="fg-lbl">Status</span>
+        <button class="fbtn" data-filter="status" data-val="LIVE" data-st="LIVE" aria-pressed="false"><span class="glyph" style="background:var(--st-live)"></span>LIVE</button>
+        <button class="fbtn" data-filter="status" data-val="SKELETT" data-st="SKELETT" aria-pressed="false"><span class="glyph" style="background:var(--st-skel)"></span>SKELETT</button>
+        <button class="fbtn" data-filter="status" data-val="TODO" data-st="TODO" aria-pressed="false"><span class="glyph" style="background:var(--st-todo)"></span>TODO</button>
+        <button class="fbtn" data-filter="status" data-val="REPO?" data-st="REPO?" aria-pressed="false"><span class="glyph" style="background:var(--st-repo)"></span>REPO?</button>
+        <button class="fbtn" data-filter="status" data-val="EXT" data-st="EXT" aria-pressed="false"><span class="glyph" style="background:var(--st-ext);border-radius:50%"></span>EXT</button>
+      </div>
+      <div class="filter-group" role="group" aria-label="Filter nach Prioritaet">
+        <span class="fg-lbl">Prio</span>
+        <button class="fbtn" data-filter="prio" data-val="P0" aria-pressed="false">P0</button>
+        <button class="fbtn" data-filter="prio" data-val="P1" aria-pressed="false">P1</button>
+        <button class="fbtn" data-filter="prio" data-val="P2" aria-pressed="false">P2</button>
+      </div>
+      <span class="inv-count" id="inv-count" aria-live="polite"></span>
+    </div>
+
+    <div class="table-shell reveal">
+      <div class="table-scroll">
+        <table class="inv">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Typ</th>
+              <th scope="col">Status</th>
+              <th scope="col">Prio</th>
+              <th scope="col">Repo</th>
+              <th scope="col">Notiz</th>
+            </tr>
+          </thead>
+          <tbody id="inv-body"><!-- rows injected --></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SUBSYSTEMS ================= -->
+<section id="teilsysteme" aria-labelledby="sub-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker"><span class="num">03</span> Teilsysteme</span>
+      <h2 id="sub-h">Vier tragende Saeulen + Querschnitt</h2>
+      <p>Die Architektur loest sich in ein gebendes Fundament, drei verbrauchende Frontends und einen serverseitigen Orchestrator auf.</p>
+    </div>
+
+    <div class="bento">
+      <article class="scard span-6 reveal">
+        <span class="s-tag">Fundament · EU-only</span>
+        <h3>DSGVO-KI-Kern</h3>
+        <p>Das eine gebende Fundament: PII-Gate vor jedem LLM-Call, Dual-LLM Content-Stripper (18 Injection-Pattern), AI-Gateway mit EU-Routing &amp; Modul-A-Killswitch, LiteLLM-Proxy, mandatory WildGuard-Output-Filter, Supabase-RLS und Langfuse-Audit.</p>
+        <ul>
+          <li>PII-Pseudonymisierung &rarr; AES-256-GCM Re-Identify-Map (nur serverseitig)</li>
+          <li>EU-LLM ueber Bedrock / Azure SE / Vertex EU / Mistral Paris</li>
+          <li>Audit nur Hashes/Metadaten, 6-Monate-Aufbewahrung (Art. 26 EU AI Act)</li>
+        </ul>
+        <div class="s-stack">
+          <span class="s-pill blu">FastAPI</span><span class="s-pill blu">LiteLLM</span><span class="s-pill blu">Supabase RLS</span><span class="s-pill">WildGuard-7B</span><span class="s-pill">Presidio/GLiNER</span>
+        </div>
+      </article>
+
+      <article class="scard span-6 reveal">
+        <span class="s-tag">Greenfield · groesste Luecke</span>
+        <h3>Werkhof-Orchestrator</h3>
+        <p>Das fehlende Backend und die Zentrale: einziger Token-Halter (Token-Vault-Prinzip), Ingest-Worker (ARQ/Redis), erzwungene Freigabe-Queue (Human-in-the-Loop), PII/PDF/DATEV. Existiert heute nirgends.</p>
+        <ul>
+          <li>Haelt tmERIK-Bearer, M365-OAuth, DATEV-DUO &mdash; kein Frontend ruft je extern direkt</li>
+          <li>Jede write/send-KI-Aktion: draft &rarr; awaiting_approval &rarr; approved</li>
+          <li>LLM-Calls ausschliesslich ueber LiteLLM, immer ueber PII-Service</li>
+        </ul>
+        <div class="s-stack">
+          <span class="s-pill hi">FastAPI</span><span class="s-pill hi">ARQ/Redis</span><span class="s-pill">SSE</span><span class="s-pill">WeasyPrint</span><span class="s-pill">Postgres</span>
+        </div>
+      </article>
+
+      <article class="scard span-4 reveal">
+        <span class="s-tag">Frontend · SaaS</span>
+        <h3>xdab-next</h3>
+        <p>Marketing live/statisch, KI-Workspace <code style="font-family:var(--mono);font-size:.8em">/app</code> noch Skelett ohne page.tsx. Dark-Luxury, Three.js Partikel; middleware.ts &amp; supabase-server.ts physisch vorhanden.</p>
+        <div class="s-stack"><span class="s-pill">Next.js</span><span class="s-pill">Three.js</span><span class="s-pill blu">Supabase</span></div>
+      </article>
+
+      <article class="scard span-4 reveal">
+        <span class="s-tag">Frontend · intern</span>
+        <h3>Werkhof-App</h3>
+        <p>Internes Werkstatt-OS (CRM/Auftraege/Freigaben/Hermes/WhatsApp/Werkzeug). Single-File 117 KB localStorage-Prototyp, Migration zu Next.js noetig.</p>
+        <div class="s-stack"><span class="s-pill">Werkstatt-OS</span><span class="s-pill">PWA</span><span class="s-pill">localStorage</span></div>
+      </article>
+
+      <article class="scard span-4 reveal">
+        <span class="s-tag">Frontend · extern</span>
+        <h3>Kundenportal + KFZ-Site</h3>
+        <p>Akquise-Landing mit 3-Schritt-Konfigurator (LIVE/statisch) und Self-Service-Portal (Fake-Login, localStorage). Kanonisch als <code style="font-family:var(--mono);font-size:.8em">/portal</code> neu zu bauen.</p>
+        <div class="s-stack"><span class="s-pill">Editorial</span><span class="s-pill">Fraunces</span><span class="s-pill">Konfigurator</span></div>
+      </article>
+
+      <article class="scard span-8 reveal">
+        <span class="s-tag">Querschnitt · Design + Sicherheit</span>
+        <h3>Zwei Marken auf einem Token-Kern</h3>
+        <p><b>werkstatt-design</b> (Editorial: Fraunces+Hanken, warmes Papier, Schild-Glow) fuer Gorski/Portal/Werkhof/WerkLeih &mdash; vs. <b>xdab-ui</b> (dark, tech, Tailwind-Preset, Three.js) fuer das SaaS-Frontend. Beide speisen sich aus <code style="font-family:var(--mono);font-size:.8em">@xdab/tokens</code>. Quer dazu: Cross-Tenant-Negativtest als CI-Gate (RLS-Isolation) und Secret-Vault statt .env im Repo.</p>
+        <div class="s-stack"><span class="s-pill">@xdab/tokens</span><span class="s-pill">Tailwind-Preset</span><span class="s-pill blu">RLS-Gate</span><span class="s-pill hi">Doppler/Vault</span></div>
+      </article>
+
+      <article class="scard span-4 reveal">
+        <span class="s-tag">Neben-Plattform</span>
+        <h3>WerkLeih</h3>
+        <p>B2B-Werkzeug-Sharing per git-subtree-split aus dem Werkhof in eigenes Repo/GmbH. Eigene Tochter-Supabase, Stripe Connect (Monatsgebuehr + 8 % Provision), konsumiert den XDAB-Kern.</p>
+        <div class="s-stack"><span class="s-pill">Next.js</span><span class="s-pill">Stripe Connect</span><span class="s-pill">Imagen 4</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= tmERIK / TOPMOTIVE LANE ================= -->
+<section id="tmerik" aria-labelledby="lane-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker"><span class="num">04</span> Integrations-Lane</span>
+      <h2 id="lane-h">tmERIK &amp; TOPMOTIVE</h2>
+      <p>Der serverseitige Datenpfad fuer Stammdaten und Faktura &mdash; mit Mock-First-Designziel: Tag-1-Switch auf Echtdaten ohne UI-Umbau via Adapter-Pattern.</p>
+    </div>
+
+    <div class="lane reveal">
+      <h3>Stammdaten-Pfad &amp; Faktura-Frage</h3>
+      <p class="lane-sub">tmERIK liefert Kunden/Fahrzeuge/HU/Verfuegbarkeit per REST-Bearer (Alpha) &mdash; aber <b>keine Rechnungen</b>. Deshalb ist die Faktura-Engine ungeklaert: TOPMOTIVE-API vs. lexoffice/sevDesk, der Faktura-Weg laeuft heute ueber M365/Power Automate, nicht ueber tmERIK.</p>
+
+      <div class="lane-flow">
+        <div class="lane-step">
+          <span class="ls-n">// QUELLE</span>
+          <span class="ls-t">tmERIK</span>
+          <span class="ls-d">REST Bearer (Alpha), Polling 5 min. Kunden/Fahrzeuge/HU/Verfuegbarkeit. KEINE Faktura.</span>
+          <span class="chip-sm" data-st="EXT"><span class="glyph"></span>EXT</span>
+        </div>
+        <span class="lane-arrow" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </span>
+        <div class="lane-step">
+          <span class="ls-n">// WRAPPER</span>
+          <span class="ls-t">tmERIK-Adapter</span>
+          <span class="ls-d">Serverseitiger REST-Wrapper, Mock-First moeglich. Token-Halterrolle im Orchestrator.</span>
+          <span class="chip-sm" data-st="TODO"><span class="glyph"></span>TODO</span>
+        </div>
+        <span class="lane-arrow" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </span>
+        <div class="lane-step">
+          <span class="ls-n">// ZENTRALE</span>
+          <span class="ls-t">Orchestrator</span>
+          <span class="ls-d">Einziger Token-Halter, buendelt Stammdaten in Portal-Schema (RLS, tenant_id).</span>
+          <span class="chip-sm" data-st="TODO"><span class="glyph"></span>TODO</span>
+        </div>
+        <span class="lane-arrow" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </span>
+        <div class="lane-step">
+          <span class="ls-n">// FAKTURA</span>
+          <span class="ls-t">M365 / TOPMOTIVE?</span>
+          <span class="ls-d">Beleg-Erkennung &rarr; SharePoint (GoBD) &rarr; /ingest/invoice &rarr; DATEV-Buchungsstapel.</span>
+          <span class="chip-sm" data-st="EXT"><span class="glyph"></span>EXT</span>
+        </div>
+      </div>
+
+      <div class="lane-note">
+        <b>Mock-First-Designziel:</b> Bis der tmERIK-Bearer-Token geliefert ist, laeuft der Adapter gegen Mocks. Echtdaten-Phase 5 ist token-blockiert &mdash; aber kein UI-Umbau noetig, weil das Adapter-Pattern den Schalter serverseitig haelt. Die Faktura-Engine bleibt eine offene Entscheidung (TOPMOTIVE-API vs. lexoffice/sevDesk), da tmERIK keine Rechnungen schreibt.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TIMELINE ================= -->
+<section id="phasen" aria-labelledby="ph-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker"><span class="num">05</span> Schlachtplan</span>
+      <h2 id="ph-h">7-Phasen-Roadmap</h2>
+      <p>Phase 0 ist auf Disk erledigt, Phase 1 teilweise. Der DSGVO-KI-Kern und die komplette Orchestrator-Ebene sind die verbleibende Greenfield-Arbeit.</p>
+    </div>
+
+    <div class="timeline reveal">
+      <article class="phase" data-done="true">
+        <div class="phase-rail"><div class="phase-node">0</div><div class="phase-line"></div></div>
+        <div class="phase-body">
+          <h3>Fundament-Konsolidierung <span class="phase-state done">ERLEDIGT</span></h3>
+          <p>Auf Disk fertig: <code style="font-family:var(--mono);font-size:.85em">workers/</code>, 3 Supabase-Migrationen, <code style="font-family:var(--mono);font-size:.85em">compliance/</code> und <code style="font-family:var(--mono);font-size:.85em">infra/gateway</code> (docker-compose + Caddyfile) konsolidiert.</p>
+        </div>
+      </article>
+
+      <article class="phase" data-done="partial">
+        <div class="phase-rail"><div class="phase-node">1</div><div class="phase-line"></div></div>
+        <div class="phase-body">
+          <h3>Route-Protection &amp; Server-Auth <span class="phase-state part">TEILWEISE</span></h3>
+          <p><code style="font-family:var(--mono);font-size:.85em">middleware.ts</code> schuetzt /app/* und /checkout/* fail-closed; <code style="font-family:var(--mono);font-size:.85em">supabase-server.ts</code> existiert. Offen: api/chat/route.ts mit echtem content-stripper&rarr;ai-gateway-Streaming.</p>
+        </div>
+      </article>
+
+      <article class="phase" data-done="todo">
+        <div class="phase-rail"><div class="phase-node">2</div><div class="phase-line"></div></div>
+        <div class="phase-body">
+          <h3>Worker-Deployment <span class="phase-state todo">TODO</span></h3>
+          <p>Die 4 Cloudflare Workers (content-stripper, ai-gateway, auth-helper, stripe) sind im Repo BSI-gehaertet, aber nicht deployed. Status REPO?.</p>
+        </div>
+      </article>
+
+      <article class="phase" data-done="todo">
+        <div class="phase-rail"><div class="phase-node">3</div><div class="phase-line"></div></div>
+        <div class="phase-body">
+          <h3>DSGVO-KI-Kern hochziehen <span class="phase-state todo">TODO</span></h3>
+          <p>PII-Service (Presidio/GLiNER), LiteLLM-Proxy (Hetzner CPX31), WildGuard-Output-Filter, Supabase-EU-Instanz konfigurieren, Langfuse-Audit. Alles nur Konzept/Config.</p>
+        </div>
+      </article>
+
+      <article class="phase" data-done="todo">
+        <div class="phase-rail"><div class="phase-node">4</div><div class="phase-line"></div></div>
+        <div class="phase-body">
+          <h3>Werkhof-Orchestrator bauen <span class="phase-state todo">TODO</span></h3>
+          <p>Die einzige echte Greenfield-Luecke: FastAPI-Zentrale, Token-Vault, Freigabe-Queue+SSE, Hermes-Harness, PDF/DATEV. Existiert nirgends.</p>
+        </div>
+      </article>
+
+      <article class="phase" data-done="todo">
+        <div class="phase-rail"><div class="phase-node">5</div><div class="phase-line"></div></div>
+        <div class="phase-body">
+          <h3>Echtdaten-Anbindung <span class="phase-state todo">TODO</span></h3>
+          <p>tmERIK-Adapter von Mock auf Echtdaten, M365-Eingangsrechnungs-Flow, DATEV-Export. Token-blockiert (siehe Blocker 1 &amp; 4).</p>
+        </div>
+      </article>
+
+      <article class="phase" data-done="todo">
+        <div class="phase-rail"><div class="phase-node">6</div><div class="phase-line"></div></div>
+        <div class="phase-body">
+          <h3>Skalierung &amp; Neben-Plattform <span class="phase-state todo">TODO</span></h3>
+          <p>Hermes-Agent (8 Auto-Skills), Onboarding-Generator ins Admin-Backend, WerkLeih-subtree-split in eigenes Repo/GmbH, Design-System-Monorepo.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BLOCKER ================= -->
+<section id="blocker" aria-labelledby="bl-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker"><span class="num">06</span> Echtbetrieb-Blocker</span>
+      <h2 id="bl-h">Vier Blocker &mdash; Entscheidung &amp; Recht, nicht Code</h2>
+      <p>Diese vier Punkte limitieren den Echtbetrieb. Keiner davon ist ein Code-Problem; es sind ausstehende Entscheidungen, Tokens oder rechtliche Freigaben.</p>
+    </div>
+
+    <div class="blockers reveal">
+      <article class="blocker">
+        <span class="b-num" aria-hidden="true">1</span>
+        <span class="b-cat">Token</span>
+        <h3>tmERIK Bearer-Token fehlt</h3>
+        <p>Blockiert Echtdaten-Phase 5. Bis Lieferung laeuft der Adapter Mock-First; Tag-1-Switch ohne UI-Umbau ist vorbereitet.</p>
+      </article>
+      <article class="blocker">
+        <span class="b-num" aria-hidden="true">2</span>
+        <span class="b-cat">Entscheidung</span>
+        <h3>Faktura-Engine ungeklaert</h3>
+        <p>tmERIK schreibt keine Rechnungen. TOPMOTIVE-API vs. lexoffice/sevDesk noch offen; Faktura-Weg laeuft aktuell ueber M365.</p>
+      </article>
+      <article class="blocker">
+        <span class="b-num" aria-hidden="true">3</span>
+        <span class="b-cat">Recht</span>
+        <h3>AVV-Kette + DSFA Portal</h3>
+        <p>Auftragsverarbeitungs-Kette und Datenschutz-Folgenabschaetzung (Art. 35) fuer das Kundenportal anwaltlich noch offen.</p>
+      </article>
+      <article class="blocker">
+        <span class="b-num" aria-hidden="true">4</span>
+        <span class="b-cat">Infrastruktur</span>
+        <h3>M365-Test-Tenant fehlt</h3>
+        <p>Ohne Test-Tenant kein Eingangsrechnungs-Flow (Outlook &rarr; AI Builder &rarr; SharePoint &rarr; /ingest/invoice).</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Architektur-Aufloesung</h4>
+        <p>Ein gebendes DSGVO-KI-Fundament + drei Frontends (SaaS / Werkhof-intern / Portal-extern) + ein serverseitiger Orchestrator als einziger Token-Halter. Human-in-the-Loop und Modul-A-Killswitch sind hart verdrahtet, nicht optional.</p>
+      </div>
+      <div>
+        <h4>Schema-Abweichung</h4>
+        <p>Echte Supabase-Migrationen nutzen <code>organizations</code>, <code>user_profiles</code>, <code>chats</code>, <code>messages</code>, <code>rate_limits</code>, <code>mfa_recovery_codes</code>, <code>active_sessions</code>, <code>hibp_breach_log</code>, <code>webhook_events</code> &mdash; statt orgs/conversations aus der Inventar-Doku.</p>
+      </div>
+      <div>
+        <h4>Repos</h4>
+        <ul>
+          <li><code>github.com/NatoshiSakamoto67/xdab-next</code></li>
+          <li><code>…/kfz-gorski-site</code></li>
+          <li><code>…/kfz-gorski-kundenportal</code></li>
+          <li><code>…/werkhof</code></li>
+          <li>werkleih + design-system noch zu erstellen</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>XDAB · Operations-Atlas &mdash; Single Source of Truth</span>
+      <span id="foot-counts">Stand 2026-06-07</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= DETAIL DRAWER ================= -->
+<div class="scrim" id="scrim" tabindex="-1"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true">
+  <div class="drawer-head">
+    <button class="drawer-close" id="drawer-close" aria-label="Detail-Panel schliessen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <p class="drawer-kicker" id="drawer-layer">—</p>
+    <h3 id="drawer-title">—</h3>
+    <div class="drawer-chips" id="drawer-chips"></div>
+  </div>
+  <div class="drawer-body">
+    <dl id="drawer-dl"></dl>
+    <p class="drawer-notes-head">Notizen</p>
+    <p class="drawer-notes" id="drawer-notes">—</p>
+    <div class="conn-block" id="conn-out"></div>
+    <div class="conn-block" id="conn-in"></div>
+  </div>
+</aside>
+
+<script>
+"use strict";
+/* ============================================================
+   DATA — topology (single source of truth)
+   ============================================================ */
+const ATLAS = {"edges":[{"from":"besucher","to":"kfz-site","relation":"oeffnet","dataflow":"Browser-Aufruf der oeffentlichen Landing-Page"},{"from":"endkunde","to":"kundenportal","relation":"oeffnet","dataflow":"Self-Service-Login (OTP/Fake-Login im Prototyp)"},{"from":"werkstatt-team","to":"werkhof-app","relation":"oeffnet","dataflow":"internes Werkstatt-OS via Browser/PWA"},{"from":"unternehmen","to":"xdab-frontend","relation":"oeffnet","dataflow":"SaaS-Marketing + KI-Workspace via Browser"},{"from":"kfz-site","to":"kfz-wa-worker","relation":"sendet","dataflow":"3-Schritt-Konfigurator -> strukturierte WA-Anfrage + Fahrzeugschein (heute Click-to-Chat-Deeplink)"},{"from":"kfz-site","to":"design-werkstatt","relation":"konsumiert","dataflow":"Fraunces+Hanken Editorial-Tokens; site.css ist Referenz-Quelle"},{"from":"kundenportal","to":"middleware","relation":"durchlaeuft","dataflow":"JWT/OTP-Session-Check"},{"from":"kundenportal","to":"kfz-proxy-worker","relation":"liest","dataflow":"nur sanitierte Portal-DB-Daten, nie tmERIK direkt"},{"from":"kundenportal","to":"design-werkstatt","relation":"konsumiert","dataflow":"Hanken+Bebas->Fraunces Migration"},{"from":"werkhof-app","to":"middleware","relation":"durchlaeuft","dataflow":"JWT-Session-Check"},{"from":"werkhof-app","to":"werkhof-orchestrator","relation":"ruft","dataflow":"CRM/Auftraege/Freigaben/Hermes-Chat ueber Orchestrator-API"},{"from":"werkhof-app","to":"werkleih-embed","relation":"einbettet","dataflow":"iframe/Deep-Link der WerkLeih-Oberflaeche"},{"from":"werkhof-app","to":"design-werkstatt","relation":"konsumiert","dataflow":"werkstatt.min.css Editorial-Marke"},{"from":"xdab-frontend","to":"middleware","relation":"durchlaeuft","dataflow":"Route-Protection /app/*,/checkout/* via Supabase-Session, fail-closed"},{"from":"xdab-frontend","to":"api-chat-route","relation":"ruft","dataflow":"POST /api/chat (server-only) statt simuliertem setInterval-Streaming"},{"from":"xdab-frontend","to":"design-xdab","relation":"konsumiert","dataflow":"Dark-Luxury Tailwind-Preset, Three.js Partikel"},{"from":"middleware","to":"supabase-server-client","relation":"nutzt","dataflow":"createServerClient+httpOnly-Cookies fuer Session-Pruefung"},{"from":"supabase-server-client","to":"supabase","relation":"liest","dataflow":"RLS-gesicherte Session/Org-Abfrage"},{"from":"api-chat-route","to":"content-stripper-worker","relation":"ruft","dataflow":"Untrusted User-Input -> 18 Injection-Pattern + Sanitizing-LLM"},{"from":"content-stripper-worker","to":"pii-service","relation":"ruft","dataflow":"Pseudonymisierung PERSON/EMAIL/PHONE/IBAN/KENNZEICHEN vor LLM"},{"from":"content-stripper-worker","to":"ai-gateway-worker","relation":"ruft","dataflow":"sanitierter Prompt weiter an Gateway"},{"from":"ai-gateway-worker","to":"supabase","relation":"schreibt","dataflow":"Audit-Log-Eintrag (Hashes/Metadaten), Token-Quota-Update"},{"from":"ai-gateway-worker","to":"litellm-proxy","relation":"routet","dataflow":"JWT-validiert, EU-Region-Routing; Modul-A-Killswitch blockt JWT module=dsb"},{"from":"ai-gateway-worker","to":"web-search-worker","relation":"ruft","dataflow":"Tool-Call Brave Search (EU) wenn Web-Search aktiv"},{"from":"pii-service","to":"supabase","relation":"schreibt","dataflow":"AES-256-GCM Re-Identify-Map (RLS), Re-Hydrate nur serverseitig"},{"from":"litellm-proxy","to":"bedrock","relation":"konsumiert","dataflow":"OpenAI-kompatibel -> EU-LLM (Bedrock FRA/STO/IRL, Azure SE, Vertex EU, Mistral Paris)"},{"from":"litellm-proxy","to":"wildguard","relation":"ruft","dataflow":"Output-Filter (mandatory fuer Hermes-Calls), Verdict ins Audit-Log"},{"from":"litellm-proxy","to":"langfuse-audit","relation":"schreibt","dataflow":"LLM-Audit-Callbacks, Spend-Tracking pro Virtual-Key"},{"from":"auth-helper-worker","to":"supabase","relation":"schreibt","dataflow":"HIBP-Log, Recovery-Codes, Session-Tracking; Supabase Auth = Identity-Provider"},{"from":"xdab-frontend","to":"auth-helper-worker","relation":"ruft","dataflow":"Registrierung/Login: HIBP k-Anonymity + Turnstile"},{"from":"stripe-worker","to":"supabase","relation":"schreibt","dataflow":"Checkout/Webhook -> subscriptions, webhook_events"},{"from":"xdab-frontend","to":"stripe-worker","relation":"ruft","dataflow":"Checkout-Session Solo/Plus/Pro/Business, kein Stripe-SDK im Bundle"},{"from":"hermes-bridge-worker","to":"hermes-agent","relation":"triggert","dataflow":"JWT-gesicherte Bot-Runs aus /app/bots"},{"from":"hermes-agent","to":"supabase","relation":"liest","dataflow":"pollt bot_configs"},{"from":"hermes-agent","to":"litellm-proxy","relation":"ruft","dataflow":"8 Auto-Agenten-Skills via LiteLLM, PII ueber Content-Stripper"},{"from":"hermes-agent","to":"langfuse-audit","relation":"schreibt","dataflow":"Bot-Ergebnisse -> audit_log + Telegram/Email-Push"},{"from":"werkhof-orchestrator","to":"token-vault","relation":"haelt","dataflow":"tmERIK Bearer, M365 OAuth, DATEV-DUO - einziger serverseitiger Token-Halter"},{"from":"werkhof-orchestrator","to":"freigabe-queue","relation":"schreibt","dataflow":"jede write/send-Aktion -> draft->awaiting_approval (Human-in-the-Loop)"},{"from":"werkhof-orchestrator","to":"pii-service","relation":"ruft","dataflow":"Pseudonymisierung vor jedem LLM-Call (nie direkt LLM)"},{"from":"werkhof-orchestrator","to":"litellm-proxy","relation":"ruft","dataflow":"LLM-Calls ausschliesslich ueber LiteLLM"},{"from":"werkhof-orchestrator","to":"tmerik-adapter","relation":"ruft","dataflow":"Kunden/Fahrzeuge/HU/Verfuegbarkeit, Mock-First bis Token da"},{"from":"werkhof-orchestrator","to":"hermes-harness","relation":"ruft","dataflow":"Function-Calling: Angebots-/KV-/Rechnungs-Entwuerfe -> Freigabe-Queue"},{"from":"werkhof-orchestrator","to":"pdf-service","relation":"ruft","dataflow":"GoBD-konforme PDFs aus freigegebenen Belegen (WeasyPrint)"},{"from":"werkhof-orchestrator","to":"datev-exporter","relation":"ruft","dataflow":"GoBD-Buchungsstapel -> DUO-Ordner"},{"from":"werkhof-orchestrator","to":"supabase","relation":"schreibt","dataflow":"Portal-Schema: customers_cache/vehicles_cache/bookings/incoming_invoices/approval_queue, tenant_id+RLS"},{"from":"tmerik-adapter","to":"tmerik","relation":"ruft","dataflow":"REST Bearer (Alpha), Polling 5min; KEINE Faktura (tmERIK-Limit)"},{"from":"m365-connector","to":"m365","relation":"konsumiert","dataflow":"Outlook-Trigger -> AI Builder Beleg-Erkennung -> SharePoint(GoBD)"},{"from":"m365-connector","to":"werkhof-orchestrator","relation":"sendet","dataflow":"POST /ingest/invoice strukturierte Belegdaten"},{"from":"datev-exporter","to":"datev","relation":"schreibt","dataflow":"CSV/DATEV-Buchungsstapel in DUO-Ordner, Pflichtangaben Para.14 UStG"},{"from":"kfz-wa-worker","to":"whatsapp-360dialog","relation":"konsumiert","dataflow":"WA-Business-API-Webhook empfaengt Anfrage (Leistung/FIN/Wunschtag)"},{"from":"kfz-wa-worker","to":"werkhof-orchestrator","relation":"sendet","dataflow":"geparste Anfrage -> Orchestrator -> tmERIK"},{"from":"portal-beleg-webhook","to":"m365","relation":"konsumiert","dataflow":"empfaengt strukturierte Belegdaten von Power Automate"},{"from":"portal-beleg-webhook","to":"supabase","relation":"schreibt","dataflow":"portal_belege + PDF in Supabase Storage"},{"from":"kfz-proxy-worker","to":"werkhof-orchestrator","relation":"geht-auf-in","dataflow":"Empfehlung: kein separater Worker, Token-Halterrolle im Orchestrator buendeln"},{"from":"werkleih-embed","to":"werkleih-web","relation":"abgeloest-durch","dataflow":"git-subtree-split aus werkhof/app/werkleih in eigenes Repo"},{"from":"werkleih-web","to":"werkleih-supabase","relation":"liest","dataflow":"eigene Tochter-Supabase/Tenant"},{"from":"werkleih-web","to":"ai-gateway-worker","relation":"konsumiert","dataflow":"XDAB-Kern fuer KI-Werkhilfe/Zustandsfotos (Imagen 4)"},{"from":"werkleih-web","to":"werkleih-stripe-connect","relation":"ruft","dataflow":"Monatsgebuehr + 8% Provision, Connect Express SEPA"},{"from":"werkleih-web","to":"freigabe-queue","relation":"schreibt","dataflow":"Buchungen ebenfalls Human-in-the-Loop"},{"from":"design-tokens","to":"design-werkstatt","relation":"speist","dataflow":"@xdab/tokens Primitive -> Werkstatt-Editorial-Marke"},{"from":"design-tokens","to":"design-xdab","relation":"speist","dataflow":"@xdab/tokens Primitive -> XDAB-SaaS Tech-Marke"},{"from":"onboarding-generator","to":"supabase","relation":"schreibt","dataflow":"neuer Tenant + tenant.js White-Label in <2 Min"},{"from":"ci-cross-tenant-test","to":"supabase","relation":"prueft","dataflow":"Negativtest: Tenant A darf nie Tenant-B-Daten lesen; Gate bei Migration-Push"},{"from":"secret-vault","to":"werkhof-orchestrator","relation":"liefert","dataflow":"Produktions-Secrets (tmERIK Bearer, LiteLLM Master, Supabase Service Key), Rotation"},{"from":"secret-vault","to":"litellm-proxy","relation":"liefert","dataflow":"Master-Key/Provider-Keys statt .env im Repo"}],"layers":[{"name":"Endnutzer-Ebene (Browser / PWA)","nodes":[{"id":"besucher","name":"Besucher","type":"actor","status":"LIVE","repo":"-","prio":"-","notes":"Anonymer Web-Besucher der KFZ-Akquise-Seite."},{"id":"endkunde","name":"Endkunde (KFZ)","type":"actor","status":"LIVE","repo":"-","prio":"-","notes":"Werkstattkunde nutzt das Self-Service-Kundenportal."},{"id":"werkstatt-team","name":"Werkstatt-Team","type":"actor","status":"LIVE","repo":"-","prio":"-","notes":"Meister/Mitarbeiter bedienen das interne Werkhof-OS und geben KI-Aktionen frei."},{"id":"unternehmen","name":"Unternehmen (XDAB-Kunde)","type":"actor","status":"LIVE","repo":"-","prio":"-","notes":"SaaS-Tenant nutzt den DSGVO-KI-Workspace."},{"id":"kfz-site","name":"KFZ-Gorski-Site (Landing + Konfigurator)","type":"frontend","status":"LIVE","repo":"kfz-gorski-site","prio":"P0","notes":"Statische Akquise-Seite mit 3-Schritt-Termin-Konfigurator; Fraunces selbst-gehostet; noindex aktiv, Go-Live-Blocker offen."},{"id":"kundenportal","name":"Kundenportal (kfz-gorski-kundenportal -> /portal in xdab-next)","type":"frontend","status":"LIVE","repo":"kfz-gorski-kundenportal","prio":"P0","notes":"Endkunden-Self-Service (Rechnungen/Termine/Fahrzeuge), aktuell Single-File-Prototyp mit localStorage/Fake-Login; kanonisch als /portal-Route neu zu bauen."},{"id":"werkhof-app","name":"Werkhof-App (Werkstatt-Shell)","type":"frontend","status":"LIVE","repo":"werkhof","prio":"P0","notes":"Internes Werkstatt-OS (CRM/Auftraege/Freigaben/Hermes/WhatsApp/Werkzeug), Single-File 117KB localStorage-Prototyp, Migration zu Next.js noetig."},{"id":"xdab-frontend","name":"xdab-next Frontend (Marketing + /app KI-Workspace)","type":"frontend","status":"SKELETT","repo":"xdab-next","prio":"P0","notes":"Marketing-Seiten LIVE/statisch; /app, (auth), (checkout) sind Ordner-Skelette ohne page.tsx; Dark-Luxury + Three.js Partikel."}]},{"name":"Edge / API-Gateway-Ebene (Cloudflare Workers)","nodes":[{"id":"middleware","name":"middleware.ts (Route-Protection)","type":"middleware","status":"LIVE","repo":"xdab-next","prio":"P0","notes":"Phase-1-Teil erledigt: schuetzt /app/* und /checkout/* via Supabase-Session, fail-closed (Datei auf Disk vorhanden)."},{"id":"supabase-server-client","name":"src/lib/supabase-server.ts (Server-Client)","type":"library","status":"LIVE","repo":"xdab-next","prio":"P0","notes":"createServerClient+Cookies fuer serverseitige Auth-Checks; existiert (Phase-1-Teil)."},{"id":"api-chat-route","name":"src/app/api/chat/route.ts","type":"route-handler","status":"TODO","repo":"xdab-next","prio":"P0","notes":"Echter Flow content-stripper->ai-gateway mit Streaming; fehlt, WorkspaceChat simuliert noch via setInterval."},{"id":"ai-gateway-worker","name":"ai-gateway-worker (+ bsi-v2)","type":"worker","status":"REPO?","prio":"P0","repo":"xdab-next","notes":"Code im Repo (workers/, BSI-gehaertet, EU-Routing, Modul-A-Killswitch), aber NICHT deployed; wrangler name xdab-ai-gateway."},{"id":"content-stripper-worker","name":"content-stripper-worker","type":"worker","status":"REPO?","repo":"xdab-next","prio":"P0","notes":"BSI Dual-LLM, 18 Injection-Pattern; Code im Repo, nicht deployed; wrangler name xdab-content-stripper."},{"id":"auth-helper-worker","name":"auth-helper-worker","type":"worker","status":"REPO?","repo":"xdab-next","prio":"P0","notes":"HIBP k-Anonymity, Turnstile, Recovery-Codes, Sessions; Code im Repo, nicht deployed; wrangler name xdab-auth-helper."},{"id":"stripe-worker","name":"stripe-worker","type":"worker","status":"REPO?","repo":"xdab-next","prio":"P0","notes":"Checkout/Webhook/Customer-Portal fuer Solo/Plus/Pro/Business; Code im Repo, nicht deployed; wrangler name xdab-stripe-worker."},{"id":"web-search-worker","name":"web-search-worker (5. Worker)","type":"worker","status":"TODO","repo":"xdab-next","prio":"P1","notes":"Brave Search (EU) Default, Perplexity optional Premium; Tool-Call vom ai-gateway; neu zu bauen."},{"id":"hermes-bridge-worker","name":"hermes-bridge-worker (6. Worker)","type":"worker","status":"TODO","repo":"xdab-next","prio":"P1","notes":"JWT-gesicherte Bruecke /app/bots <-> Hermes-Agent; triggert Bot-Runs; neu zu bauen."},{"id":"kfz-proxy-worker","name":"kfz-gorski-proxy (Worker)","type":"worker","status":"TODO","repo":"kfz-gorski-kundenportal","prio":"P0","notes":"API-Proxy haelt tmERIK-Token + validiert Supabase-JWT fuer Portal; soll im Orchestrator aufgehen (ein Token-Halter)."}]},{"name":"DSGVO-KI-Kern (XDAB-Fundament, EU-only)","nodes":[{"id":"pii-service","name":"PII-Pseudonymisierungs-Service","type":"service","status":"TODO","repo":"-","prio":"P0","notes":"FastAPI (Presidio+Flair/GLiNER): pseudonymisiert vor jedem LLM-Call, AES-256-GCM-Map in Supabase; nur Konzept, kein laufender Dienst."},{"id":"litellm-proxy","name":"LiteLLM-Proxy (Hetzner CPX31)","type":"service","status":"TODO","repo":"xdab-next","prio":"P0","notes":"Multi-Provider-Aggregation, Virtual-Keys pro Org/Modul, Spend-Cap, Redis-Cache, dsb-key ohne Hermes; docker-compose+Caddyfile in infra/gateway fertig, nicht deployed."},{"id":"wildguard","name":"WildGuard-7B Output-Filter","type":"service","status":"TODO","repo":"-","prio":"P0","notes":"Mandatory Output-Filter (selber Server, idle-sharing), Verdict ins Audit-Log; nicht deployed."},{"id":"supabase","name":"Supabase EU-Frankfurt (DB+Auth+Storage)","type":"db","status":"TODO","repo":"xdab-next","prio":"P0","notes":"Postgres+RLS+pgvector, 4 isolierte DB-Rollen; 3 Migrationen im Repo (organizations/memberships/subscriptions/audit_log/token_usage/subprocessors/chats/messages/active_sessions u.a.), Instanz nicht konfiguriert."},{"id":"hermes-agent","name":"Hermes-Agent (Hetzner CPX21)","type":"service","status":"TODO","repo":"xdab-next","prio":"P1","notes":"Bot-Backend fuer 8 Auto-Agenten, pollt bot_configs, pusht Audit-Log + Telegram/Email; nur Config-Konstanten (hermes.ts), kein Server."},{"id":"langfuse-audit","name":"Langfuse / Audit-Log","type":"service","status":"TODO","repo":"-","prio":"P1","notes":"LLM-Audit (nur Hashes/Metadaten, 6-Monate-Aufbewahrung Art.26 EU AI Act); nicht deployed."},{"id":"bedrock","name":"EU-LLM-Provider (Bedrock/Azure/Vertex/Mistral)","type":"external","status":"EXT","repo":"-","prio":"P0","notes":"Bedrock FRA/STO/IRL, Azure Sweden, Vertex EU-West4, Mistral Paris, ElevenLabs; nur Bedrock-AVV vorhanden, Rest ausstehend."}]},{"name":"Orchestrator-Ebene (Werkhof-Zentrale, FastAPI, Hetzner EU)","nodes":[{"id":"werkhof-orchestrator","name":"werkhof-orchestrator (FastAPI)","type":"service","status":"TODO","repo":"-","prio":"P0","notes":"DAS fehlende Backend und die Zentrale: einziger Token-Halter, Ingest-Worker (ARQ/Redis), Freigabe/PII/PDF/DATEV; existiert nirgends, groesste Luecke."},{"id":"token-vault","name":"Token-Vault","type":"service","status":"TODO","repo":"-","prio":"P0","notes":"Serverseitiger Halter fuer tmERIK Bearer, M365 OAuth, DATEV-DUO; kein Frontend ruft je extern direkt (Token-Vault-Prinzip)."},{"id":"freigabe-queue","name":"Freigabe-Queue + SSE (Human-in-the-Loop)","type":"service","status":"TODO","repo":"-","prio":"P0","notes":"Postgres approval_queue + SSE: draft->awaiting_approval->approved; jede write/send-KI-Aktion erzwungen; im Prototyp nur als UI simuliert."},{"id":"tmerik-adapter","name":"tmERIK-Proxy/Adapter","type":"adapter","status":"TODO","repo":"-","prio":"P0","notes":"Serverseitiger REST-Wrapper (Kunden/Fahrzeuge/HU/Verfuegbarkeit/booking/Foto); Mock-First moeglich; KEINE Faktura (tmERIK-Limit)."},{"id":"hermes-harness","name":"Hermes-Harness (Agent-Loop)","type":"service","status":"TODO","repo":"-","prio":"P1","notes":"Function-Calling via LiteLLM: Angebots-/KV-/Rechnungs-Entwuerfe aus pseudonymisierten Daten; jede write-Aktion in Freigabe-Queue."},{"id":"m365-connector","name":"M365 / Power-Automate-Connector","type":"adapter","status":"TODO","repo":"-","prio":"P1","notes":"Outlook-Trigger->AI Builder->SharePoint(GoBD)->POST /ingest/invoice->DATEV; M365-Test-Tenant fehlt."},{"id":"datev-exporter","name":"DATEV-Exporter","type":"service","status":"TODO","repo":"-","prio":"P1","notes":"GoBD-Buchungsstapel (CSV/DATEV) aus freigegebenen Belegen in DUO-Ordner; DATEV-DUO-Details offen."},{"id":"pdf-service","name":"PDF-Service (WeasyPrint)","type":"service","status":"TODO","repo":"-","prio":"P1","notes":"GoBD-konforme PDFs, unveraenderbares Archiv (S3/Object-Lock), XRechnung B2B."},{"id":"kfz-wa-worker","name":"kfz-gorski-wa-worker","type":"worker","status":"TODO","repo":"kfz-gorski-site","prio":"P1","notes":"WA-Business-API-Webhook: parst Anfrage (Leistung/FIN/Wunschtag), leitet an Orchestrator->tmERIK; ersetzt Click-to-Chat."},{"id":"portal-beleg-webhook","name":"Power-Automate-Beleg-Webhook-Handler","type":"service","status":"TODO","repo":"kfz-gorski-kundenportal","prio":"P1","notes":"Edge Function: empfaengt Belegdaten von Power Automate, schreibt portal_belege + PDF in Supabase Storage."}]},{"name":"Externe Dienste","nodes":[{"id":"tmerik","name":"tmERIK (Stammdaten/Termine)","type":"external","status":"EXT","repo":"-","prio":"P0","notes":"REST Bearer (Alpha); Quelle fuer Kunden/Fahrzeuge/HU/Verfuegbarkeit; Token-Lieferdatum blockiert Echtdaten-Phase 5."},{"id":"m365","name":"M365 / Power Automate (AI Builder)","type":"external","status":"EXT","repo":"-","prio":"P1","notes":"Outlook->AI Builder Beleg-Erkennung->SharePoint GoBD; Faktura-Weg laeuft hierueber, nicht ueber tmERIK; Test-Tenant fehlt."},{"id":"datev","name":"DATEV DUO","type":"external","status":"EXT","repo":"-","prio":"P1","notes":"Buchungsstapel-Uebergabe an Steuerberater (Ordner/Export); DUO-Anbindungsdetails offen."},{"id":"whatsapp-360dialog","name":"360dialog WhatsApp (BSP EU)","type":"external","status":"EXT","repo":"-","prio":"P1","notes":"WA-Business-API BSP (im Konzept favorisiert vs Meta/Bird/Twilio); dedizierte WABA-Nummer noetig."}]},{"name":"Neben-Plattform (WerkLeih)","nodes":[{"id":"werkleih-embed","name":"WerkLeih (in werkhof/app/werkleih)","type":"frontend","status":"LIVE","repo":"werkhof","prio":"P1","notes":"255KB Single-File-Prototyp, als iframe/Deep-Link in Werkhof-App; herauszuloesen."},{"id":"werkleih-web","name":"WerkLeih-Web (Next.js, eigenes Repo)","type":"frontend","status":"TODO","repo":"werkleih (geplant)","prio":"P1","notes":"Eigenstaendige B2B-Werkzeug-Sharing-Plattform (Suche/Karte/Buchung/KI-Werkhilfe); git-subtree-split, eigene GmbH, konsumiert XDAB-Kern."},{"id":"werkleih-supabase","name":"WerkLeih-Supabase (eigener Tenant)","type":"db","status":"TODO","repo":"werkleih (geplant)","prio":"P1","notes":"Eigene Tochter-Supabase/Tenant; haftungsrechtliche Trennung von Werkhof."},{"id":"werkleih-stripe-connect","name":"WerkLeih Stripe Connect","type":"external","status":"TODO","repo":"werkleih (geplant)","prio":"P2","notes":"Monatsgebuehr + 8% Provision je Buchung, Auszahlung via Connect Express, SEPA."}]},{"name":"Design-System & Querschnitt","nodes":[{"id":"design-tokens","name":"@xdab/tokens (Primitive)","type":"library","status":"TODO","repo":"design-system (geplant)","prio":"P1","notes":"Geteilter Primitiv-Kern fuer beide Marken-Layer; Monorepo geplant."},{"id":"design-werkstatt","name":"@xdab/werkstatt-design","type":"library","status":"TODO","repo":"design-system (geplant)","prio":"P1","notes":"Editorial-Marke (Fraunces+Hanken, warmes Papier, Schild-Glow) fuer Gorski/Portal/Werkhof/WerkLeih; KFZ-Site site.css ist Referenz-Quelle."},{"id":"design-xdab","name":"@xdab/xdab-ui","type":"library","status":"TODO","repo":"design-system (geplant)","prio":"P1","notes":"SaaS-Marke (dark, tech, Tailwind-Preset, Three.js) fuer XDAB-Frontend; aktuelle MASTER.md im Repo ist veraltetes helles Artefakt."},{"id":"onboarding-generator","name":"Onboarding-Generator (White-Label)","type":"service","status":"LIVE","repo":"werkhof","prio":"P1","notes":"onboarding.html: Name/CI-Farben/WA-Nummer -> tenant.js in <2 Min; soll ins serverseitige Admin-Backend wandern."},{"id":"ci-cross-tenant-test","name":"Cross-Tenant-Negativtest (CI)","type":"test","status":"TODO","repo":"xdab-next","prio":"P0","notes":"Beweist RLS-Isolation (Tenant A nie Tenant-B-Daten); Gate bei jedem Migration-Push."},{"id":"secret-vault","name":"Secret-Management (Doppler/Hetzner)","type":"service","status":"TODO","repo":"-","prio":"P0","notes":"Vault fuer Produktions-Secrets (tmERIK/LiteLLM-Master/Supabase-Service-Key) + Rotation; niemals .env im Repo."}]}]};
+
+/* ---- index lookups ---- */
+const NODE_BY_ID = {};
+const LAYER_OF = {};
+ATLAS.layers.forEach((layer, li) => {
+  layer.nodes.forEach(n => { NODE_BY_ID[n.id] = n; LAYER_OF[n.id] = layer.name; });
+});
+const ALL_NODES = ATLAS.layers.flatMap(l => l.nodes);
+
+/* ---- helpers ---- */
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+/* ============================================================
+   HEAD STATS
+   ============================================================ */
+(function stats() {
+  $("#stat-layers").textContent = ATLAS.layers.length;
+  $("#stat-nodes").textContent = ALL_NODES.length;
+  $("#stat-edges").textContent = ATLAS.edges.length;
+  const live = ALL_NODES.filter(n => n.status === "LIVE").length;
+  $("#stat-live").textContent = live;
+  $("#foot-counts").textContent =
+    `Stand 2026-06-07 · ${ATLAS.layers.length} Ebenen · ${ALL_NODES.length} Knoten · ${ATLAS.edges.length} Kanten`;
+})();
+
+/* ============================================================
+   RENDER TOPOLOGY BANDS
+   ============================================================ */
+function chipSm(status) {
+  return `<span class="chip-sm" data-st="${esc(status)}"><span class="glyph" aria-hidden="true"></span>${esc(status)}</span>`;
+}
+function nodeCard(n) {
+  const prio = n.prio || "-";
+  return `<button class="node" data-st="${esc(n.status)}" data-id="${esc(n.id)}" type="button"
+            aria-label="${esc(n.name)} — Status ${esc(n.status)}, Prioritaet ${esc(prio)}. Details oeffnen.">
+    <span class="node-top">
+      <span class="node-name">${esc(n.name)}</span>
+      <span class="badge-prio" data-p="${esc(prio)}">${esc(prio)}</span>
+    </span>
+    <span class="node-meta">
+      ${chipSm(n.status)}
+      <span class="node-type">${esc(n.type)}</span>
+    </span>
+  </button>`;
+}
+const downArrow = `<div class="flow-down" aria-hidden="true"><svg viewBox="0 0 22 26" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 2v18m-6-6 6 6 6-6"/></svg></div>`;
+
+(function renderTopo() {
+  const host = $("#topo");
+  const html = ATLAS.layers.map((layer, li) => {
+    const band = `<div class="layer-band" data-li="${li}">
+      <div class="layer-head">
+        <span class="l-idx" aria-hidden="true">${li}</span>
+        <h3>${esc(layer.name)}</h3>
+        <span class="l-count">${layer.nodes.length} Knoten</span>
+      </div>
+      <div class="node-grid">${layer.nodes.map(nodeCard).join("")}</div>
+    </div>`;
+    return band + (li < ATLAS.layers.length - 1 ? downArrow : "");
+  }).join("");
+  host.innerHTML = html;
+})();
+
+/* ============================================================
+   INVENTORY TABLE
+   ============================================================ */
+const invState = { q: "", status: new Set(), prio: new Set() };
+
+function rowHtml(n) {
+  return `<tr data-id="${esc(n.id)}" tabindex="0" role="button" aria-label="${esc(n.name)} — Details oeffnen">
+    <td class="td-name">${esc(n.name)}</td>
+    <td class="td-type">${esc(n.type)}</td>
+    <td>${chipSm(n.status)}</td>
+    <td><span class="badge-prio" data-p="${esc(n.prio || "-")}">${esc(n.prio || "-")}</span></td>
+    <td class="td-repo">${esc(n.repo)}</td>
+    <td class="td-notes">${esc(n.notes)}</td>
+  </tr>`;
+}
+function renderInventory() {
+  const body = $("#inv-body");
+  const q = invState.q.trim().toLowerCase();
+  const rows = ALL_NODES.filter(n => {
+    if (invState.status.size && !invState.status.has(n.status)) return false;
+    if (invState.prio.size && !invState.prio.has(n.prio)) return false;
+    if (q) {
+      const hay = (n.name + " " + n.type + " " + n.repo + " " + n.notes + " " + n.status + " " + (n.prio||"")).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  body.innerHTML = rows.length
+    ? rows.map(rowHtml).join("")
+    : `<tr><td colspan="6" class="no-results">Keine Treffer fuer die aktuelle Auswahl.</td></tr>`;
+  $("#inv-count").textContent = `${rows.length} / ${ALL_NODES.length} Knoten`;
+}
+
+$("#inv-search").addEventListener("input", e => { invState.q = e.target.value; renderInventory(); });
+$$(".fbtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const dim = btn.dataset.filter; // status | prio
+    const val = btn.dataset.val;
+    const set = invState[dim];
+    if (set.has(val)) { set.delete(val); btn.setAttribute("aria-pressed", "false"); }
+    else { set.add(val); btn.setAttribute("aria-pressed", "true"); }
+    renderInventory();
+  });
+});
+renderInventory();
+
+/* ============================================================
+   DETAIL DRAWER
+   ============================================================ */
+const drawer = $("#drawer");
+const scrim = $("#scrim");
+let lastFocused = null;
+
+function connItem(edge, otherId, dir) {
+  const other = NODE_BY_ID[otherId];
+  const otherName = other ? other.name : otherId;
+  const relLine = dir === "out"
+    ? `<span class="ci-rel">${esc(edge.relation)} <span class="arr">&rarr;</span> ${esc(otherName)}</span>`
+    : `<span class="ci-rel">${esc(otherName)} <span class="arr">&rarr;</span> ${esc(edge.relation)}</span>`;
+  return `<button class="conn-item" data-id="${esc(otherId)}" type="button">
+    ${relLine}
+    <span class="ci-flow">${esc(edge.dataflow)}</span>
+  </button>`;
+}
+
+function openDrawer(id) {
+  const n = NODE_BY_ID[id];
+  if (!n) return;
+  lastFocused = document.activeElement;
+
+  drawer.dataset.st = n.status;
+  $("#drawer-layer").textContent = LAYER_OF[id] || "";
+  $("#drawer-title").textContent = n.name;
+  $("#drawer-chips").innerHTML =
+    `<span class="chip" data-st="${esc(n.status)}"><span class="glyph" aria-hidden="true"></span>${esc(n.status)}</span>` +
+    `<span class="badge-prio" data-p="${esc(n.prio || "-")}">${esc(n.prio || "-")}</span>`;
+
+  $("#drawer-dl").innerHTML =
+    `<div class="dl-row"><dt>Typ</dt><dd class="mono-val">${esc(n.type)}</dd></div>` +
+    `<div class="dl-row"><dt>Status</dt><dd>${esc(n.status)}</dd></div>` +
+    `<div class="dl-row"><dt>Prio</dt><dd>${esc(n.prio || "-")}</dd></div>` +
+    `<div class="dl-row"><dt>Repo</dt><dd class="mono-val">${esc(n.repo)}</dd></div>` +
+    `<div class="dl-row"><dt>ID</dt><dd class="mono-val">${esc(n.id)}</dd></div>`;
+
+  $("#drawer-notes").textContent = n.notes;
+
+  const out = ATLAS.edges.filter(e => e.from === id);
+  const inc = ATLAS.edges.filter(e => e.to === id);
+  $("#conn-out").innerHTML = out.length
+    ? `<h4>Ausgehend (${out.length})</h4><div class="conn-list">${out.map(e => connItem(e, e.to, "out")).join("")}</div>`
+    : "";
+  $("#conn-in").innerHTML = inc.length
+    ? `<h4>Eingehend (${inc.length})</h4><div class="conn-list">${inc.map(e => connItem(e, e.from, "in")).join("")}</div>`
+    : "";
+
+  // connection buttons re-open drawer for target
+  drawer.querySelectorAll(".conn-item").forEach(b => {
+    b.addEventListener("click", () => openDrawer(b.dataset.id));
+  });
+
+  // highlight in topology
+  highlightTopo(id);
+
+  drawer.classList.add("open");
+  scrim.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
+  $("#drawer-close").focus();
+  document.body.style.overflow = "hidden";
+}
+
+function closeDrawer() {
+  drawer.classList.remove("open");
+  scrim.classList.remove("open");
+  drawer.setAttribute("aria-hidden", "true");
+  clearHighlight();
+  document.body.style.overflow = "";
+  if (lastFocused && lastFocused.focus) lastFocused.focus();
+}
+
+function highlightTopo(id) {
+  const topo = $("#topo");
+  clearHighlight();
+  const related = new Set();
+  ATLAS.edges.forEach(e => {
+    if (e.from === id) related.add(e.to);
+    if (e.to === id) related.add(e.from);
+  });
+  topo.classList.add("is-focusing");
+  $$("#topo .node").forEach(card => {
+    const cid = card.dataset.id;
+    if (cid === id) card.classList.add("is-active");
+    else if (related.has(cid)) card.classList.add("is-rel");
+  });
+}
+function clearHighlight() {
+  const topo = $("#topo");
+  topo.classList.remove("is-focusing");
+  $$("#topo .node").forEach(c => c.classList.remove("is-active", "is-rel"));
+}
+
+/* event delegation: topology cards + table rows */
+$("#topo").addEventListener("click", e => {
+  const card = e.target.closest(".node");
+  if (card) openDrawer(card.dataset.id);
+});
+$("#inv-body").addEventListener("click", e => {
+  const row = e.target.closest("tr[data-id]");
+  if (row) openDrawer(row.dataset.id);
+});
+$("#inv-body").addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === " ") {
+    const row = e.target.closest("tr[data-id]");
+    if (row) { e.preventDefault(); openDrawer(row.dataset.id); }
+  }
+});
+
+$("#drawer-close").addEventListener("click", closeDrawer);
+scrim.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
+});
+
+/* focus trap inside drawer */
+drawer.addEventListener("keydown", e => {
+  if (e.key !== "Tab") return;
+  const focusables = drawer.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])');
+  if (!focusables.length) return;
+  const first = focusables[0], last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
+/* ============================================================
+   REVEAL ON SCROLL
+   ============================================================ */
+(function reveal() {
+  const els = $$(".reveal");
+  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    els.forEach(el => el.classList.add("in"));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+  els.forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>

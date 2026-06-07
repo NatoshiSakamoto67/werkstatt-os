@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "papier",
+    "name": "Papier · Werkstatt-Editorial",
+    "beschreibung": "Warmes, handwerklich-editoriales Theme auf cremigem Off-White mit feiner Papier-Faser-Textur, kräftigen Serif-Headlines und Mono-//-Labels in Orange. Beleg- und Docket-Karten mit leicht eckigen Kanten geben jedem Abschnitt das Gefühl eines sauber dokumentierten Auftrags.",
+    "best_for": "Werkstätten, KFZ-Betriebe, Handwerk, Manufakturen und inhabergeführte Dienstleister, die bodenständig, ehrlich und hochwertig wirken wollen — überall, wo Verlässlichkeit, Dokumentation und greifbares Handwerk zur Marke gehören. CI-Akzent ist per --cust-accent frei auf die Kundenfarbe umstellbar (Default CI-Blau #146DAB).",
+    "bytes": 13299
+  },
+  {
+    "slug": "stahl",
+    "name": "Stahl · Industrial",
+    "beschreibung": "Ein roher Werkstatt-Hallen-Look in kühlem Anthrazit und gebürstetem Stahl, mit technischer Schmal-Grotesk, Gitterlinien und sparsam gesetzten Gefahrenstreifen in Signal-Orange. Wirkt robust, präzise und unverkennbar nach Maschinenbau – ganz ohne generischen Standard-Look.",
+    "best_for": "KFZ-Werkstätten, Maschinenbau, Metallverarbeitung, Schweiß- und Schlosserbetriebe, Industrie-Dienstleister, Werkzeug-/Geräteverleih und Handwerksmarken, die einen technischen, kantigen und wertigen Auftritt wollen.",
+    "bytes": 14922
+  },
+  {
+    "slug": "glas",
+    "name": "Glas · Glassmorphism",
+    "beschreibung": "Ein hochmodernes, durchscheinendes Theme im Apple-Liquid-Glass-Stil: milchige Glaskarten mit Blur, Saettigung und feinen Glanzkanten, weiche grosse Radien und ein dezent lebendiger Farbverlauf-Hintergrund schaffen Tiefe durch Layering. Trotz Transparenz bleibt der Text dank kraeftiger Kontraste und Fallbacks jederzeit klar lesbar.",
+    "best_for": "Premium-Tech, SaaS, Design- und Kreativstudios, App-Launches, Fintech und moderne Dienstleistungsmarken, die eine leichte, frische und edle Anmutung mit Apple-Liquid-Glass-Charakter suchen. Die CI-Farbe laesst sich pro Kunde ueber --cust-accent setzen, ohne dass das uebrige Design angepasst werden muss.",
+    "bytes": 15741
+  },
+  {
+    "slug": "edel",
+    "name": "Edel · Luxury",
+    "beschreibung": "Ein dunkles Luxus-Theme in tiefem Anthrazit mit warmem Gold-/Messing-Akzent, eleganten Serif-Headlines, viel Negativraum und feinen Haarlinien. Dezente Hover-Glows und disziplinierter Kontrast geben jeder Seite eine Premium-Marken-Anmutung.",
+    "best_for": "Premium- und Luxusmarken: gehobener Automobilhandel und Tuning, exklusive Immobilien, Schmuck/Uhren, Fine-Dining und Hotellerie, Privatbanken sowie hochwertige Beratungs- und Manufaktur-Dienstleister, die eine Bentley-/Rolls-Royce-artige Wirkung wollen.",
+    "bytes": 11780
+  },
+  {
+    "slug": "minimal",
+    "name": "Minimal · Basic S/W",
+    "beschreibung": "Ein radikal reduziertes Schwarz-Weiss-Theme: reines Weiss, sehr duenne Systemschrift, viel Weissraum und nur ein winziger Akzent. Schweizer Basic-Anmutung mit maximaler Ruhe und Klarheit.",
+    "best_for": "Architekturbueros, Galerien, Designstudios, Berater, Fotografen und Premium-Marken, die durch Zurueckhaltung statt durch Dekoration ueberzeugen wollen.",
+    "bytes": 10966
+  }
+]

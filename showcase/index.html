@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XDAB · Showcase — Design-Pakete & Demos</title>
+<meta name="description" content="Design-Pakete, Komponenten, Landing-Demo und System-Atlas der XDAB-Werkstatt-Plattform.">
+<style>
+  :root{--paper:#FCFBF8;--paper2:#F3F0EA;--ink:#0B0D10;--line:#E6E1D8;--line2:#D6D0C5;
+    --grau:#565C66;--blau:#146DAB;--orange:#FBAF3A;
+    --serif:'Fraunces',Georgia,'Times New Roman',serif;--mono:ui-monospace,Menlo,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);overflow-x:clip;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;
+    background-image:repeating-linear-gradient(90deg,rgba(11,13,16,.013) 0 1px,transparent 1px 3px),repeating-linear-gradient(0deg,rgba(11,13,16,.01) 0 1px,transparent 1px 4px)}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+  .strip{height:4px;background:linear-gradient(90deg,var(--blau),var(--orange))}
+  header{padding:64px 0 28px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:1.6px;font-size:12px;color:var(--grau);margin:0 0 14px}
+  .eyebrow::before{content:"// ";color:var(--orange);font-weight:700}
+  h1{font-family:var(--serif);font-weight:640;letter-spacing:-1px;line-height:.98;font-size:clamp(38px,6vw,70px);margin:0 0 12px}
+  h1 .thin{color:#6b7280;font-weight:340}
+  .lead{color:var(--grau);max-width:60ch;font-size:clamp(16px,1.6vw,19px);margin:0}
+  section{padding:44px 0 4px}
+  h2{font-family:var(--serif);font-weight:600;letter-spacing:-.4px;font-size:clamp(23px,3vw,34px);margin:0 0 6px}
+  .sub{color:var(--grau);margin:0 0 24px;font-size:15px}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+  a.card{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;background:#fff;
+    border:1px solid var(--line);border-radius:16px;padding:22px;position:relative;overflow:hidden;
+    transition:transform .18s cubic-bezier(.16,1,.3,1),box-shadow .18s,border-color .18s}
+  a.card:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:0 18px 40px -28px rgba(11,13,16,.5)}
+  a.card:focus-visible{outline:3px solid var(--blau);outline-offset:2px}
+  .card .ic{font-size:24px}
+  .card .t{font-family:var(--serif);font-size:21px;font-weight:600}
+  .card .d{font-size:13.5px;color:var(--grau);line-height:1.45}
+  .pakete{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .pk{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.6px;
+    border:1px solid var(--line2);border-radius:999px;padding:4px 10px;color:var(--grau)}
+  footer{margin:54px 0 70px;padding-top:20px;border-top:1px solid var(--line);color:#6b7280;font-family:var(--mono);font-size:13px}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<header><div class="wrap">
+  <p class="eyebrow">XDAB · Werkstatt-Plattform</p>
+  <h1>Eine Plattform. <span class="thin">Jede Marke.</span></h1>
+  <p class="lead">Jeder Kunde bekommt drei Dinge — Plattform, Kundenportal und Website — im eigenen CI. Hier kannst du die Design-Pakete durchklicken und die Demos ansehen.</p>
+</div></header>
+<main class="wrap">
+  <section>
+    <h2>Design-Pakete zur Auswahl</h2>
+    <p class="sub">Live umschalten, CI-Farbe testen, vergleichen.</p>
+    <div class="grid">
+      <a class="card" href="themes/index.html">
+        <span class="ic">🎨</span><span class="t">Design-Pakete (Umschalter)</span>
+        <span class="d">Dieselbe Seite in 5 Stilen — mit CI-Akzent-Regler.</span>
+        <span class="pakete"><span class="pk">Papier</span><span class="pk">Stahl</span><span class="pk">Glas</span><span class="pk">Edel</span><span class="pk">Minimal</span></span>
+      </a>
+    </div>
+  </section>
+  <section>
+    <h2>Demos & System</h2>
+    <p class="sub">Die fertigen Bausteine.</p>
+    <div class="grid">
+      <a class="card" href="landing/index.html"><span class="ic">🚗</span><span class="t">Landing-Demo</span><span class="d">Akquise-Seite mit Fahrzeugschein-Erfassung + Unfallaufnahme (Demo: KFZ Gorski).</span></a>
+      <a class="card" href="design-system/showcase.html"><span class="ic">🧩</span><span class="t">Komponenten</span><span class="d">Der Design-System-Baukasten: Tokens, Belege, Chips, Tabellen.</span></a>
+      <a class="card" href="../app/"><span class="ic">🏭</span><span class="t">Werkhof-App</span><span class="d">Das interne Werkstatt-OS (neu designt).</span></a>
+      <a class="card" href="atlas.html"><span class="ic">🗺️</span><span class="t">Operations-Atlas</span><span class="d">Die ganze System-Topologie auf einen Blick (intern).</span></a>
+    </div>
+  </section>
+</main>
+<footer><div class="wrap">XDAB · Showcase · github.io/werkhof/showcase/</div></footer>
+</body>
+</html>
