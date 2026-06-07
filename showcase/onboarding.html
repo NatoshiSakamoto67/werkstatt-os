@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="papier">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding-Generator · tenant.js für Landing, Portal &amp; Werkhof</title>
+<meta name="description" content="Ein Formular, drei tenant.js. Werkstatt-CI, Theme und Schrift wählen, Live-Vorschau, fertige Konfig herunterladen.">
+<style>
+/* =========================================================================
+   FONT REGISTRY — system-font fallbacks per design family (no external CDNs).
+   The names match the DS --font-* registry so the preview maps 1:1 to prod.
+   ========================================================================= */
+:root{
+  --font-fraunces: 'Fraunces','Hoefler Text','Georgia','Times New Roman',serif;
+  --font-playfair: 'Playfair Display','Hoefler Text','Georgia',serif;
+  --font-space:    'Space Grotesk','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --font-inter:    'Inter','Helvetica Neue','Segoe UI',system-ui,sans-serif;
+  --font-oswald:   'Oswald','Bebas Neue','Impact','Haettenschweiler',sans-serif;
+
+  /* canonical CI aliases — mirror whitelabel.js output */
+  --accent:    #146DAB;
+  --accent-2:  #FBAF3A;
+  --accent-deep:#0E5183;
+
+  /* paper design system base */
+  --paper:        oklch(97.5% 0.008 85);
+  --paper-2:      oklch(99% 0.006 85);
+  --ink:          oklch(22% 0.02 65);
+  --ink-soft:     oklch(40% 0.02 65);
+  --ink-faint:    oklch(58% 0.015 65);
+  --line:         oklch(85% 0.012 75);
+  --line-soft:    oklch(91% 0.01 80);
+
+  --display: var(--font-fraunces);
+  --body: var(--font-inter);
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 30px;
+
+  --space-section: clamp(2.5rem, 2rem + 4vw, 5.5rem);
+  --shadow-soft: 0 1px 2px oklch(20% 0.02 65 / .04), 0 8px 24px oklch(20% 0.02 65 / .07);
+  --shadow-lift: 0 2px 6px oklch(20% 0.02 65 / .08), 0 20px 48px oklch(20% 0.02 65 / .14);
+
+  --duration-fast: 150ms;
+  --duration-normal: 320ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Theme accents for the page chrome itself (papier default) ---- */
+[data-theme="papier"]{ --paper: oklch(97.5% 0.008 85); --ink: oklch(22% 0.02 65); --line: oklch(85% 0.012 75); }
+
+*{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body{
+  margin: 0;
+  font-family: var(--body);
+  color: var(--ink);
+  background:
+    radial-gradient(120% 80% at 100% -10%, oklch(95% 0.03 80 / .55), transparent 60%),
+    radial-gradient(90% 70% at -10% 0%, oklch(94% 0.025 250 / .35), transparent 55%),
+    var(--paper);
+  background-attachment: fixed;
+  line-height: 1.55;
+  font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.05rem);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* subtle paper grain */
+body::before{
+  content:"";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  opacity: .35;
+  z-index: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+h1,h2,h3,h4,.display{ font-family: var(--display); font-weight: 600; line-height: 1.05; letter-spacing: -0.015em; }
+a{ color: var(--accent-deep); }
+
+.wrap{ position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 0 clamp(1rem, 0.5rem + 3vw, 2.5rem); }
+
+/* ============================ HEADER ============================ */
+header.site{
+  position: sticky; top: 0; z-index: 30;
+  backdrop-filter: blur(14px) saturate(1.3);
+  background: oklch(98% 0.008 85 / .8);
+  border-bottom: 1px solid var(--line-soft);
+}
+.site-inner{ display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; }
+.brandmark{ display: flex; align-items: center; gap: 0.7rem; }
+.brandmark .mk{
+  width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+  font-family: var(--display); font-weight: 600; font-size: 1.05rem; color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  box-shadow: var(--shadow-soft);
+}
+.brandmark .tt{ font-family: var(--display); font-weight: 600; font-size: 1.18rem; letter-spacing: -0.02em; }
+.brandmark .tt span{ color: var(--accent); }
+.head-meta{ font-size: 0.82rem; color: var(--ink-faint); display: none; }
+@media(min-width:760px){ .head-meta{ display:block; } }
+
+/* ============================ HERO ============================ */
+.hero{ padding: clamp(2.5rem, 2rem + 5vw, 5.5rem) 0 clamp(1.5rem,1rem+2vw,2.5rem); }
+.hero .overline{
+  font-family: var(--font-space);
+  text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; font-weight: 600;
+  color: var(--accent); display: inline-flex; align-items: center; gap: 0.5rem;
+}
+.hero .overline::before{ content:""; width: 28px; height: 2px; background: var(--accent-2); display:inline-block; }
+.hero h1{ font-size: clamp(2.4rem, 1.3rem + 5vw, 4.6rem); margin: 0.7rem 0 0.6rem; max-width: 16ch; }
+.hero h1 em{ font-style: italic; color: var(--accent); }
+.hero p.lede{ font-size: clamp(1.05rem, 1rem + 0.6vw, 1.3rem); color: var(--ink-soft); max-width: 60ch; margin: 0; }
+.hero .badges{ display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.6rem; }
+.badge{
+  font-family: var(--font-space); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.02em;
+  padding: 0.4rem 0.8rem; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--paper-2); color: var(--ink-soft); display: inline-flex; align-items:center; gap: 0.4rem;
+}
+.badge b{ color: var(--accent-deep); font-weight: 700; }
+
+/* ============================ LAYOUT GRID ============================ */
+.studio{
+  display: grid; gap: clamp(1.4rem, 1rem + 2vw, 2.4rem);
+  grid-template-columns: 1fr;
+  padding-bottom: var(--space-section);
+}
+@media(min-width: 1000px){ .studio{ grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr); align-items: start; } }
+
+/* ============================ FORM PANEL ============================ */
+.panel{
+  background: linear-gradient(180deg, var(--paper-2), var(--paper));
+  border: 1px solid var(--line); border-radius: var(--r-xl);
+  box-shadow: var(--shadow-soft);
+  padding: clamp(1.3rem, 1rem + 1.5vw, 2.1rem);
+}
+.panel h2{ font-size: 1.5rem; margin: 0 0 0.25rem; }
+.panel .sub{ color: var(--ink-faint); font-size: 0.9rem; margin: 0 0 1.4rem; }
+
+fieldset{ border: 0; padding: 0; margin: 0 0 1.6rem; }
+fieldset legend{
+  font-family: var(--font-space); text-transform: uppercase; letter-spacing: 0.16em;
+  font-size: 0.68rem; font-weight: 700; color: var(--accent);
+  padding: 0; margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.6rem; width: 100%;
+}
+fieldset legend::after{ content:""; flex: 1; height: 1px; background: var(--line-soft); }
+
+.grid2{ display: grid; gap: 0.9rem 1rem; grid-template-columns: 1fr; }
+@media(min-width: 560px){ .grid2{ grid-template-columns: 1fr 1fr; } }
+.col-span{ grid-column: 1 / -1; }
+
+.field{ display: flex; flex-direction: column; gap: 0.35rem; }
+.field label{ font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 0.5rem; }
+.field label .hint{ font-weight: 400; color: var(--ink-faint); font-size: 0.72rem; }
+.field .req{ color: var(--accent); }
+
+input[type=text], input[type=tel], input[type=email], input[type=url], select, textarea{
+  font: inherit; font-size: 0.92rem; color: var(--ink);
+  padding: 0.6rem 0.75rem; border: 1px solid var(--line); border-radius: var(--r-sm);
+  background: var(--paper-2); width: 100%;
+  transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease, background var(--duration-fast) ease;
+}
+textarea{ resize: vertical; min-height: 70px; line-height: 1.45; }
+input:focus-visible, select:focus-visible, textarea:focus-visible{
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+  background: var(--paper);
+}
+input::placeholder, textarea::placeholder{ color: var(--ink-faint); }
+select{ appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b6b6b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat; background-position: right 0.7rem center; padding-right: 2.2rem;
+}
+
+/* color input rows */
+.color-row{ display: flex; align-items: center; gap: 0.6rem; }
+.color-row input[type=color]{
+  appearance: none; -webkit-appearance: none; border: 1px solid var(--line); border-radius: var(--r-sm);
+  width: 52px; height: 42px; padding: 3px; background: var(--paper-2); cursor: pointer; flex: none;
+}
+.color-row input[type=color]::-webkit-color-swatch-wrapper{ padding: 0; }
+.color-row input[type=color]::-webkit-color-swatch{ border: none; border-radius: 5px; }
+.color-row input[type=text]{ font-family: var(--font-space); letter-spacing: 0.04em; text-transform: uppercase; }
+
+.swatch-presets{ display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.swatch-presets button{
+  border: 1px solid var(--line); background: var(--paper-2); border-radius: 999px;
+  padding: 0.3rem 0.5rem 0.3rem 0.4rem; display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.72rem; font-family: var(--font-space); color: var(--ink-soft); cursor: pointer;
+  transition: border-color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+.swatch-presets button:hover{ border-color: var(--accent); transform: translateY(-1px); }
+.swatch-presets .dot{ width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px oklch(0% 0 0 / .12); }
+
+.field-error{ font-size: 0.72rem; color: oklch(55% 0.18 28); font-weight: 600; min-height: 0; }
+input[aria-invalid="true"], select[aria-invalid="true"]{ border-color: oklch(60% 0.2 28); box-shadow: 0 0 0 3px oklch(60% 0.2 28 / .15); }
+
+/* ============================ PREVIEW PANEL ============================ */
+.preview-wrap{ position: sticky; top: 84px; display: flex; flex-direction: column; gap: 1.2rem; }
+@media(max-width: 999px){ .preview-wrap{ position: static; } }
+
+.preview-head{ display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.preview-head h2{ font-size: 1.25rem; margin: 0; }
+.preview-head .live{ font-family: var(--font-space); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); display: inline-flex; align-items: center; gap: 0.45rem; }
+.preview-head .live .pulse{ width: 8px; height: 8px; border-radius: 50%; background: oklch(70% 0.18 145); box-shadow: 0 0 0 0 oklch(70% 0.18 145 / .6); animation: pulse 2s infinite; }
+@keyframes pulse{ 0%{ box-shadow: 0 0 0 0 oklch(70% 0.18 145 / .55);} 70%{ box-shadow: 0 0 0 8px oklch(70% 0.18 145 / 0);} 100%{ box-shadow: 0 0 0 0 oklch(70% 0.18 145 / 0);} }
+
+/* device frame holding the iframe-equivalent inline preview */
+.device{
+  border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden;
+  box-shadow: var(--shadow-lift); background: #fff;
+}
+.device .chrome{
+  display: flex; align-items: center; gap: 0.45rem; padding: 0.55rem 0.85rem;
+  background: oklch(94% 0.008 85); border-bottom: 1px solid var(--line-soft);
+}
+.device .chrome .dot{ width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.device .chrome .url{
+  margin-left: 0.6rem; font-family: var(--font-space); font-size: 0.72rem; color: var(--ink-faint);
+  background: var(--paper-2); padding: 0.2rem 0.7rem; border-radius: 999px; border: 1px solid var(--line-soft);
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* === THE PREVIEW HERO (this is the themed surface) === */
+.pv{
+  --pv-accent: #146DAB; --pv-accent2: #FBAF3A; --pv-deep: #0E5183;
+  --pv-display: var(--font-fraunces); --pv-body: var(--font-inter);
+  --pv-paper: oklch(97.5% 0.008 85); --pv-ink: oklch(22% 0.02 65); --pv-soft: oklch(42% 0.02 65);
+  --pv-card: oklch(99% 0.006 85); --pv-line: oklch(86% 0.012 75);
+  position: relative; min-height: 430px; padding: 1.6rem 1.4rem 1.5rem;
+  font-family: var(--pv-body); color: var(--pv-ink); background: var(--pv-paper);
+  transition: background var(--duration-normal) ease, color var(--duration-normal) ease;
+  overflow: hidden;
+}
+.pv::after{ content:""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 90% at 110% -10%, color-mix(in oklab, var(--pv-accent2) 28%, transparent), transparent 55%);
+}
+.pv-top{ position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.7rem; }
+.pv-brand{ display: flex; align-items: center; gap: 0.6rem; }
+.pv-mk{ width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: #fff; font-family: var(--pv-display); font-weight: 600; font-size: 1rem; background: linear-gradient(135deg, var(--pv-accent), var(--pv-deep)); box-shadow: 0 6px 16px color-mix(in oklab, var(--pv-accent) 35%, transparent); overflow: hidden; flex: none; }
+.pv-mk img{ width: 100%; height: 100%; object-fit: contain; }
+.pv-name{ font-family: var(--pv-display); font-weight: 600; font-size: 1.1rem; letter-spacing: -0.02em; line-height: 1.1; }
+.pv-nav{ display: none; gap: 1rem; font-size: 0.8rem; color: var(--pv-soft); }
+@media(min-width: 520px){ .pv-nav{ display: flex; } }
+.pv-cta{ font-family: var(--pv-body); font-weight: 600; font-size: 0.78rem; padding: 0.45rem 0.9rem; border-radius: 999px; color: #fff; background: var(--pv-accent); border: none; box-shadow: 0 6px 16px color-mix(in oklab, var(--pv-accent) 35%, transparent); white-space: nowrap; }
+
+.pv-hero{ position: relative; z-index: 2; max-width: 30ch; }
+.pv-over{ font-family: var(--font-space); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.66rem; font-weight: 600; color: var(--pv-accent); display: inline-flex; align-items: center; gap: 0.45rem; }
+.pv-over::before{ content:""; width: 22px; height: 2px; background: var(--pv-accent2); }
+.pv-hero h3{ font-family: var(--pv-display); font-weight: 600; font-size: clamp(1.9rem, 1.3rem + 3vw, 2.9rem); line-height: 1.02; letter-spacing: -0.02em; margin: 0.55rem 0 0.6rem; color: var(--pv-ink); }
+.pv-hero h3 em{ font-style: italic; color: var(--pv-accent); }
+.pv-hero p{ color: var(--pv-soft); font-size: 0.92rem; margin: 0 0 1.1rem; max-width: 34ch; }
+.pv-actions{ display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.pv-btn-1{ font-family: var(--pv-body); font-weight: 600; font-size: 0.82rem; padding: 0.62rem 1.1rem; border-radius: 10px; color: #fff; background: var(--pv-accent); border: none; box-shadow: 0 8px 20px color-mix(in oklab, var(--pv-accent) 30%, transparent); display: inline-flex; align-items: center; gap: 0.45rem; }
+.pv-btn-2{ font-family: var(--pv-body); font-weight: 600; font-size: 0.82rem; padding: 0.62rem 1.1rem; border-radius: 10px; color: var(--pv-deep); background: transparent; border: 1.5px solid color-mix(in oklab, var(--pv-accent) 40%, var(--pv-line)); display: inline-flex; align-items: center; gap: 0.45rem; }
+.pv-btn-wa{ background: oklch(64% 0.16 150); box-shadow: 0 8px 20px oklch(64% 0.16 150 / .3); }
+
+.pv-cards{ position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin-top: 1.7rem; }
+.pv-card{ background: var(--pv-card); border: 1px solid var(--pv-line); border-radius: 14px; padding: 0.8rem; box-shadow: 0 1px 2px oklch(20% 0.02 65 / .04), 0 10px 26px oklch(20% 0.02 65 / .06); }
+.pv-card .ic{ width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: color-mix(in oklab, var(--pv-accent2) 26%, var(--pv-card)); color: var(--pv-deep); margin-bottom: 0.5rem; }
+.pv-card .ic svg{ width: 16px; height: 16px; }
+.pv-card b{ font-family: var(--pv-display); font-weight: 600; font-size: 0.85rem; display: block; color: var(--pv-ink); }
+.pv-card span{ font-size: 0.72rem; color: var(--pv-soft); }
+.pv-card.feat{ background: linear-gradient(160deg, var(--pv-accent), var(--pv-deep)); border-color: transparent; }
+.pv-card.feat .ic{ background: oklch(100% 0 0 / .18); color: #fff; }
+.pv-card.feat b, .pv-card.feat span{ color: #fff; }
+.pv-card.feat span{ color: oklch(100% 0 0 / .82); }
+
+/* dark mode preview */
+.pv[data-mode="dark"]{ --pv-paper: oklch(20% 0.015 265); --pv-ink: oklch(95% 0.005 85); --pv-soft: oklch(72% 0.01 85); --pv-card: oklch(25% 0.015 265); --pv-line: oklch(34% 0.015 265); }
+
+/* theme overrides for the preview surface */
+.pv[data-pvtheme="stahl"]{ --pv-paper: oklch(94% 0.005 250); --pv-card: oklch(97% 0.004 250); --pv-ink: oklch(24% 0.02 255); --pv-line: oklch(82% 0.01 250); }
+.pv[data-pvtheme="stahl"][data-mode="dark"]{ --pv-paper: oklch(22% 0.015 255); --pv-card: oklch(27% 0.015 255); }
+.pv[data-pvtheme="glas"]{ --pv-paper: oklch(95% 0.02 230); --pv-card: oklch(99% 0.01 230 / .7); --pv-line: oklch(85% 0.02 230 / .6); }
+.pv[data-pvtheme="glas"] .pv-card{ backdrop-filter: blur(8px); }
+.pv[data-pvtheme="glas"][data-mode="dark"]{ --pv-paper: oklch(24% 0.03 255); --pv-card: oklch(30% 0.03 255 / .55); }
+.pv[data-pvtheme="edel"]{ --pv-paper: oklch(18% 0.015 285); --pv-ink: oklch(94% 0.01 85); --pv-soft: oklch(72% 0.015 85); --pv-card: oklch(23% 0.02 285); --pv-line: oklch(34% 0.02 285); }
+.pv[data-pvtheme="edel"] .pv-card.feat{ box-shadow: 0 10px 30px color-mix(in oklab, var(--pv-accent) 45%, transparent); }
+.pv[data-pvtheme="minimal"]{ --pv-paper: oklch(100% 0 0); --pv-card: oklch(100% 0 0); --pv-ink: oklch(15% 0 0); --pv-soft: oklch(45% 0 0); --pv-line: oklch(90% 0 0); }
+.pv[data-pvtheme="minimal"]::after{ display: none; }
+.pv[data-pvtheme="minimal"][data-mode="dark"]{ --pv-paper: oklch(14% 0 0); --pv-card: oklch(19% 0 0); --pv-ink: oklch(96% 0 0); --pv-line: oklch(30% 0 0); }
+
+/* preview controls */
+.pv-controls{ display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.pv-controls .seg{ display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--paper-2); }
+.pv-controls .seg button{ font-family: var(--font-space); font-size: 0.74rem; padding: 0.4rem 0.85rem; border: none; background: transparent; color: var(--ink-soft); cursor: pointer; transition: background var(--duration-fast) ease, color var(--duration-fast) ease; }
+.pv-controls .seg button[aria-pressed="true"]{ background: var(--accent); color: #fff; }
+.pv-controls .meta{ font-size: 0.75rem; color: var(--ink-faint); margin-left: auto; font-family: var(--font-space); }
+
+/* ============================ OUTPUT / DOWNLOAD ============================ */
+.output{ margin-top: 0.4rem; }
+.actions-bar{ display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin-bottom: 1.1rem; }
+.btn{
+  font: inherit; font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  padding: 0.72rem 1.3rem; border-radius: 12px; border: 1px solid transparent;
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-fast) ease, background var(--duration-fast) ease;
+}
+.btn svg{ width: 17px; height: 17px; }
+.btn-primary{ background: var(--accent); color: #fff; box-shadow: 0 8px 22px color-mix(in oklab, var(--accent) 32%, transparent); }
+.btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 12px 30px color-mix(in oklab, var(--accent) 38%, transparent); }
+.btn-primary:active{ transform: translateY(0); }
+.btn-ghost{ background: var(--paper-2); color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover{ border-color: var(--accent); transform: translateY(-2px); }
+.btn:focus-visible{ outline: 3px solid color-mix(in oklab, var(--accent) 40%, transparent); outline-offset: 2px; }
+
+/* file tabs */
+.file-tabs{ display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: -1px; }
+.file-tabs button{
+  font-family: var(--font-space); font-size: 0.78rem; font-weight: 500;
+  padding: 0.5rem 0.95rem; border: 1px solid var(--line); border-bottom-color: transparent;
+  background: var(--paper); color: var(--ink-soft); cursor: pointer;
+  border-radius: 10px 10px 0 0; transition: background var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+.file-tabs button[aria-selected="true"]{ background: oklch(24% 0.02 265); color: oklch(95% 0.01 85); border-color: oklch(24% 0.02 265); }
+.file-tabs button .pill{ font-size: 0.62rem; padding: 0.05rem 0.4rem; border-radius: 999px; background: color-mix(in oklab, var(--accent) 18%, transparent); color: var(--accent-deep); margin-left: 0.4rem; }
+.file-tabs button[aria-selected="true"] .pill{ background: oklch(100% 0 0 / .16); color: oklch(96% 0 0); }
+
+.code-shell{
+  border: 1px solid oklch(24% 0.02 265); border-radius: 0 12px 12px 12px;
+  background: oklch(20% 0.018 265); overflow: hidden; box-shadow: var(--shadow-lift);
+}
+.code-bar{ display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.9rem; border-bottom: 1px solid oklch(30% 0.02 265); }
+.code-bar .fn{ font-family: var(--font-space); font-size: 0.74rem; color: oklch(75% 0.02 265); }
+.code-bar .copy{ font-family: var(--font-space); font-size: 0.72rem; color: oklch(85% 0.02 265); background: oklch(28% 0.02 265); border: 1px solid oklch(38% 0.02 265); border-radius: 8px; padding: 0.3rem 0.7rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: background var(--duration-fast) ease; }
+.code-bar .copy:hover{ background: oklch(34% 0.02 265); }
+.code-bar .copy.ok{ background: oklch(45% 0.14 150); border-color: oklch(55% 0.14 150); color: #fff; }
+pre.code{
+  margin: 0; padding: 1rem 1.1rem; overflow-x: auto; max-height: 460px;
+  font-family: 'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,Consolas,monospace;
+  font-size: 0.78rem; line-height: 1.6; color: oklch(90% 0.01 85); tab-size: 2;
+}
+pre.code .k{ color: oklch(78% 0.13 300); }   /* keyword */
+pre.code .s{ color: oklch(80% 0.12 140); }   /* string */
+pre.code .p{ color: oklch(82% 0.11 60); }    /* property */
+pre.code .c{ color: oklch(58% 0.02 265); font-style: italic; } /* comment */
+pre.code .n{ color: oklch(80% 0.12 220); }   /* number/bool */
+pre.code::-webkit-scrollbar{ height: 9px; width: 9px; }
+pre.code::-webkit-scrollbar-thumb{ background: oklch(40% 0.02 265); border-radius: 9px; }
+
+/* ============================ STEPS ============================ */
+.steps{ margin: clamp(2.5rem,2rem+3vw,4rem) 0 var(--space-section); }
+.steps h2{ font-size: clamp(1.6rem, 1.2rem + 2vw, 2.4rem); margin: 0 0 0.4rem; max-width: 18ch; }
+.steps h2 em{ font-style: italic; color: var(--accent); }
+.steps .sub{ color: var(--ink-soft); max-width: 56ch; margin: 0 0 2rem; }
+.step-grid{ display: grid; gap: 1rem; grid-template-columns: 1fr; counter-reset: step; }
+@media(min-width: 720px){ .step-grid{ grid-template-columns: repeat(3, 1fr); } }
+.step{
+  position: relative; background: linear-gradient(180deg, var(--paper-2), var(--paper));
+  border: 1px solid var(--line); border-radius: var(--r-lg); padding: 1.6rem 1.3rem 1.4rem;
+  box-shadow: var(--shadow-soft); transition: transform var(--duration-normal) var(--ease-out-expo), box-shadow var(--duration-normal) ease;
+}
+.step:hover{ transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+.step::before{
+  counter-increment: step; content: counter(step,decimal-leading-zero);
+  font-family: var(--display); font-size: 2.6rem; font-weight: 600; line-height: 1;
+  color: color-mix(in oklab, var(--accent) 70%, transparent); display: block; margin-bottom: 0.7rem;
+}
+.step h3{ font-size: 1.1rem; margin: 0 0 0.4rem; }
+.step p{ color: var(--ink-soft); font-size: 0.88rem; margin: 0 0 0.7rem; }
+.step code{ font-family: var(--font-space); font-size: 0.76rem; background: oklch(92% 0.015 265); color: var(--accent-deep); padding: 0.15rem 0.45rem; border-radius: 6px; border: 1px solid var(--line-soft); }
+.step .files{ display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.6rem; }
+.step .files div{ font-family: var(--font-space); font-size: 0.74rem; color: var(--ink-soft); display: flex; align-items: center; gap: 0.45rem; }
+.step .files svg{ width: 13px; height: 13px; color: var(--accent); flex: none; }
+
+/* checklist */
+.checklist{ background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 8%, var(--paper-2)), var(--paper-2)); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 1.4rem 1.4rem 1.2rem; box-shadow: var(--shadow-soft); }
+.checklist h3{ font-size: 1.05rem; margin: 0 0 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+.checklist ul{ list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+@media(min-width: 640px){ .checklist ul{ grid-template-columns: 1fr 1fr; } }
+.checklist li{ display: flex; gap: 0.55rem; font-size: 0.85rem; color: var(--ink-soft); align-items: flex-start; }
+.checklist li svg{ width: 16px; height: 16px; color: oklch(62% 0.15 150); flex: none; margin-top: 2px; }
+
+/* toast */
+.toast{
+  position: fixed; left: 50%; bottom: 1.5rem; transform: translate(-50%, 150%);
+  background: oklch(24% 0.02 265); color: oklch(96% 0.01 85); padding: 0.8rem 1.3rem; border-radius: 12px;
+  font-size: 0.88rem; font-weight: 500; box-shadow: var(--shadow-lift); z-index: 60;
+  display: flex; align-items: center; gap: 0.6rem; max-width: 90vw;
+  transition: transform var(--duration-normal) var(--ease-out-expo);
+}
+.toast.show{ transform: translate(-50%, 0); }
+.toast svg{ width: 18px; height: 18px; color: oklch(72% 0.16 150); flex: none; }
+
+footer.site{ border-top: 1px solid var(--line-soft); padding: 2rem 0; color: var(--ink-faint); font-size: 0.82rem; }
+footer.site .wrap{ display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; }
+footer.site .ds{ font-family: var(--font-space); letter-spacing: 0.04em; }
+
+.visually-hidden{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap site-inner">
+    <div class="brandmark">
+      <div class="mk" aria-hidden="true">W</div>
+      <div class="tt">white<span>label</span> studio</div>
+    </div>
+    <div class="head-meta">Ein Formular &rarr; drei <code style="font-family:var(--font-space)">tenant.js</code> &middot; kein Build, kein Backend</div>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero" aria-labelledby="hero-h">
+    <span class="overline">Onboarding-Generator</span>
+    <h1 id="hero-h">Neuer Kunde, <em>vollst&auml;ndig</em> eingekleidet in Minuten.</h1>
+    <p class="lede">Eine Quelle erzeugt die <strong>window.TENANT</strong>-Konfig f&uuml;r Landing, Kundenportal und Werkhof. CI, Theme und Schrift live sehen &mdash; dann als fertige <code style="font-family:var(--font-space)">tenant.js</code> herunterladen. <code style="font-family:var(--font-space)">whitelabel.js</code> bleibt in allen drei Produkten unber&uuml;hrt.</p>
+    <div class="badges">
+      <span class="badge"><b>1</b> deklaratives Schema</span>
+      <span class="badge"><b>3</b> Produkte, konsistente CI</span>
+      <span class="badge"><b>0</b> Code-&Auml;nderungen am Kern</span>
+      <span class="badge">100% Vanilla &middot; offline</span>
+    </div>
+  </section>
+
+  <section class="wrap studio" aria-label="Konfigurator und Vorschau">
+    <!-- ===================== FORM ===================== -->
+    <form class="panel" id="form" novalidate>
+      <h2>Werkstatt-Konfiguration</h2>
+      <p class="sub">Pflichtfelder sind mit <span class="req">*</span> markiert. Alles flie&szlig;t live in die Vorschau und in die generierte Datei.</p>
+
+      <fieldset>
+        <legend>Identit&auml;t</legend>
+        <div class="grid2">
+          <div class="field col-span">
+            <label for="f-name">Werkstattname <span class="req">*</span></label>
+            <input type="text" id="f-name" name="name" value="KFZ Gorski" placeholder="z.B. KFZ Gorski" autocomplete="organization" required>
+            <div class="field-error" id="err-name" aria-live="polite"></div>
+          </div>
+          <div class="field col-span">
+            <label for="f-tag">Claim / Untertitel <span class="hint">Header, Titel, WA-Texte</span></label>
+            <input type="text" id="f-tag" name="tag" value="Ihre Meisterwerkstatt in Cremlingen" placeholder="z.B. Ihre Meisterwerkstatt in ...">
+          </div>
+          <div class="field">
+            <label for="f-id">Slug / ID <span class="req">*</span></label>
+            <input type="text" id="f-id" name="id" value="gorski" placeholder="gorski" pattern="[a-z0-9-]+" required>
+            <div class="field-error" id="err-id" aria-live="polite"></div>
+          </div>
+          <div class="field">
+            <label for="f-branche">Branche</label>
+            <input type="text" id="f-branche" name="branche" value="kfz" placeholder="kfz">
+          </div>
+          <div class="field col-span">
+            <label for="f-logo">Logo-URL <span class="hint">leer &rarr; Initialen-Mark aus Name</span></label>
+            <input type="url" id="f-logo" name="logoUrl" value="" placeholder="assets/logo.svg">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Corporate Identity</legend>
+        <div class="grid2">
+          <div class="field">
+            <label for="f-accent">Akzent (Prim&auml;r) <span class="req">*</span></label>
+            <div class="color-row">
+              <input type="color" id="f-accent" value="#146DAB" aria-label="Akzentfarbe wählen">
+              <input type="text" id="f-accent-hex" value="#146DAB" pattern="#?[0-9A-Fa-f]{6}" aria-label="Akzentfarbe Hex">
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-accent2">Sekund&auml;r / Akzent 2 <span class="req">*</span></label>
+            <div class="color-row">
+              <input type="color" id="f-accent2" value="#FBAF3A" aria-label="Sekundärfarbe wählen">
+              <input type="text" id="f-accent2-hex" value="#FBAF3A" pattern="#?[0-9A-Fa-f]{6}" aria-label="Sekundärfarbe Hex">
+            </div>
+          </div>
+          <div class="field col-span">
+            <div class="swatch-presets" id="presets" role="group" aria-label="Farb-Vorlagen"></div>
+          </div>
+          <div class="field">
+            <label for="f-theme">Design-Paket <span class="hint">nur Landing</span></label>
+            <select id="f-theme" name="theme">
+              <option value="papier">Papier &mdash; warm, editorial</option>
+              <option value="stahl">Stahl &mdash; technisch, k&uuml;hl</option>
+              <option value="glas">Glas &mdash; Glassmorphism, Tiefe</option>
+              <option value="edel">Edel &mdash; dunkler Luxus</option>
+              <option value="minimal">Minimal &mdash; Swiss, reduziert</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-font">Headline-Schrift <span class="hint">leer = Theme-Standard</span></label>
+            <select id="f-font" name="font">
+              <option value="">Theme-Standard</option>
+              <option value="fraunces">Fraunces &mdash; serif, editorial</option>
+              <option value="playfair">Playfair Display &mdash; high contrast</option>
+              <option value="space">Space Grotesk &mdash; geometric</option>
+              <option value="inter">Inter &mdash; neutral, klar</option>
+              <option value="oswald">Oswald &mdash; condensed, kr&auml;ftig</option>
+            </select>
+          </div>
+          <div class="field col-span">
+            <label for="f-mode">Standard-Darstellung</label>
+            <select id="f-mode" name="mode">
+              <option value="auto">Auto (System)</option>
+              <option value="light">Hell</option>
+              <option value="dark">Dunkel</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Kontakt</legend>
+        <div class="grid2">
+          <div class="field">
+            <label for="f-tel">Telefon</label>
+            <input type="tel" id="f-tel" name="telefon" value="+49 1511 8553899" placeholder="+49 ..." autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="f-wa">WhatsApp <span class="hint">E.164 ohne +</span></label>
+            <input type="tel" id="f-wa" name="whatsapp" value="4915118553899" placeholder="4915118553899" pattern="[0-9]*">
+            <div class="field-error" id="err-wa" aria-live="polite"></div>
+          </div>
+          <div class="field">
+            <label for="f-email">E-Mail</label>
+            <input type="email" id="f-email" name="email" value="kontakt@kfz-gorski.de" placeholder="kontakt@..." autocomplete="email">
+          </div>
+          <div class="field">
+            <label for="f-emailu">Unfall / Schaden E-Mail</label>
+            <input type="email" id="f-emailu" name="unfallEmail" value="schaden@kfz-gorski.de" placeholder="schaden@...">
+          </div>
+          <div class="field col-span" style="flex-direction:row;align-items:center;gap:0.55rem">
+            <input type="checkbox" id="f-waready" checked style="width:auto;flex:none;width:18px;height:18px;accent-color:var(--accent)">
+            <label for="f-waready" style="margin:0;font-weight:500">WhatsApp ist live <span class="hint">aus = Demo-Hinweis statt Platzhalternummer</span></label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Adresse</legend>
+        <div class="grid2">
+          <div class="field col-span">
+            <label for="f-str">Stra&szlig;e &amp; Nr.</label>
+            <input type="text" id="f-str" name="strasse" value="Schapener Straße 1" placeholder="Musterstraße 1" autocomplete="street-address">
+          </div>
+          <div class="field">
+            <label for="f-plz">PLZ</label>
+            <input type="text" id="f-plz" name="plz" value="38162" placeholder="38162" autocomplete="postal-code">
+          </div>
+          <div class="field">
+            <label for="f-ort">Ort</label>
+            <input type="text" id="f-ort" name="ort" value="Cremlingen" placeholder="Cremlingen" autocomplete="address-level2">
+          </div>
+        </div>
+      </fieldset>
+    </form>
+
+    <!-- ===================== PREVIEW ===================== -->
+    <div class="preview-wrap">
+      <div class="preview-head">
+        <h2>Live-Vorschau</h2>
+        <span class="live"><span class="pulse" aria-hidden="true"></span>aktualisiert in Echtzeit</span>
+      </div>
+
+      <div class="pv-controls" role="group" aria-label="Vorschau-Steuerung">
+        <div class="seg" role="group" aria-label="Darstellungsmodus">
+          <button type="button" id="mode-light" aria-pressed="true">Hell</button>
+          <button type="button" id="mode-dark" aria-pressed="false">Dunkel</button>
+        </div>
+        <span class="meta" id="pv-meta">papier &middot; fraunces</span>
+      </div>
+
+      <div class="device">
+        <div class="chrome" aria-hidden="true">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="url" id="pv-url">kfz-gorski.de</span>
+        </div>
+        <!-- the themed surface -->
+        <div class="pv" id="pv" data-pvtheme="papier" data-mode="light">
+          <div class="pv-top">
+            <div class="pv-brand">
+              <div class="pv-mk" id="pv-mk">G</div>
+              <div class="pv-name" id="pv-name">KFZ Gorski</div>
+            </div>
+            <nav class="pv-nav" aria-hidden="true"><span>Leistungen</span><span>Team</span><span>Kontakt</span></nav>
+            <button type="button" class="pv-cta" tabindex="-1">Termin</button>
+          </div>
+          <div class="pv-hero">
+            <span class="pv-over" id="pv-over">Ihre Meisterwerkstatt in Cremlingen</span>
+            <h3>Ihr Auto in <em>besten</em> H&auml;nden.</h3>
+            <p id="pv-lede">Inspektion, Wartung und Unfallinstandsetzung &mdash; transparent, schnell und mit Meisterqualit&auml;t.</p>
+            <div class="pv-actions">
+              <button type="button" class="pv-btn-1" tabindex="-1">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Termin buchen
+              </button>
+              <button type="button" class="pv-btn-2 pv-btn-wa" id="pv-wa" tabindex="-1" style="color:#fff;border:none">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.7 14.9L2 22l5.3-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3.1.8.8-3-.2-.3A8 8 0 1 1 12 20zm4.5-5.9c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.2-2.8c-.1-.2 0-.4.1-.5l.4-.5.2-.4v-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3a3 3 0 0 0-.9 2.2c0 1.3 1 2.6 1.1 2.8.1.2 1.9 2.9 4.6 4 .6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.4-.3z"/></svg>
+                WhatsApp
+              </button>
+            </div>
+          </div>
+          <div class="pv-cards">
+            <div class="pv-card feat">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <b>Inspektion</b><span>ab 129 &euro;</span>
+            </div>
+            <div class="pv-card">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg></div>
+              <b>Wartung</b><span>HU/AU</span>
+            </div>
+            <div class="pv-card">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <b>Unfall</b><span>Schaden</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== OUTPUT ===================== -->
+      <div class="output">
+        <div class="actions-bar">
+          <button type="button" class="btn btn-primary" id="dl-active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            tenant.js herunterladen
+          </button>
+          <button type="button" class="btn btn-ghost" id="dl-all">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6l2 3h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+            Alle 3 herunterladen
+          </button>
+        </div>
+
+        <div class="file-tabs" role="tablist" aria-label="Produkt wählen">
+          <button role="tab" id="tab-landing" aria-selected="true" aria-controls="code">Landing <span class="pill">voll</span></button>
+          <button role="tab" id="tab-portal" aria-selected="false" aria-controls="code">Kundenportal <span class="pill">teil</span></button>
+          <button role="tab" id="tab-werkhof" aria-selected="false" aria-controls="code">Werkhof <span class="pill">multi</span></button>
+        </div>
+        <div class="code-shell">
+          <div class="code-bar">
+            <span class="fn" id="code-fn">landing/tenant.js</span>
+            <button type="button" class="copy" id="copy-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Kopieren
+            </button>
+          </div>
+          <pre class="code" id="code" role="tabpanel" tabindex="0" aria-label="Generierte tenant.js"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STEPS ===================== -->
+  <section class="wrap steps" aria-labelledby="steps-h">
+    <h2 id="steps-h">Drei Schritte bis <em>live</em>.</h2>
+    <p class="sub">Die generierten Dateien sind reine <code style="font-family:var(--font-space)">window.TENANT</code>-Literale &mdash; kein Build, kein Suchen-und-Ersetzen. <code style="font-family:var(--font-space)">whitelabel.js</code> liest sie und kleidet jedes Produkt automatisch ein.</p>
+    <div class="step-grid">
+      <article class="step">
+        <h3>tenant.js ablegen</h3>
+        <p>Lade die drei Dateien herunter und lege je eine in das passende Produkt &mdash; jeweils <strong>vor</strong> <code>whitelabel.js</code>.</p>
+        <div class="files">
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/></svg> landing/tenant.js</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/></svg> kundenportal/tenant.js</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/></svg> werkhof/app/tenant.js</div>
+        </div>
+      </article>
+      <article class="step">
+        <h3>Assets erg&auml;nzen</h3>
+        <p>Logo und Hero-Foto in den jeweiligen <code>assets/</code>-Ordner. Fehlt das Logo, f&auml;llt <code>whitelabel.js</code> automatisch auf den Initialen-Mark aus dem Namen zur&uuml;ck &mdash; Go-Live geht auch ohne fertiges Logo.</p>
+        <div class="files">
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg> assets/logo.svg</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg> assets/hero-werkstatt.jpg</div>
+        </div>
+      </article>
+      <article class="step">
+        <h3>Deployen</h3>
+        <p>Repos pushen oder hochladen &mdash; fertig. Kein Eingriff in <code>whitelabel.js</code>, <code>template.css/js</code>, Portal- oder Werkhof-Code. Ab jetzt sind die Produkte vollst&auml;ndig tenant-getrieben.</p>
+        <div class="files">
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Landing geht live</div>
+          <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Portal &amp; Werkhof folgen</div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap" style="padding-bottom:var(--space-section)" aria-labelledby="check-h">
+    <div class="checklist">
+      <h3 id="check-h">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Go-Live-Checkliste
+      </h3>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Echte WhatsApp-Nummer (E.164) und <code style="font-family:var(--font-space);font-size:0.78rem">whatsappReady:true</code> &mdash; sonst bleibt der Demo-Guard aktiv.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> E-Mail und Unfall-E-Mail auf echte Adressen gesetzt.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> &Ouml;ffnungszeiten best&auml;tigt, <code style="font-family:var(--font-space);font-size:0.78rem">reviews.googleUrl</code> gesetzt.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Datenschutz- und Impressum-Seiten vorhanden.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Kontrast gepr&uuml;ft: bei sehr hellen CI-Farben <code style="font-family:var(--font-space);font-size:0.78rem">accentDeep</code> manuell setzen (WCAG 4.5:1).</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Logo + Hero-Foto in den <code style="font-family:var(--font-space);font-size:0.78rem">assets/</code>-Ordnern abgelegt.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>whitelabel studio &middot; Onboarding-Generator</span>
+    <span class="ds">papier &middot; fraunces &middot; vanilla &middot; offline-f&auml;hig</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg">Erledigt</span>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------------------------------------------------------------
+     Element registry
+     --------------------------------------------------------------------- */
+  var $ = function(id){ return document.getElementById(id); };
+  var form = $("form");
+  var pv = $("pv");
+  var toastEl = $("toast"), toastMsg = $("toast-msg");
+  var activeProduct = "landing";
+
+  var FONT_VARS = {
+    fraunces: "var(--font-fraunces)", playfair: "var(--font-playfair)",
+    space: "var(--font-space)", inter: "var(--font-inter)", oswald: "var(--font-oswald)"
+  };
+  var THEME_FONT_DEFAULT = {
+    papier: "fraunces", stahl: "space", glas: "inter", edel: "playfair", minimal: "inter"
+  };
+
+  var PRESETS = [
+    { name: "Werkstatt-Blau", a: "#146DAB", b: "#FBAF3A" },
+    { name: "Anthrazit",      a: "#2F3640", b: "#E84118" },
+    { name: "Tannengrün",     a: "#1B6B43", b: "#D9A441" },
+    { name: "Bordeaux",       a: "#7A1E2D", b: "#C7A24A" },
+    { name: "Indigo",         a: "#3B3B98", b: "#FFD32A" },
+    { name: "Petrol",         a: "#0E6E78", b: "#F39C12" }
+  ];
+
+  /* ---------------------------------------------------------------------
+     Validation helpers (boundary input, fail visibly)
+     --------------------------------------------------------------------- */
+  function isHex(v){ return /^#?[0-9A-Fa-f]{6}$/.test((v||"").trim()); }
+  function normHex(v){ v = (v||"").trim(); if(!v) return ""; if(v[0] !== "#") v = "#" + v; return v.toUpperCase(); }
+  function slugify(v){ return (v||"").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
+  function esc(v){ return String(v == null ? "" : v).replace(/\\/g, "\\\\").replace(/"/g, '\\"'); }
+  function setErr(id, msg){ var el = $(id); if(!el) return; el.textContent = msg || ""; }
+  function mark(el, bad){ if(el) el.setAttribute("aria-invalid", bad ? "true" : "false"); }
+
+  /* ---------------------------------------------------------------------
+     Read the form into one canonical config object (single source)
+     --------------------------------------------------------------------- */
+  function readConfig(){
+    var name = $("f-name").value.trim();
+    var id = $("f-id").value.trim() || slugify(name);
+    var accent = normHex($("f-accent-hex").value) || "#146DAB";
+    var accent2 = normHex($("f-accent2-hex").value) || "#FBAF3A";
+    return {
+      id: id,
+      name: name,
+      tag: $("f-tag").value.trim(),
+      logoUrl: $("f-logo").value.trim(),
+      branche: $("f-branche").value.trim(),
+      accent: accent,
+      accent2: accent2,
+      theme: $("f-theme").value,
+      font: $("f-font").value,
+      mode: $("f-mode").value,
+      telefon: $("f-tel").value.trim(),
+      whatsapp: $("f-wa").value.replace(/[^0-9]/g, ""),
+      whatsappReady: $("f-waready").checked,
+      email: $("f-email").value.trim(),
+      unfallEmail: $("f-emailu").value.trim(),
+      strasse: $("f-str").value.trim(),
+      plz: $("f-plz").value.trim(),
+      ort: $("f-ort").value.trim()
+    };
+  }
+
+  function validate(c){
+    var ok = true;
+    if(!c.name){ setErr("err-name", "Werkstattname ist erforderlich."); mark($("f-name"), true); ok = false; }
+    else { setErr("err-name", ""); mark($("f-name"), false); }
+
+    if(!c.id || !/^[a-z0-9-]+$/.test(c.id)){ setErr("err-id", "Nur Kleinbuchstaben, Zahlen, Bindestrich."); mark($("f-id"), true); ok = false; }
+    else { setErr("err-id", ""); mark($("f-id"), false); }
+
+    if(c.whatsapp && (c.whatsapp.length < 8 || c.whatsapp[0] === "0")){
+      setErr("err-wa", "E.164 erwartet: Landesvorwahl ohne 0/+ (z.B. 4915...)."); mark($("f-wa"), true);
+    } else { setErr("err-wa", ""); mark($("f-wa"), false); }
+    return ok;
+  }
+
+  /* ---------------------------------------------------------------------
+     Live preview — maps config -> the themed surface (compositor-safe)
+     --------------------------------------------------------------------- */
+  function initials(name){
+    var parts = (name || "").split(/\s+/).filter(Boolean);
+    if(!parts.length) return "W";
+    if(parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function applyPreview(c){
+    pv.style.setProperty("--pv-accent", c.accent);
+    pv.style.setProperty("--pv-accent2", c.accent2);
+    // accentDeep via color-mix, identical to whitelabel.js derivation
+    pv.style.setProperty("--pv-deep", "color-mix(in oklab, " + c.accent + " 78%, black)");
+
+    var fontKey = c.font || THEME_FONT_DEFAULT[c.theme] || "inter";
+    pv.style.setProperty("--pv-display", FONT_VARS[fontKey] || "var(--font-inter)");
+
+    pv.setAttribute("data-pvtheme", c.theme);
+    pv.setAttribute("data-mode", currentMode());
+
+    // brand mark: logo or initials
+    var mk = $("pv-mk");
+    if(c.logoUrl){
+      mk.innerHTML = "";
+      var img = document.createElement("img");
+      img.alt = c.name || "Logo";
+      img.src = c.logoUrl;
+      img.onerror = function(){ mk.textContent = initials(c.name); };
+      mk.appendChild(img);
+    } else {
+      mk.textContent = initials(c.name);
+    }
+    $("pv-name").textContent = c.name || "Werkstatt";
+    $("pv-over").textContent = c.tag || "Ihre Werkstatt vor Ort";
+    $("pv-url").textContent = (c.id ? c.id : "werkstatt") + (c.branche === "kfz" ? ".de" : ".de");
+    $("pv-meta").textContent = c.theme + " · " + fontKey;
+
+    // WA button reflects demo-guard
+    var wa = $("pv-wa");
+    if(c.whatsappReady && c.whatsapp){ wa.style.opacity = "1"; wa.title = "wa.me/" + c.whatsapp; }
+    else { wa.style.opacity = "0.6"; wa.title = "Demo-Modus (whatsappReady:false)"; }
+  }
+
+  /* ---------------------------------------------------------------------
+     Mode toggle (preview only — does not write storage)
+     --------------------------------------------------------------------- */
+  var modeState = "light";
+  function currentMode(){ return modeState; }
+  function setMode(m){
+    modeState = m;
+    $("mode-light").setAttribute("aria-pressed", String(m === "light"));
+    $("mode-dark").setAttribute("aria-pressed", String(m === "dark"));
+    pv.setAttribute("data-mode", m);
+  }
+  $("mode-light").addEventListener("click", function(){ setMode("light"); });
+  $("mode-dark").addEventListener("click", function(){ setMode("dark"); });
+
+  /* ---------------------------------------------------------------------
+     tenant.js generators — one canonical config, three shaped outputs
+     --------------------------------------------------------------------- */
+  var INDENT = "  ";
+  function q(v){ return '"' + esc(v) + '"'; }
+
+  function addrLiteral(c){
+    return "{ strasse:" + q(c.strasse) + ", plz:" + q(c.plz) + ", ort:" + q(c.ort) + ", land:\"DE\" }";
+  }
+
+  function header(product){
+    return [
+      "// tenant.js — " + product,
+      "// Generiert vom whitelabel-Onboarding-Generator. Kein Build nötig.",
+      "// Diese Datei wird VOR whitelabel.js geladen. whitelabel.js liest window.TENANT.",
+      ""
+    ].join("\n");
+  }
+
+  function genLanding(c){
+    var L = [];
+    L.push(header("LANDING (volles Schema)"));
+    L.push("window.TENANT = {");
+    L.push(INDENT + "/* IDENTITÄT */");
+    L.push(INDENT + "id:        " + q(c.id) + ",");
+    L.push(INDENT + "name:      " + q(c.name) + ",");
+    L.push(INDENT + "tag:       " + q(c.tag) + ",");
+    L.push(INDENT + "logoUrl:   " + q(c.logoUrl) + ",");
+    L.push(INDENT + "branche:   " + q(c.branche) + ",");
+    L.push("");
+    L.push(INDENT + "/* CI — accent=Primär/Aktion, accent2=Sekundär/Akzent */");
+    L.push(INDENT + "accent:    " + q(c.accent) + ",");
+    L.push(INDENT + "accent2:   " + q(c.accent2) + ",");
+    L.push(INDENT + "accentDeep:\"\",  // leer -> whitelabel.js leitet via color-mix ab");
+    L.push("");
+    L.push(INDENT + "/* DESIGN-PAKET (nur die Landing nutzt umschaltbare Themes) */");
+    L.push(INDENT + "theme:     " + q(c.theme) + ",");
+    L.push(INDENT + "font:      " + q(c.font) + ",");
+    L.push(INDENT + "mode:      " + q(c.mode) + ",");
+    L.push("");
+    L.push(INDENT + "/* KONTAKT */");
+    L.push(INDENT + "telefon:   " + q(c.telefon) + ",");
+    L.push(INDENT + "whatsapp:  " + q(c.whatsapp) + ",");
+    L.push(INDENT + "whatsappReady: " + (c.whatsappReady ? "true" : "false") + ",");
+    L.push(INDENT + "email:     " + q(c.email) + ",");
+    L.push(INDENT + "unfallEmail:" + q(c.unfallEmail) + ",");
+    L.push("");
+    L.push(INDENT + "adresse:   " + addrLiteral(c) + ",");
+    L.push(INDENT + "mapsUrl:   \"https://www.google.com/maps/dir/?api=1&destination=" +
+      encodeURIComponent((c.strasse ? c.strasse + ", " : "") + c.plz + " " + c.ort) + "\",");
+    L.push("");
+    L.push(INDENT + "/* ÖFFNUNGSZEITEN — day: 0=So .. 6=Sa */");
+    L.push(INDENT + "oeffnungszeiten: [");
+    L.push(INDENT + INDENT + "{ day:1, von:\"08:00\", bis:\"18:00\" }, { day:2, von:\"08:00\", bis:\"18:00\" },");
+    L.push(INDENT + INDENT + "{ day:3, von:\"08:00\", bis:\"18:00\" }, { day:4, von:\"08:00\", bis:\"18:00\" },");
+    L.push(INDENT + INDENT + "{ day:5, von:\"08:00\", bis:\"16:00\" }, { day:6, geschlossen:true }, { day:0, geschlossen:true }");
+    L.push(INDENT + "],");
+    L.push("");
+    L.push(INDENT + "/* INHALTE — anpassen */");
+    L.push(INDENT + "leistungen: [");
+    L.push(INDENT + INDENT + "{ id:\"inspektion\", titel:\"Inspektion & Wartung\", dauer:\"ca. 2 Std.\", preis:\"ab 129 EUR\" },");
+    L.push(INDENT + INDENT + "{ id:\"huau\",       titel:\"HU/AU\",               dauer:\"ca. 1 Std.\", preis:\"ab 99 EUR\" },");
+    L.push(INDENT + INDENT + "{ id:\"unfall\",     titel:\"Unfallinstandsetzung\", dauer:\"individuell\", preis:\"auf Anfrage\" }");
+    L.push(INDENT + "],");
+    L.push(INDENT + "faq:     [ { q:\"Brauche ich einen Termin?\", a:\"Ja, am besten per WhatsApp oder Telefon.\" } ],");
+    L.push(INDENT + "reviews: { googleUrl:\"\", score:4.9, count:0, items:[] },");
+    L.push(INDENT + "team:    [ { name:" + q(c.name.split(" ").slice(-1)[0] || c.name) + ", rolle:\"Inhaber & Kfz-Meister\", foto:\"\", tag:\"Ihr Meister\" } ],");
+    L.push(INDENT + "about:   { heading:\"\", body:[], signatur:" + q(c.name) + ", pills:[\"Meisterbetrieb\"] },");
+    L.push("");
+    L.push(INDENT + "/* KONFIGURATOR / ENDPUNKTE */");
+    L.push(INDENT + "booking:   { leadDays:7, requireService:true, useApiAvailability:false },");
+    L.push(INDENT + "endpunkte: { mode:\"whatsapp\", fahrzeugschein:\"\", unfall:\"\", termin:\"\" },");
+    L.push("");
+    L.push(INDENT + "/* RECHTLICHES */");
+    L.push(INDENT + "datenschutzHref: \"datenschutz.html\",");
+    L.push(INDENT + "impressumHref:   \"impressum.html\",");
+    L.push("};");
+    return L.join("\n");
+  }
+
+  function genPortal(c){
+    var L = [];
+    L.push(header("KUNDENPORTAL (Teilmenge — theme/font werden ignoriert)"));
+    L.push("window.TENANT = {");
+    L.push(INDENT + "id:        " + q(c.id) + ",");
+    L.push(INDENT + "name:      " + q(c.name) + ",");
+    L.push(INDENT + "tag:       " + q(c.tag) + ",");
+    L.push(INDENT + "logoUrl:   " + q(c.logoUrl) + ",");
+    L.push("");
+    L.push(INDENT + "accent:    " + q(c.accent) + ",");
+    L.push(INDENT + "accent2:   " + q(c.accent2) + ",");
+    L.push(INDENT + "mode:      " + q(c.mode === "dark" ? "light" : (c.mode === "auto" ? "light" : c.mode)) + ",  // Portal: light|bw");
+    L.push("");
+    L.push(INDENT + "telefon:   " + q(c.telefon) + ",");
+    L.push(INDENT + "whatsapp:  " + q(c.whatsapp) + ",");
+    L.push(INDENT + "whatsappReady: " + (c.whatsappReady ? "true" : "false") + ",");
+    L.push(INDENT + "email:     " + q(c.email) + ",");
+    L.push("");
+    L.push(INDENT + "adresse:   " + addrLiteral(c) + ",");
+    L.push("");
+    L.push(INDENT + "datenschutzHref: \"datenschutz.html\",");
+    L.push(INDENT + "impressumHref:   \"impressum.html\",");
+    L.push("};");
+    return L.join("\n");
+  }
+
+  function genWerkhof(c){
+    var L = [];
+    L.push(header("WERKHOF (Multi-Mandant — theme/font werden ignoriert)"));
+    L.push("window.TENANT = {");
+    L.push(INDENT + "id:        " + q(c.id) + ",");
+    L.push(INDENT + "name:      " + q(c.name) + ",");
+    L.push(INDENT + "tag:       " + q(c.tag) + ",");
+    L.push("");
+    L.push(INDENT + "accent:    " + q(c.accent) + ",");
+    L.push(INDENT + "accent2:   " + q(c.accent2) + ",");
+    L.push(INDENT + "mode:      " + q(c.mode === "auto" ? "light" : c.mode) + ",  // Werkhof: light|dark");
+    L.push("");
+    L.push(INDENT + "whatsapp:  " + q(c.whatsapp) + ",");
+    L.push(INDENT + "whatsappReady: " + (c.whatsappReady ? "true" : "false") + ",");
+    L.push("");
+    L.push(INDENT + "/* WERKHOF Multi-Mandant — mind. der Kunde selbst als erster Mandant */");
+    L.push(INDENT + "tenants:   [");
+    L.push(INDENT + INDENT + "{ id:" + q(c.id) + ", name:" + q(c.name) + ", mark:" + q(initials(c.name)) + ", ort:" + q(c.ort) + " }");
+    L.push(INDENT + "],");
+    L.push("};");
+    return L.join("\n");
+  }
+
+  function generate(product, c){
+    if(product === "portal") return genPortal(c);
+    if(product === "werkhof") return genWerkhof(c);
+    return genLanding(c);
+  }
+
+  /* ---------------------------------------------------------------------
+     Lightweight JS syntax highlight (escaped, token-by-line)
+     --------------------------------------------------------------------- */
+  function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function highlight(code){
+    return code.split("\n").map(function(line){
+      var trimmed = line.replace(/^\s+/, "");
+      if(trimmed.indexOf("//") === 0 || trimmed.indexOf("/*") === 0 || trimmed.indexOf("*") === 0){
+        return '<span class="c">' + escapeHtml(line) + '</span>';
+      }
+      var out = escapeHtml(line);
+      // strings
+      out = out.replace(/(&quot;)(?:[^&]|&(?!quot;))*?(&quot;)/g, function(m){ return '<span class="s">' + m + '</span>'; });
+      out = out.replace(/(")((?:\\.|[^"\\])*)(")/g, '<span class="s">$1$2$3</span>');
+      // keywords / booleans / numbers
+      out = out.replace(/\b(window|true|false|null)\b/g, '<span class="k">$1</span>');
+      out = out.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="n">$1</span>');
+      // property keys (word followed by colon at indentation)
+      out = out.replace(/(^\s*)([A-Za-z_][\w]*)(\s*:)/, '$1<span class="p">$2</span>$3');
+      return out;
+    }).join("\n");
+  }
+
+  /* ---------------------------------------------------------------------
+     Code panel + tabs
+     --------------------------------------------------------------------- */
+  var FN = { landing: "landing/tenant.js", portal: "kundenportal/tenant.js", werkhof: "werkhof/app/tenant.js" };
+  function currentCode(){ return generate(activeProduct, readConfig()); }
+
+  function renderCode(){
+    var code = currentCode();
+    $("code").innerHTML = highlight(code);
+    $("code-fn").textContent = FN[activeProduct];
+  }
+
+  function selectTab(product){
+    activeProduct = product;
+    ["landing","portal","werkhof"].forEach(function(p){
+      $("tab-" + p).setAttribute("aria-selected", String(p === product));
+    });
+    renderCode();
+  }
+  $("tab-landing").addEventListener("click", function(){ selectTab("landing"); });
+  $("tab-portal").addEventListener("click", function(){ selectTab("portal"); });
+  $("tab-werkhof").addEventListener("click", function(){ selectTab("werkhof"); });
+
+  /* ---------------------------------------------------------------------
+     Download (Blob) + copy + toast
+     --------------------------------------------------------------------- */
+  function toast(msg){
+    toastMsg.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function(){ toastEl.classList.remove("show"); }, 2600);
+  }
+
+  function downloadText(filename, text){
+    try{
+      var blob = new Blob([text], { type: "application/javascript;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+      return true;
+    } catch(e){
+      toast("Download fehlgeschlagen — Code manuell kopieren.");
+      return false;
+    }
+  }
+
+  // file names prefixed so all three are distinguishable in the Downloads folder
+  var DLNAME = { landing: "landing.tenant.js", portal: "kundenportal.tenant.js", werkhof: "werkhof.tenant.js" };
+
+  $("dl-active").addEventListener("click", function(){
+    var c = readConfig();
+    if(!validate(c)){ toast("Bitte Pflichtfelder prüfen."); return; }
+    if(downloadText(DLNAME[activeProduct], generate(activeProduct, c)))
+      toast("Heruntergeladen: " + FN[activeProduct]);
+  });
+
+  $("dl-all").addEventListener("click", function(){
+    var c = readConfig();
+    if(!validate(c)){ toast("Bitte Pflichtfelder prüfen."); return; }
+    var products = ["landing", "portal", "werkhof"];
+    products.forEach(function(p, i){
+      setTimeout(function(){ downloadText(DLNAME[p], generate(p, c)); }, i * 350);
+    });
+    toast("Alle drei tenant.js heruntergeladen.");
+  });
+
+  $("copy-btn").addEventListener("click", function(){
+    var btn = this, text = currentCode();
+    var done = function(){
+      btn.classList.add("ok");
+      var label = btn.querySelector("svg") ? null : null;
+      var orig = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Kopiert';
+      setTimeout(function(){ btn.classList.remove("ok"); btn.innerHTML = orig; }, 1800);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ legacyCopy(text); done(); });
+    } else { legacyCopy(text); done(); }
+  });
+
+  function legacyCopy(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); } catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------------------------------------------------------------------
+     Color input two-way sync (picker <-> hex text)
+     --------------------------------------------------------------------- */
+  function syncColor(pickerId, textId){
+    var picker = $(pickerId), text = $(textId);
+    picker.addEventListener("input", function(){ text.value = picker.value.toUpperCase(); update(); });
+    text.addEventListener("input", function(){
+      var v = normHex(text.value);
+      if(isHex(v)){ picker.value = v; mark(text, false); }
+      else { mark(text, true); }
+      update();
+    });
+    text.addEventListener("blur", function(){ if(isHex(text.value)) text.value = normHex(text.value); });
+  }
+  syncColor("f-accent", "f-accent-hex");
+  syncColor("f-accent2", "f-accent2-hex");
+
+  /* presets */
+  (function buildPresets(){
+    var wrap = $("presets");
+    PRESETS.forEach(function(p){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.innerHTML = '<span class="dot" style="background:' + p.a + '"></span>' +
+                    '<span class="dot" style="background:' + p.b + ';margin-left:-8px"></span>' + p.name;
+      b.addEventListener("click", function(){
+        $("f-accent").value = p.a; $("f-accent-hex").value = p.a;
+        $("f-accent2").value = p.b; $("f-accent2-hex").value = p.b;
+        update();
+      });
+      wrap.appendChild(b);
+    });
+  })();
+
+  /* auto-slug from name until user edits slug manually */
+  var slugTouched = false;
+  $("f-id").addEventListener("input", function(){ slugTouched = true; });
+  $("f-name").addEventListener("input", function(){
+    if(!slugTouched){ $("f-id").value = slugify($("f-name").value); }
+  });
+
+  /* ---------------------------------------------------------------------
+     Master update — single render path
+     --------------------------------------------------------------------- */
+  var raf = null;
+  function update(){
+    if(raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(function(){
+      var c = readConfig();
+      validate(c);
+      applyPreview(c);
+      renderCode();
+    });
+  }
+
+  // bind every input/select once
+  form.addEventListener("input", update);
+  form.addEventListener("change", update);
+
+  // initial paint
+  setMode("light");
+  update();
+})();
+</script>
+</body>
+</html>

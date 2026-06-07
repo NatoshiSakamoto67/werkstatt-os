@@ -1,0 +1,67 @@
+/* =============================================================================
+ *  fonts.css (whitelabel) — Re-Export der self-hosted Schriften + Registry.
+ * -----------------------------------------------------------------------------
+ *  Spiegelt design-system/fonts/fonts.css fuer Produkte, die das Design-System
+ *  als Geschwister-Kopie unter ./fonts/ neben whitelabel/ ablegen.
+ *
+ *  ANNAHME: die .woff2-Dateien liegen in ../fonts/ relativ zu DIESER Datei,
+ *  also <produkt>/fonts/*.woff2 wenn whitelabel/ und fonts/ Geschwister sind.
+ *  Liegt der Font-Ordner woanders, nur die url()-Pfade unten anpassen — es
+ *  bleibt EINE Stelle.
+ *
+ *  DSGVO: ausschliesslich lokale Dateien (OFL-lizenziert). KEIN Google-Fonts,
+ *  KEIN externes CDN, kein Tracking-Roundtrip. font-display:swap vermeidet FOIT.
+ *
+ *  EINBINDUNG (im <head>, idealerweise NACH den Produkt-Styles, VOR Theme-CSS):
+ *    <link rel="stylesheet" href="whitelabel/fonts.css">
+ * ========================================================================== */
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('../fonts/Fraunces.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../fonts/SpaceGrotesk.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../fonts/PlayfairDisplay.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Oswald';
+  src: url('../fonts/Oswald.woff2') format('woff2');
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* -----------------------------------------------------------------------------
+ *  Schrift-Registry als CSS-Variablen. whitelabel.js verweist auf diese Keys
+ *  (TENANT.font -> var(--font-<key>)) fuer den Headline-Override; der Body
+ *  bleibt bei der Theme-Schrift. Jeder Stack hat System-Fallbacks, damit Text
+ *  auch waehrend des Font-Swaps sofort lesbar ist.
+ * --------------------------------------------------------------------------- */
+:root {
+  --font-fraunces: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-space:    'Space Grotesk', system-ui, sans-serif;
+  --font-inter:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-oswald:   'Oswald', 'Arial Narrow', system-ui, sans-serif;
+}
