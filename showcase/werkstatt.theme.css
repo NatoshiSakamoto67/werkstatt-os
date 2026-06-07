@@ -415,8 +415,8 @@
  * ========================================================================== */
 @media (prefers-color-scheme: dark) {
   /* --- Papier dunkel: warmes Papier kippt zu warmem Anthrazit --- */
-  :root,
-  [data-theme="papier"] {
+  .auto-dark:root,
+  .auto-dark[data-theme="papier"] {
     color-scheme: dark;
     --ds-mix-light: oklch(22% 0.01 70);        /* soft mischt Richtung Flaeche */
 
@@ -435,7 +435,7 @@
   }
 
   /* --- Glas dunkel: heller Verlauf kippt zu tiefem Blau-Glas --- */
-  [data-theme="glas"] {
+  .auto-dark[data-theme="glas"] {
     color-scheme: dark;
     --ds-mix-light: oklch(24% 0.04 268);
     --ds-bg: oklch(20% 0.03 268);
@@ -457,7 +457,7 @@
   }
 
   /* --- Minimal dunkel: invertiert zu Schwarz/Weiss --- */
-  [data-theme="minimal"] {
+  .auto-dark[data-theme="minimal"] {
     color-scheme: dark;
     --ds-accent-base: oklch(96% 0 0);          /* near-white Akzent auf Schwarz */
     --ds-accent-2: oklch(96% 0 0);
