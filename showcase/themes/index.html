@@ -1,208 +1,495 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="papier">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design-Pakete &middot; Vorschau &amp; Auswahl</title>
-<meta name="description" content="Theme-Vorschau fuer Meisterwerkstatt-Websites: Papier, Stahl, Glas, Edel und Minimal im direkten Vergleich.">
+<title>Design-Pakete &middot; Vorschau &amp; Auswahl (White-Label v2)</title>
+<meta name="description" content="Theme-Vorschau fuer Meisterwerkstatt-Websites: Papier, Stahl, Glas, Edel und Minimal — per data-theme umgeschaltet, ohne Stylesheet-Wechsel.">
 
-<!-- AKTIVES THEME-STYLESHEET (wird per JS umgeschaltet) -->
-<link id="theme" rel="stylesheet" href="papier.css">
+<!-- ===========================================================================
+     FOUC-Bootstrap: setzt data-theme/--cust-accent/--cust-font VOR dem Paint.
+     (Identischer Inhalt wie whitelabel/bootstrap.js — hier inline fuer die
+     Vorschau; in echten Produkten ebenso ganz oben im <head> inlinen.)
+     =========================================================================== -->
+<script>
+(function (d) {
+  var T = window.TENANT || {}, h = d.documentElement, k = h.dataset,
+      A = { papier: 1, stahl: 1, glas: 1, edel: 1, minimal: 1 },
+      F = { fraunces: 1, playfair: 1, space: 1, inter: 1, oswald: 1 },
+      t = (T.theme || k.theme || "papier").toLowerCase(),
+      c = (T.accent || k.accent || "").trim(),
+      f = (T.font || k.font || "").toLowerCase();
+  k.theme = A[t] ? t : "papier";
+  if (/^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(c) ||
+      /^(?:rgb|rgba|oklch|oklab)\([0-9a-z%.,/\s+-]+\)$/i.test(c))
+    h.style.setProperty("--cust-accent", c);
+  if (F[f]) h.style.setProperty("--cust-font", "var(--font-" + f + ")");
+})(document);
+</script>
 
-<!-- Selbst-gehostete Schriftarten (DSGVO-sicher) + Schrift-Override-Schicht -->
+<!-- ===========================================================================
+     EINMALIG geladen (KEIN link-swap mehr):
+       1) werkstatt.theme.css  — definiert die --ds-* Tokens + [data-theme]-Bloecke
+       2) fonts.css            — self-hosted Schriften + --font-* Registry
+     Die werkstatt.theme.css ist die Single Source of Truth fuer den
+     Token-Kontrakt. Damit diese Vorschau auch eigenstaendig (und vor dem Bau der
+     werkstatt.theme.css) korrekt rendert, ist der VOLLE Kontrakt zusaetzlich im
+     <style> unten gespiegelt — identische Tokennamen, identische Ableitungen.
+     =========================================================================== -->
+<link rel="stylesheet" href="../werkstatt.theme.css">
 <link rel="stylesheet" href="../fonts/fonts.css">
-<style id="fontOverride"></style>
 
-<!-- MINIMALES EIGEN-CSS: nur fuer die Umschalter-Leiste. Der Rest kommt aus dem Theme. -->
 <style>
-  /* Reset / Grundlagen, damit die Picker-Leiste unabhaengig vom Theme stabil ist */
-  *, *::before, *::after { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; }
+/* ===========================================================================
+   GEMEINSAMER TOKEN-KONTRAKT  (--ds-*)
+   ---------------------------------------------------------------------------
+   theme.css definiert diese; Produkte konsumieren NUR --ds-*. papier ist der
+   :root-Default; jedes weitere Paket ueberschreibt die Tokens via
+   [data-theme="..."] am <html>. Aus EINER Kundenfarbe --cust-accent leitet
+   sich die gesamte Akzent-Palette algorithmisch ab.
+   =========================================================================== */
 
-  /* ----- Picker-Leiste (themenneutral, dunkles Tool-Chrome) ----- */
-  .pk {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: #0d0f12;
-    color: #e9eaec;
-    border-bottom: 1px solid rgba(255,255,255,.1);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+/* ---- AKZENT-AUTOMATIK (themenneutrale Ableitungsregel) -------------------
+   Jeder [data-theme]-Block setzt nur --cust-accent-DEFAULT (= Theme-Default,
+   falls der Kunde keine CI-Farbe liefert) und die Flaechen-/Schrift-Tokens.
+   Die folgende Regel berechnet daraus die abgeleiteten Akzenttoene EINMAL. */
+:root {
+  /* on-accent Fallback fuer Engines ohne contrast-color() */
+  --ds-on-accent: #fff;
+}
+@supports (color: color-mix(in oklch, red, blue)) {
+  :root {
+    --ds-accent-hover: color-mix(in oklch, var(--ds-accent), black 12%);
+    --ds-accent-soft:  color-mix(in oklch, var(--ds-accent), white 82%);
   }
-  .pk-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: .85rem 1.25rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: .75rem 1rem;
-  }
-  .pk-label {
-    font-size: .72rem;
-    letter-spacing: .18em;
-    text-transform: uppercase;
-    color: #7e828b;
-    margin-right: .25rem;
-    flex: 0 0 auto;
-  }
-  .pk-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .4rem;
-    flex: 1 1 auto;
-  }
-  .pk-tab {
-    appearance: none;
-    border: 1px solid rgba(255,255,255,.16);
-    background: #16191e;
-    color: #cfd2d8;
-    font: inherit;
-    font-size: .82rem;
-    font-weight: 600;
-    letter-spacing: .01em;
-    padding: .5rem .85rem;
-    border-radius: 7px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    transition: transform .18s ease, background-color .18s ease, border-color .18s ease, color .18s ease;
-  }
-  .pk-tab .pk-dot {
-    width: .7rem;
-    height: .7rem;
-    border-radius: 50%;
-    flex: 0 0 auto;
-    box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
-  }
-  .pk-tab:hover { background: #20242b; border-color: rgba(255,255,255,.3); transform: translateY(-1px); }
-  .pk-tab:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
-  .pk-tab[aria-pressed="true"] {
-    background: #f4f5f7;
-    color: #14171c;
-    border-color: #f4f5f7;
-  }
+}
+@supports (color: contrast-color(black)) {
+  :root { --ds-on-accent: contrast-color(var(--ds-accent)); }
+}
 
-  /* Swatch-Farben je Paket auf der Picker-Leiste */
-  .pk-tab[data-slug="papier"]  .pk-dot { background: #e8732a; }
-  .pk-tab[data-slug="stahl"]   .pk-dot { background: #ff7a18; }
-  .pk-tab[data-slug="glas"]    .pk-dot { background: #4f86ff; }
-  .pk-tab[data-slug="edel"]    .pk-dot { background: #c8a24a; }
-  .pk-tab[data-slug="minimal"] .pk-dot { background: #111111; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+/* =========================================================================
+   PAPIER · Werkstatt-Editorial  (Default = :root)
+   ========================================================================= */
+:root,
+[data-theme="papier"] {
+  --ds-bg:         #FCFBF8;
+  --ds-surface:    #F6F3EC;
+  --ds-surface-2:  #FCFBF8;
+  --ds-text:       #1C1A16;
+  --ds-text-soft:  #5A554B;
+  --ds-line:       #DED7C8;
+  --ds-line-2:     #CFC6B2;
 
-  /* ----- Info-Zeile zum aktiven Paket ----- */
-  .pk-info {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: .9rem 1.25rem 1.05rem;
-    border-top: 1px solid rgba(255,255,255,.07);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: .35rem .5rem;
-  }
-  .pk-info-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: .55rem;
-  }
-  .pk-info-name {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0;
-  }
-  .pk-info-tagline {
-    font-size: .8rem;
-    color: #9aa7c0;
-    letter-spacing: .02em;
-  }
-  .pk-info-desc {
-    font-size: .85rem;
-    line-height: 1.55;
-    color: #b7bbc4;
-    max-width: 78ch;
-    margin: 0;
-  }
-  .pk-info-best {
-    font-size: .78rem;
-    color: #8a8f99;
-  }
-  .pk-info-best strong {
-    color: #d6d9df;
-    font-weight: 600;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    font-size: .68rem;
-    margin-right: .35rem;
-  }
+  --ds-accent:       var(--cust-accent, #146DAB);
+  --ds-accent-2:     var(--cust-accent-2, #FBAF3A);
+  --ds-accent-hover: var(--ds-accent);                 /* @supports verfeinert */
+  --ds-accent-soft:  var(--ds-accent);
+  --ds-on-accent:    #fff;
 
-  /* ----- CI-Akzent-Picker (Kunde kann --cust-accent live testen) ----- */
-  .pk-accent {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    flex: 0 0 auto;
-    font-size: .75rem;
-    color: #9aa0aa;
-  }
-  .pk-accent label { letter-spacing: .04em; }
-  .pk-accent input[type="color"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: 1px solid rgba(255,255,255,.25);
-    border-radius: 6px;
-    background: none;
-    cursor: pointer;
-  }
-  .pk-accent input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
-  .pk-accent input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
-  .pk-accent input[type="color"]:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
-  .pk-accent button {
-    appearance: none;
-    border: 1px solid rgba(255,255,255,.16);
-    background: transparent;
-    color: #9aa0aa;
-    font: inherit;
-    font-size: .72rem;
-    padding: .3rem .55rem;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  .pk-accent button:hover { color: #e9eaec; border-color: rgba(255,255,255,.3); }
-  .pk-accent button:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+  --ds-font-display: var(--cust-font, Georgia, "Times New Roman", Times, serif);
+  --ds-font-body:    var(--cust-font-body, Georgia, "Times New Roman", Times, serif);
 
-  /* ----- Schrift-Auswahl ----- */
-  .pk-font { display:inline-flex; align-items:center; gap:.5rem; flex:0 0 auto; font-size:.75rem; color:#9aa0aa; }
-  .pk-font label { letter-spacing:.04em; }
-  .pk-font select {
-    appearance:none; -webkit-appearance:none;
-    background:#16191e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239aa0aa'/%3E%3C/svg%3E") no-repeat right .6rem center;
-    color:#cfd2d8; border:1px solid rgba(255,255,255,.16); border-radius:6px;
-    font:inherit; font-size:.78rem; padding:.4rem 1.6rem .4rem .6rem; cursor:pointer;
-  }
-  .pk-font select:focus-visible { outline:2px solid #6aa0ff; outline-offset:2px; }
+  --ds-radius:    5px;
+  --ds-radius-lg: 8px;
+  --ds-shadow:    0 1px 0 var(--ds-line), 0 18px 40px -28px rgba(28,26,22,.45);
+  --ds-texture:
+    radial-gradient(rgba(28,26,22,.035) 0.5px, transparent 0.6px),
+    radial-gradient(rgba(28,26,22,.022) 0.5px, transparent 0.6px);
+  --ds-texture-size: 3px 3px, 7px 7px;
+}
 
-  /* Smooth Theme-Wechsel, aber Reduced-Motion respektieren */
-  @media (prefers-reduced-motion: reduce) {
-    .pk-tab { transition: none; }
-  }
+/* =========================================================================
+   STAHL · Industrial (dunkel, Schmal-Grotesk, eckig)
+   ========================================================================= */
+[data-theme="stahl"] {
+  --ds-bg:         #14171A;
+  --ds-surface:    #1C2024;
+  --ds-surface-2:  #24292E;
+  --ds-text:       #E9EDF1;
+  --ds-text-soft:  #AAB3BC;
+  --ds-line:       #3A4148;
+  --ds-line-2:     #2F353B;
 
-  @media (max-width: 560px) {
-    .pk-label { width: 100%; }
-    .pk-accent { width: 100%; justify-content: flex-start; padding-top: .25rem; }
+  --ds-accent:       var(--cust-accent, #FF6A00);
+  --ds-accent-2:     var(--cust-accent-2, #FFB000);
+  --ds-accent-hover: var(--ds-accent);
+  --ds-accent-soft:  var(--ds-accent);
+  --ds-on-accent:    #0C0E10;
+
+  --ds-font-display: var(--cust-font, "Arial Narrow", "Roboto Condensed", system-ui, sans-serif);
+  --ds-font-body:    var(--cust-font-body, "Arial Narrow", "Roboto Condensed", system-ui, sans-serif);
+
+  --ds-radius:    2px;
+  --ds-radius-lg: 4px;
+  --ds-shadow:    0 1px 0 rgba(255,255,255,.04), 0 22px 44px -30px rgba(0,0,0,.8);
+  --ds-texture:
+    linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+  --ds-texture-size: 32px 32px, 32px 32px;
+}
+
+/* =========================================================================
+   GLAS · Glassmorphism (heller Farbverlauf, milchige Karten, grosse Radien)
+   ========================================================================= */
+[data-theme="glas"] {
+  --ds-bg:         #EEF2FB;
+  --ds-surface:    rgba(255,255,255,.42);
+  --ds-surface-2:  rgba(255,255,255,.6);
+  --ds-text:       #161A2B;
+  --ds-text-soft:  #424A66;
+  --ds-line:       rgba(255,255,255,.62);
+  --ds-line-2:     rgba(120,130,170,.28);
+
+  --ds-accent:       var(--cust-accent, #4F7CFF);
+  --ds-accent-2:     var(--cust-accent-2, #8A5BFF);
+  --ds-accent-hover: var(--ds-accent);
+  --ds-accent-soft:  var(--ds-accent);
+  --ds-on-accent:    #fff;
+
+  --ds-font-display: var(--cust-font, ui-rounded, "SF Pro Rounded", system-ui, sans-serif);
+  --ds-font-body:    var(--cust-font-body, ui-sans-serif, system-ui, -apple-system, sans-serif);
+
+  --ds-radius:    14px;
+  --ds-radius-lg: 28px;
+  --ds-shadow:    0 18px 50px -16px rgba(20,28,64,.32);
+  --ds-texture:
+    radial-gradient(42rem 42rem at 12% -8%, rgba(96,140,255,.55), transparent 60%),
+    radial-gradient(38rem 38rem at 92% 6%, rgba(150,110,255,.45), transparent 60%),
+    radial-gradient(46rem 46rem at 78% 104%, rgba(80,200,255,.4), transparent 60%);
+  --ds-texture-size: auto;
+}
+
+/* =========================================================================
+   EDEL · Luxury (tiefes Anthrazit, Gold-Akzent, Serif, viel Negativraum)
+   ========================================================================= */
+[data-theme="edel"] {
+  --ds-bg:         #111316;
+  --ds-surface:    #16191D;
+  --ds-surface-2:  #1C2026;
+  --ds-text:       #ECE8E1;
+  --ds-text-soft:  #A7A39B;
+  --ds-line:       rgba(255,255,255,.08);
+  --ds-line-2:     rgba(255,255,255,.14);
+
+  --ds-accent:       var(--cust-accent, #C8A24A);
+  --ds-accent-2:     var(--cust-accent-2, #E0C074);
+  --ds-accent-hover: var(--ds-accent);
+  --ds-accent-soft:  var(--ds-accent);
+  --ds-on-accent:    #14110A;
+
+  --ds-font-display: var(--cust-font, "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif);
+  --ds-font-body:    var(--cust-font-body, ui-sans-serif, system-ui, -apple-system, sans-serif);
+
+  --ds-radius:    2px;
+  --ds-radius-lg: 4px;
+  --ds-shadow:    0 1px 0 rgba(255,255,255,.05), 0 30px 60px -34px rgba(0,0,0,.9);
+  --ds-texture:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);
+  --ds-texture-size: auto;
+}
+
+/* =========================================================================
+   MINIMAL · Basic S/W (reines Weiss, Systemschrift, eckig, fast keine Linie)
+   ========================================================================= */
+[data-theme="minimal"] {
+  --ds-bg:         #FFFFFF;
+  --ds-surface:    #FFFFFF;
+  --ds-surface-2:  #FAFAFA;
+  --ds-text:       #0A0A0A;
+  --ds-text-soft:  #444444;
+  --ds-line:       #ECECEC;
+  --ds-line-2:     #DDDDDD;
+
+  --ds-accent:       var(--cust-accent, #111111);
+  --ds-accent-2:     var(--cust-accent-2, #111111);
+  --ds-accent-hover: var(--ds-accent);
+  --ds-accent-soft:  var(--ds-accent);
+  --ds-on-accent:    #FFFFFF;
+
+  --ds-font-display: var(--cust-font, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+  --ds-font-body:    var(--cust-font-body, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
+
+  --ds-radius:    0px;
+  --ds-radius-lg: 0px;
+  --ds-shadow:    none;
+  --ds-texture:   none;
+  --ds-texture-size: auto;
+}
+
+/* ===========================================================================
+   BEISPIEL-WERKSTATT (.pv-*) — konsumiert AUSSCHLIESSLICH --ds-* Tokens.
+   Genau deshalb greift data-theme: kein einziger Hardcode-Farbwert hier.
+   =========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+
+.pv {
+  background-color: var(--ds-bg);
+  background-image: var(--ds-texture);
+  background-size: var(--ds-texture-size, auto);
+  background-attachment: fixed;
+  color: var(--ds-text);
+  font-family: var(--ds-font-body);
+  font-size: 18px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 60vh;
+  transition: background-color .3s ease, color .3s ease;
+}
+.pv-wrap {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: clamp(1.1rem, .6rem + 2vw, 2rem);
+}
+
+:where(.pv a, .pv button, .pv input, .pv select):focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 3px;
+  border-radius: var(--ds-radius);
+}
+
+/* ---- Nav ---- */
+.pv-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  padding-block: 1.4rem;
+  border-bottom: 1px solid var(--ds-line);
+}
+.pv-brand {
+  font-family: var(--ds-font-display);
+  font-weight: 700; font-size: 1.32rem; letter-spacing: -0.01em;
+  color: var(--ds-text); text-decoration: none;
+  display: inline-flex; align-items: center; gap: .55ch;
+}
+.pv-brand-mark {
+  display: inline-grid; place-items: center;
+  width: 1.9em; height: 1.9em;
+  border-radius: var(--ds-radius);
+  background: var(--ds-accent); color: var(--ds-on-accent);
+  font-size: .7em; font-weight: 700; letter-spacing: 0;
+}
+.pv-links { display: flex; align-items: center; gap: clamp(.9rem, .4rem + 1.6vw, 2rem); flex-wrap: wrap; }
+.pv-links a {
+  font-size: .74rem; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--ds-text-soft); text-decoration: none;
+  position: relative; padding-block: .2rem;
+  transition: color .24s ease;
+}
+.pv-links a::after {
+  content: ""; position: absolute; left: 0; bottom: -2px;
+  width: 100%; height: 1.5px; background: var(--ds-accent);
+  transform: scaleX(0); transform-origin: left; transition: transform .24s ease;
+}
+.pv-links a:hover { color: var(--ds-text); }
+.pv-links a:hover::after { transform: scaleX(1); }
+
+/* ---- Hero ---- */
+.pv-hero {
+  padding-block: clamp(3rem, 2rem + 6vw, 6.5rem) clamp(3.5rem, 2.5rem + 5vw, 7rem);
+  border-bottom: 1px solid var(--ds-line);
+}
+.pv-eyebrow {
+  display: inline-flex; align-items: center; gap: .6ch;
+  font-family: var(--ds-font-body);
+  font-size: .76rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ds-accent-2); margin: 0 0 1.4rem;
+}
+.pv-title {
+  font-family: var(--ds-font-display);
+  font-weight: 700;
+  font-size: clamp(2.75rem, 1.2rem + 6.4vw, 6rem);
+  line-height: .99; letter-spacing: -0.025em;
+  margin: 0 0 1.4rem; max-width: 16ch; text-wrap: balance;
+  color: var(--ds-text);
+}
+.pv-title em { font-style: italic; color: var(--ds-accent); }
+.pv-sub {
+  font-size: clamp(1.05rem, .95rem + .5vw, 1.35rem); line-height: 1.55;
+  color: var(--ds-text-soft); max-width: 56ch; margin: 0 0 2.2rem;
+}
+.pv-cta { display: flex; flex-wrap: wrap; gap: .85rem; align-items: center; }
+
+/* ---- Buttons ---- */
+.pv-btn {
+  display: inline-flex; align-items: center; gap: .6ch;
+  font-family: var(--ds-font-body);
+  font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600;
+  color: var(--ds-on-accent); background: var(--ds-accent);
+  border: 1.5px solid var(--ds-accent); border-radius: var(--ds-radius);
+  padding: .85rem 1.5rem; text-decoration: none; cursor: pointer;
+  transition: transform .24s ease, background-color .24s ease, box-shadow .24s ease;
+}
+.pv-btn:hover { transform: translateY(-2px); background: var(--ds-accent-hover); }
+.pv-btn:active { transform: translateY(0); }
+.pv-btn.ghost {
+  color: var(--ds-text); background: transparent; border-color: var(--ds-line-2);
+}
+.pv-btn.ghost::after { content: "\2192"; transition: transform .24s ease; }
+.pv-btn.ghost:hover {
+  border-color: var(--ds-text); background: var(--ds-surface); transform: translateY(-2px);
+}
+.pv-btn.ghost:hover::after { transform: translateX(3px); }
+
+/* ---- Stats ---- */
+.pv-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px; background: var(--ds-line);
+  border: 1px solid var(--ds-line); border-radius: var(--ds-radius);
+  overflow: hidden; margin-block: clamp(3.5rem, 2.5rem + 5vw, 7rem);
+}
+.pv-stat { background: var(--ds-bg); padding: 1.7rem 1.4rem; display: flex; flex-direction: column; gap: .4rem; }
+.pv-stat-num {
+  font-family: var(--ds-font-display); font-weight: 700;
+  font-size: clamp(2rem, 1.4rem + 1.8vw, 3rem); line-height: 1; letter-spacing: -0.02em;
+  color: var(--ds-text);
+}
+.pv-stat-num::first-letter { color: var(--ds-accent); }
+.pv-stat-lbl { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ds-text-soft); }
+
+/* ---- Section ---- */
+.pv-section { padding-block: clamp(3.5rem, 2.5rem + 5vw, 7rem); border-bottom: 1px solid var(--ds-line); }
+.pv-section-title {
+  font-family: var(--ds-font-display); font-weight: 700;
+  font-size: clamp(1.6rem, 1rem + 2.4vw, 2.6rem); line-height: 1.05; letter-spacing: -0.02em;
+  margin: 0 0 2rem; color: var(--ds-text);
+}
+
+/* ---- Cards ---- */
+.pv-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1.3rem; }
+.pv-card {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-line); border-radius: var(--ds-radius-lg);
+  padding: 1.6rem 1.5rem 1.7rem; position: relative; overflow: hidden;
+  box-shadow: var(--ds-shadow);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+}
+.pv-card::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--ds-accent);
+}
+.pv-card:hover { transform: translateY(-4px); border-color: var(--ds-line-2); }
+.pv-card-t {
+  font-family: var(--ds-font-display); font-weight: 700; font-size: 1.32rem; letter-spacing: -0.01em;
+  margin: 1rem 0 .55rem; color: var(--ds-text);
+}
+.pv-card-d { font-size: .98rem; line-height: 1.6; color: var(--ds-text-soft); margin: 0; }
+.pv-tag {
+  display: inline-flex; align-items: center;
+  font-size: .66rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ds-on-accent); background: var(--ds-accent);
+  border-radius: var(--ds-radius); padding: .28rem .6rem;
+}
+
+/* ---- Form ---- */
+.pv-form {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem 1.3rem;
+  background: var(--ds-surface); border: 1px solid var(--ds-line);
+  border-radius: var(--ds-radius-lg); padding: clamp(1.4rem, 1rem + 2vw, 2.4rem);
+  box-shadow: var(--ds-shadow);
+}
+.pv-field { display: flex; flex-direction: column; gap: .5rem; }
+.pv-field.full, .pv-field:last-of-type { grid-column: 1 / -1; }
+.pv-field label { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ds-text-soft); }
+.pv-field input, .pv-field select {
+  font-family: var(--ds-font-body); font-size: 1rem; color: var(--ds-text);
+  background: var(--ds-surface-2); border: 1px solid var(--ds-line-2);
+  border-radius: var(--ds-radius); padding: .8rem .9rem; width: 100%;
+  transition: border-color .24s ease, box-shadow .24s ease;
+}
+.pv-field input:focus, .pv-field select:focus {
+  outline: none; border-color: var(--ds-accent);
+  box-shadow: 0 0 0 3px var(--ds-accent-soft);
+}
+
+/* ---- Footer ---- */
+.pv-footer {
+  padding-block: 2.6rem; display: flex; flex-wrap: wrap;
+  align-items: center; justify-content: space-between; gap: 1rem;
+  font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ds-text-soft);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+  .pv { font-size: 17px; }
+  .pv-form { grid-template-columns: 1fr; }
+  .pv-footer { flex-direction: column; align-items: flex-start; }
+}
+
+/* ===========================================================================
+   PICKER-LEISTE (eigenes, themenneutrales Tool-Chrome — KEINE --ds-* Tokens)
+   =========================================================================== */
+.pk {
+  position: sticky; top: 0; z-index: 1000;
+  background: #0d0f12; color: #e9eaec;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.pk-inner { max-width: 1100px; margin: 0 auto; padding: .85rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; }
+.pk-label { font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: #7e828b; margin-right: .25rem; flex: 0 0 auto; }
+.pk-tabs { display: flex; flex-wrap: wrap; gap: .4rem; flex: 1 1 auto; }
+.pk-tab {
+  appearance: none; border: 1px solid rgba(255,255,255,.16); background: #16191e; color: #cfd2d8;
+  font: inherit; font-size: .82rem; font-weight: 600; padding: .5rem .85rem; border-radius: 7px;
+  cursor: pointer; display: inline-flex; align-items: center; gap: .5rem;
+  transition: transform .18s ease, background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+.pk-tab .pk-dot { width: .7rem; height: .7rem; border-radius: 50%; flex: 0 0 auto; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25); }
+.pk-tab:hover { background: #20242b; border-color: rgba(255,255,255,.3); transform: translateY(-1px); }
+.pk-tab:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+.pk-tab[aria-pressed="true"] { background: #f4f5f7; color: #14171c; border-color: #f4f5f7; }
+.pk-tab[data-slug="papier"]  .pk-dot { background: #146DAB; }
+.pk-tab[data-slug="stahl"]   .pk-dot { background: #ff6a00; }
+.pk-tab[data-slug="glas"]    .pk-dot { background: #4f7cff; }
+.pk-tab[data-slug="edel"]    .pk-dot { background: #c8a24a; }
+.pk-tab[data-slug="minimal"] .pk-dot { background: #111111; box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+
+.pk-info { max-width: 1100px; margin: 0 auto; padding: .9rem 1.25rem 1.05rem; border-top: 1px solid rgba(255,255,255,.07); display: grid; gap: .35rem .5rem; }
+.pk-info-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .55rem; }
+.pk-info-name { font-size: 1rem; font-weight: 700; color: #fff; margin: 0; }
+.pk-info-tagline { font-size: .8rem; color: #9aa7c0; letter-spacing: .02em; }
+.pk-info-desc { font-size: .85rem; line-height: 1.55; color: #b7bbc4; max-width: 78ch; margin: 0; }
+.pk-info-best { font-size: .78rem; color: #8a8f99; }
+.pk-info-best strong { color: #d6d9df; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: .68rem; margin-right: .35rem; }
+
+.pk-accent { display: inline-flex; align-items: center; gap: .5rem; flex: 0 0 auto; font-size: .75rem; color: #9aa0aa; }
+.pk-accent input[type="color"] { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; padding: 0; border: 1px solid rgba(255,255,255,.25); border-radius: 6px; background: none; cursor: pointer; }
+.pk-accent input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+.pk-accent input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
+.pk-accent input[type="color"]:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+.pk-accent button { appearance: none; border: 1px solid rgba(255,255,255,.16); background: transparent; color: #9aa0aa; font: inherit; font-size: .72rem; padding: .3rem .55rem; border-radius: 6px; cursor: pointer; }
+.pk-accent button:hover { color: #e9eaec; border-color: rgba(255,255,255,.3); }
+.pk-accent button:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+
+.pk-font { display: inline-flex; align-items: center; gap: .5rem; flex: 0 0 auto; font-size: .75rem; color: #9aa0aa; }
+.pk-font select {
+  appearance: none; -webkit-appearance: none;
+  background: #16191e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239aa0aa'/%3E%3C/svg%3E") no-repeat right .6rem center;
+  color: #cfd2d8; border: 1px solid rgba(255,255,255,.16); border-radius: 6px;
+  font: inherit; font-size: .78rem; padding: .4rem 1.6rem .4rem .6rem; cursor: pointer;
+}
+.pk-font select:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
   }
+  .pv-btn:hover, .pv-card:hover, .pv-btn.ghost:hover { transform: none; }
+}
+@media (max-width: 560px) {
+  .pk-label { width: 100%; }
+  .pk-accent, .pk-font { width: 100%; justify-content: flex-start; padding-top: .25rem; }
+}
 </style>
 </head>
 
 <body>
 
-<!-- ============ THEME-PICKER (eigenes Tool-Chrome, nicht Teil des Themes) ============ -->
+<!-- ============ THEME-PICKER (Tool-Chrome, kein Teil des Themes) ============ -->
 <header class="pk" aria-label="Theme-Auswahl">
   <div class="pk-inner">
     <span class="pk-label" id="pk-label">Design-Paket</span>
@@ -215,18 +502,18 @@
     </div>
     <div class="pk-accent">
       <label for="pk-accent-input">CI-Akzent</label>
-      <input type="color" id="pk-accent-input" value="#e8732a" title="Kundenfarbe (--cust-accent) live testen">
+      <input type="color" id="pk-accent-input" value="#146DAB" title="Kundenfarbe (--cust-accent) live testen">
       <button type="button" id="pk-accent-reset">Reset</button>
     </div>
     <div class="pk-font">
       <label for="pk-font-select">Schrift</label>
-      <select id="pk-font-select" title="Schriftart der Ueberschriften">
+      <select id="pk-font-select" title="Schriftart (--cust-font)">
         <option value="">Theme-Standard</option>
-        <option value="var(--font-fraunces)">Fraunces · Editorial-Serif</option>
-        <option value="var(--font-playfair)">Playfair · Luxus-Serif</option>
-        <option value="var(--font-space)">Space Grotesk · Modern</option>
-        <option value="var(--font-inter)">Inter · Neutral</option>
-        <option value="var(--font-oswald)">Oswald · Industrie</option>
+        <option value="fraunces">Fraunces &middot; Editorial-Serif</option>
+        <option value="playfair">Playfair &middot; Luxus-Serif</option>
+        <option value="space">Space Grotesk &middot; Modern</option>
+        <option value="inter">Inter &middot; Neutral</option>
+        <option value="oswald">Oswald &middot; Industrie</option>
       </select>
     </div>
   </div>
@@ -235,205 +522,172 @@
       <p class="pk-info-name" id="pk-info-name">Papier</p>
       <span class="pk-info-tagline" id="pk-info-tagline">Werkstatt-Editorial</span>
     </div>
-    <p class="pk-info-desc" id="pk-info-desc">Warmes, handwerklich-editoriales Theme auf cremigem Off-White mit feiner Papier-Faser-Textur, kraeftigen Serif-Headlines und Mono-//-Labels in Orange. Beleg- und Docket-Karten mit leicht eckigen Kanten geben jedem Abschnitt das Gefuehl eines sauber dokumentierten Auftrags.</p>
-    <p class="pk-info-best"><strong>Best for</strong><span id="pk-info-best">Klassische Familien- und Meisterbetriebe, die Vertrauen, Sorgfalt und handwerkliche Tradition ausstrahlen wollen.</span></p>
+    <p class="pk-info-desc" id="pk-info-desc"></p>
+    <p class="pk-info-best"><strong>Best for</strong><span id="pk-info-best"></span></p>
   </div>
 </header>
 
-<!-- ============ LIVE-VORSCHAU: fiktive Meisterwerkstatt, kleidet sich per Theme neu ein ============ -->
-<div class="pv">
+<!-- ============ LIVE-VORSCHAU: fiktive Werkstatt, kleidet sich per data-theme neu ============ -->
+<main class="pv">
+  <div class="pv-wrap">
 
-  <!-- NAV -->
-  <nav class="pv-nav" aria-label="Hauptnavigation">
-    <a class="pv-brand" href="#">Muster Werkstatt</a>
-    <div class="pv-links">
-      <a href="#leistungen">Leistungen</a>
-      <a href="#zahlen">Betrieb</a>
-      <a href="#termin">Termin</a>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <section class="pv-hero" aria-labelledby="pv-title">
-    <p class="pv-eyebrow">// MEISTERBETRIEB</p>
-    <h1 class="pv-title" id="pv-title">Ihr Auto in den Haenden, die es verdient.</h1>
-    <p class="pv-sub">Seit 1986 schrauben wir mit Diagnose-Technik von heute und der Sorgfalt von gestern. Von der Inspektion bis zur Unfallinstandsetzung &mdash; transparent, termintreu, ohne Ueberraschungen auf der Rechnung.</p>
-    <div class="pv-cta">
-      <a class="pv-btn" href="#termin">Termin anfragen</a>
-      <a class="pv-btn ghost" href="#leistungen">Leistungen ansehen</a>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <section class="pv-stats" id="zahlen" aria-label="Kennzahlen">
-    <div class="pv-stat">
-      <span class="pv-stat-num">38</span>
-      <span class="pv-stat-lbl">Jahre Erfahrung</span>
-    </div>
-    <div class="pv-stat">
-      <span class="pv-stat-num">12.400</span>
-      <span class="pv-stat-lbl">Reparaturen erledigt</span>
-    </div>
-    <div class="pv-stat">
-      <span class="pv-stat-num">4,9</span>
-      <span class="pv-stat-lbl">Sterne Kundenbewertung</span>
-    </div>
-    <div class="pv-stat">
-      <span class="pv-stat-num">48&nbsp;h</span>
-      <span class="pv-stat-lbl">Ø Durchlaufzeit</span>
-    </div>
-  </section>
-
-  <!-- LEISTUNGEN -->
-  <section class="pv-section" id="leistungen" aria-labelledby="pv-leistungen-title">
-    <h2 class="pv-section-title" id="pv-leistungen-title">Was wir machen</h2>
-    <div class="pv-cards">
-      <article class="pv-card">
-        <span class="pv-tag">Wartung</span>
-        <h3 class="pv-card-t">Inspektion &amp; Service</h3>
-        <p class="pv-card-d">Herstellervorgaben, ohne die Garantie zu verlieren. Inklusive ehrlichem Foto-Befund vor jeder Freigabe und Festpreis nach Voranschlag.</p>
-      </article>
-      <article class="pv-card">
-        <span class="pv-tag">Diagnose</span>
-        <h3 class="pv-card-t">Fehlersuche &amp; Elektronik</h3>
-        <p class="pv-card-d">Steuergeraet-Auslese, Sensorik und Bordnetz. Wir finden die Ursache statt Teile zu tauschen, bis das Symptom verschwindet.</p>
-      </article>
-      <article class="pv-card">
-        <span class="pv-tag">Karosserie</span>
-        <h3 class="pv-card-t">Unfall &amp; Lack</h3>
-        <p class="pv-card-d">Direkte Abwicklung mit Ihrer Versicherung, Ersatzwagen inklusive. Spaltmasse und Farbton wie ab Werk &mdash; geprueft, nicht geschaetzt.</p>
-      </article>
-    </div>
-  </section>
-
-  <!-- TERMINFORMULAR -->
-  <section class="pv-section" id="termin" aria-labelledby="pv-termin-title">
-    <h2 class="pv-section-title" id="pv-termin-title">Termin anfragen</h2>
-    <form class="pv-form" aria-label="Terminanfrage" onsubmit="return false;">
-      <div class="pv-field">
-        <label for="f-name">Name</label>
-        <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Max Mustermann">
+    <nav class="pv-nav" aria-label="Hauptnavigation">
+      <a class="pv-brand" href="#"><span class="pv-brand-mark" data-tenant="logo" aria-hidden="true">MW</span><span data-tenant="name">Muster Werkstatt</span></a>
+      <div class="pv-links">
+        <a href="#leistungen">Leistungen</a>
+        <a href="#zahlen">Betrieb</a>
+        <a href="#termin">Termin</a>
       </div>
-      <div class="pv-field">
-        <label for="f-service">Leistung</label>
-        <select id="f-service" name="service">
-          <option>Inspektion &amp; Service</option>
-          <option>Fehlersuche &amp; Elektronik</option>
-          <option>Unfall &amp; Lack</option>
-          <option>Reifen &amp; Raeder</option>
-        </select>
+    </nav>
+
+    <section class="pv-hero" aria-labelledby="pv-title">
+      <p class="pv-eyebrow">Meisterbetrieb</p>
+      <h1 class="pv-title" id="pv-title">Ihr Auto in den H&auml;nden, die es <em>verdient</em>.</h1>
+      <p class="pv-sub">Seit 1986 schrauben wir mit Diagnose-Technik von heute und der Sorgfalt von gestern. Von der Inspektion bis zur Unfallinstandsetzung &mdash; transparent, termintreu, ohne &Uuml;berraschungen auf der Rechnung.</p>
+      <div class="pv-cta">
+        <a class="pv-btn" href="#" data-tenant="whatsapp" data-wa-text="Hallo, ich m&ouml;chte einen Termin anfragen.">Per WhatsApp anfragen</a>
+        <a class="pv-btn ghost" href="#leistungen">Leistungen ansehen</a>
       </div>
-      <div class="pv-field">
-        <label for="f-date">Wunschtermin</label>
-        <input id="f-date" name="date" type="date">
+    </section>
+
+    <section class="pv-stats" id="zahlen" aria-label="Kennzahlen">
+      <div class="pv-stat"><span class="pv-stat-num">38</span><span class="pv-stat-lbl">Jahre Erfahrung</span></div>
+      <div class="pv-stat"><span class="pv-stat-num">12.400</span><span class="pv-stat-lbl">Reparaturen erledigt</span></div>
+      <div class="pv-stat"><span class="pv-stat-num">4,9</span><span class="pv-stat-lbl">Sterne Kundenbewertung</span></div>
+      <div class="pv-stat"><span class="pv-stat-num">48&nbsp;h</span><span class="pv-stat-lbl">&Oslash; Durchlaufzeit</span></div>
+    </section>
+
+    <section class="pv-section" id="leistungen" aria-labelledby="pv-leistungen-title">
+      <h2 class="pv-section-title" id="pv-leistungen-title">Was wir machen</h2>
+      <div class="pv-cards">
+        <article class="pv-card">
+          <span class="pv-tag">Wartung</span>
+          <h3 class="pv-card-t">Inspektion &amp; Service</h3>
+          <p class="pv-card-d">Herstellervorgaben, ohne die Garantie zu verlieren. Inklusive ehrlichem Foto-Befund vor jeder Freigabe und Festpreis nach Voranschlag.</p>
+        </article>
+        <article class="pv-card">
+          <span class="pv-tag">Diagnose</span>
+          <h3 class="pv-card-t">Fehlersuche &amp; Elektronik</h3>
+          <p class="pv-card-d">Steuerger&auml;t-Auslese, Sensorik und Bordnetz. Wir finden die Ursache statt Teile zu tauschen, bis das Symptom verschwindet.</p>
+        </article>
+        <article class="pv-card">
+          <span class="pv-tag">Karosserie</span>
+          <h3 class="pv-card-t">Unfall &amp; Lack</h3>
+          <p class="pv-card-d">Direkte Abwicklung mit Ihrer Versicherung, Ersatzwagen inklusive. Spaltmasse und Farbton wie ab Werk &mdash; gepr&uuml;ft, nicht gesch&auml;tzt.</p>
+        </article>
       </div>
-      <button class="pv-btn" type="submit">Anfrage senden</button>
-    </form>
-  </section>
+    </section>
 
-  <!-- FOOTER -->
-  <footer class="pv-footer">
-    <p>Muster Werkstatt GmbH &middot; Industriestrasse 12 &middot; 44801 Bochum &middot; Mo&ndash;Fr 7:30&ndash;18:00</p>
-    <p>Dies ist eine Design-Vorschau mit fiktiven Inhalten. Kein echter Betrieb.</p>
-  </footer>
+    <section class="pv-section" id="termin" aria-labelledby="pv-termin-title">
+      <h2 class="pv-section-title" id="pv-termin-title">Termin anfragen</h2>
+      <form class="pv-form" aria-label="Terminanfrage" onsubmit="return false;">
+        <div class="pv-field">
+          <label for="f-name">Name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" placeholder="Max Mustermann">
+        </div>
+        <div class="pv-field">
+          <label for="f-service">Leistung</label>
+          <select id="f-service" name="service">
+            <option>Inspektion &amp; Service</option>
+            <option>Fehlersuche &amp; Elektronik</option>
+            <option>Unfall &amp; Lack</option>
+            <option>Reifen &amp; R&auml;der</option>
+          </select>
+        </div>
+        <div class="pv-field">
+          <label for="f-date">Wunschtermin</label>
+          <input id="f-date" name="date" type="date">
+        </div>
+        <button class="pv-btn" type="submit">Anfrage senden</button>
+      </form>
+    </section>
 
-</div>
+    <footer class="pv-footer">
+      <p><span data-tenant="name">Muster Werkstatt</span> GmbH &middot; <span data-tenant="address">Industriestrasse 12, 44801 Bochum</span> &middot; Mo&ndash;Fr 7:30&ndash;18:00</p>
+      <p>Design-Vorschau mit fiktiven Inhalten. Kein echter Betrieb.</p>
+    </footer>
 
-<!-- ============ UMSCHALT-LOGIK ============ -->
+  </div>
+</main>
+
+<!-- ============ UMSCHALT-LOGIK: data-theme statt link-swap ============ -->
 <script>
 (function () {
   "use strict";
 
-  // Theme-Metadaten (slug, name, tagline, beschreibung, best_for, default-akzent)
+  // Theme-Metadaten fuer das Info-Panel + Default-Akzent (zum Picker-Reset).
   var THEMES = {
     papier: {
-      name: "Papier",
-      tagline: "Werkstatt-Editorial",
-      desc: "Warmes, handwerklich-editoriales Theme auf cremigem Off-White mit feiner Papier-Faser-Textur, kraeftigen Serif-Headlines und Mono-//-Labels in Orange. Beleg- und Docket-Karten mit leicht eckigen Kanten geben jedem Abschnitt das Gefuehl eines sauber dokumentierten Auftrags.",
-      best: "Klassische Familien- und Meisterbetriebe, die Vertrauen, Sorgfalt und handwerkliche Tradition ausstrahlen wollen.",
-      accent: "#e8732a"
+      name: "Papier", tagline: "Werkstatt-Editorial", accent: "#146DAB",
+      desc: "Warmes, handwerklich-editoriales Theme auf cremigem Off-White mit feiner Papier-Faser-Textur, kraeftigen Serif-Headlines und Mono-Labels. Beleg- und Docket-Karten mit leicht eckigen Kanten geben jedem Abschnitt das Gefuehl eines sauber dokumentierten Auftrags.",
+      best: "Klassische Familien- und Meisterbetriebe, die Vertrauen, Sorgfalt und handwerkliche Tradition ausstrahlen wollen."
     },
     stahl: {
-      name: "Stahl",
-      tagline: "Industrial",
+      name: "Stahl", tagline: "Industrial", accent: "#ff6a00",
       desc: "Ein roher Werkstatt-Hallen-Look in kuehlem Anthrazit und gebuerstetem Stahl, mit technischer Schmal-Grotesk, Gitterlinien und sparsam gesetzten Gefahrenstreifen in Signal-Orange. Wirkt robust, praezise und unverkennbar nach Maschinenbau.",
-      best: "Technik-getriebene Betriebe, Tuning, Nutzfahrzeuge und Werkstaetten, die Praezision und Kraft betonen wollen.",
-      accent: "#ff7a18"
+      best: "Technik-getriebene Betriebe, Tuning, Nutzfahrzeuge und Werkstaetten, die Praezision und Kraft betonen wollen."
     },
     glas: {
-      name: "Glas",
-      tagline: "Glassmorphism",
-      desc: "Ein hochmodernes, durchscheinendes Theme im Apple-Liquid-Glass-Stil: milchige Glaskarten mit Blur, Saettigung und feinen Glanzkanten, weiche grosse Radien und ein dezent lebendiger Farbverlauf-Hintergrund schaffen Tiefe durch Layering. Trotz Transparenz bleibt der Text dank kraeftiger Kontraste und Fallbacks jederzeit klar lesbar.",
-      best: "Moderne, premium-orientierte Betriebe mit E-Mobilitaet, Hochvolt oder jungem Publikum.",
-      accent: "#4f86ff"
+      name: "Glas", tagline: "Glassmorphism", accent: "#4f7cff",
+      desc: "Ein hochmodernes, durchscheinendes Theme im Apple-Liquid-Glass-Stil: milchige Glaskarten mit Blur und feinen Glanzkanten, weiche grosse Radien und ein lebendiger Farbverlauf-Hintergrund schaffen Tiefe durch Layering. Trotz Transparenz bleibt der Text dank kraeftiger Kontraste klar lesbar.",
+      best: "Moderne, premium-orientierte Betriebe mit E-Mobilitaet, Hochvolt oder jungem Publikum."
     },
     edel: {
-      name: "Edel",
-      tagline: "Luxury",
+      name: "Edel", tagline: "Luxury", accent: "#c8a24a",
       desc: "Ein dunkles Luxus-Theme in tiefem Anthrazit mit warmem Gold-/Messing-Akzent, eleganten Serif-Headlines, viel Negativraum und feinen Haarlinien. Dezente Hover-Glows und disziplinierter Kontrast geben jeder Seite eine Premium-Marken-Anmutung.",
-      best: "Sport- und Oldtimer-Spezialisten, Aufbereitung und Werkstaetten mit gehobener, exklusiver Klientel.",
-      accent: "#c8a24a"
+      best: "Sport- und Oldtimer-Spezialisten, Aufbereitung und Werkstaetten mit gehobener, exklusiver Klientel."
     },
     minimal: {
-      name: "Minimal",
-      tagline: "Basic S/W",
+      name: "Minimal", tagline: "Basic S/W", accent: "#111111",
       desc: "Ein radikal reduziertes Schwarz-Weiss-Theme: reines Weiss, sehr duenne Systemschrift, viel Weissraum und nur ein winziger Akzent. Schweizer Basic-Anmutung mit maximaler Ruhe und Klarheit.",
-      best: "Betriebe, die Klarheit und Schnelligkeit ueber alles stellen &mdash; oder einen neutralen Rahmen fuer starke Bilder wollen.",
-      accent: "#111111"
+      best: "Betriebe, die Klarheit und Schnelligkeit ueber alles stellen — oder einen neutralen Rahmen fuer starke Bilder wollen."
     }
   };
 
-  var linkEl   = document.getElementById("theme");
-  var tabsWrap = document.getElementById("pk-tabs");
-  var tabs     = Array.prototype.slice.call(tabsWrap.querySelectorAll(".pk-tab"));
-  var rootEl   = document.documentElement;
+  // Erlaubte Font-Keys -> --cust-font NUR aus der Registry (vgl. whitelabel.js).
+  var ALLOWED_FONTS = { fraunces: 1, playfair: 1, space: 1, inter: 1, oswald: 1 };
 
-  var nameEl   = document.getElementById("pk-info-name");
-  var tagEl    = document.getElementById("pk-info-tagline");
-  var descEl   = document.getElementById("pk-info-desc");
-  var bestEl   = document.getElementById("pk-info-best");
-
+  var rootEl  = document.documentElement;
+  var tabs    = Array.prototype.slice.call(document.querySelectorAll("#pk-tabs .pk-tab"));
+  var nameEl  = document.getElementById("pk-info-name");
+  var tagEl   = document.getElementById("pk-info-tagline");
+  var descEl  = document.getElementById("pk-info-desc");
+  var bestEl  = document.getElementById("pk-info-best");
   var accentInput = document.getElementById("pk-accent-input");
   var accentReset = document.getElementById("pk-accent-reset");
+  var fontSelect  = document.getElementById("pk-font-select");
 
-  var current = "papier";
-  var customAccent = null; // null => Theme-Default verwenden
+  var current = rootEl.dataset.theme && THEMES[rootEl.dataset.theme] ? rootEl.dataset.theme : "papier";
+  var customAccent = null; // null => Theme-Default (Picker zeigt Default-Swatch)
 
-  function applyAccent(slug) {
-    // Wenn Kunde eine Farbe gesetzt hat, gewinnt diese. Sonst Theme-Default.
+  function applyAccent() {
     if (customAccent) {
       rootEl.style.setProperty("--cust-accent", customAccent);
       accentInput.value = customAccent;
     } else {
       rootEl.style.removeProperty("--cust-accent");
-      accentInput.value = THEMES[slug].accent;
+      accentInput.value = THEMES[current].accent;
     }
   }
 
   function setTheme(slug) {
-    if (!THEMES[slug] || slug === current) {
-      // trotzdem Akzent aktualisieren, falls nur die Farbe geaendert wurde
-      applyAccent(slug);
-      return;
-    }
+    if (!THEMES[slug]) return;
     current = slug;
 
-    // Stylesheet umschalten (Datei liegt im selben Ordner)
-    linkEl.setAttribute("href", slug + ".css");
+    // KEIN link-swap: nur das data-theme-Attribut am <html> wechseln.
+    rootEl.dataset.theme = slug;
 
-    // Tabs-Status
     tabs.forEach(function (t) {
       t.setAttribute("aria-pressed", String(t.dataset.slug === slug));
     });
 
-    // Info-Panel fuellen
     var meta = THEMES[slug];
     nameEl.textContent = meta.name;
     tagEl.textContent  = meta.tagline;
-    descEl.textContent = meta.desc;
-    bestEl.innerHTML   = meta.best;
+    descEl.textContent = meta.desc;     // textContent — kein innerHTML
+    bestEl.textContent = meta.best;
 
-    applyAccent(slug);
+    applyAccent();
   }
 
   tabs.forEach(function (t) {
@@ -441,30 +695,42 @@
   });
 
   accentInput.addEventListener("input", function () {
-    customAccent = accentInput.value;
+    customAccent = accentInput.value;             // <input type=color> liefert #rrggbb
     rootEl.style.setProperty("--cust-accent", customAccent);
   });
-
   accentReset.addEventListener("click", function () {
     customAccent = null;
-    applyAccent(current);
+    applyAccent();
   });
 
-  // ----- Schrift-Auswahl: ueberschreibt die Headline-Schrift des Themes -----
-  var fontSelect = document.getElementById("pk-font-select");
-  var fontStyle  = document.getElementById("fontOverride");
-  var FONT_TARGETS = ".pv-title,.pv-brand,.pv-eyebrow,.pv-section-title,.pv-stat-num,.pv-card-t";
+  // Schrift-Dropdown -> --cust-font NUR aus der Font-Registry.
   fontSelect.addEventListener("change", function () {
-    var stack = fontSelect.value;
-    fontStyle.textContent = stack
-      ? FONT_TARGETS + "{font-family:" + stack + " !important}"
-      : "";
+    var key = fontSelect.value;
+    if (ALLOWED_FONTS.hasOwnProperty(key)) {
+      rootEl.style.setProperty("--cust-font", "var(--font-" + key + ")");
+    } else {
+      rootEl.style.removeProperty("--cust-font");
+    }
   });
 
-  // Initialzustand
-  applyAccent(current);
+  // Initialzustand: Info-Panel + Akzent fuer das (vom Bootstrap gesetzte) Theme.
+  setTheme(current);
 })();
 </script>
 
+<style id="accent-engine-fix">
+/* === Akzent-Automatik (gewinnt die Kaskade: steht NACH allen [data-theme]-Bloecken) ===
+   Aus EINER Kundenfarbe (--ds-accent) werden Hover/Soft/On-Accent abgeleitet.
+   soft mischt Richtung --ds-bg -> theme-aware (hell wie dunkel). */
+@supports (color: color-mix(in oklch, red, blue)){
+  :root{
+    --ds-accent-hover: color-mix(in oklch, var(--ds-accent), black 14%);
+    --ds-accent-soft:  color-mix(in oklch, var(--ds-accent), var(--ds-bg) 86%);
+  }
+}
+@supports (color: contrast-color(black)){
+  :root{ --ds-on-accent: contrast-color(var(--ds-accent)); }
+}
+</style>
 </body>
 </html>
