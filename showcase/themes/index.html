@@ -9,6 +9,10 @@
 <!-- AKTIVES THEME-STYLESHEET (wird per JS umgeschaltet) -->
 <link id="theme" rel="stylesheet" href="papier.css">
 
+<!-- Selbst-gehostete Schriftarten (DSGVO-sicher) + Schrift-Override-Schicht -->
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style id="fontOverride"></style>
+
 <!-- MINIMALES EIGEN-CSS: nur fuer die Umschalter-Leiste. Der Rest kommt aus dem Theme. -->
 <style>
   /* Reset / Grundlagen, damit die Picker-Leiste unabhaengig vom Theme stabil ist */
@@ -173,6 +177,17 @@
   .pk-accent button:hover { color: #e9eaec; border-color: rgba(255,255,255,.3); }
   .pk-accent button:focus-visible { outline: 2px solid #6aa0ff; outline-offset: 2px; }
 
+  /* ----- Schrift-Auswahl ----- */
+  .pk-font { display:inline-flex; align-items:center; gap:.5rem; flex:0 0 auto; font-size:.75rem; color:#9aa0aa; }
+  .pk-font label { letter-spacing:.04em; }
+  .pk-font select {
+    appearance:none; -webkit-appearance:none;
+    background:#16191e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239aa0aa'/%3E%3C/svg%3E") no-repeat right .6rem center;
+    color:#cfd2d8; border:1px solid rgba(255,255,255,.16); border-radius:6px;
+    font:inherit; font-size:.78rem; padding:.4rem 1.6rem .4rem .6rem; cursor:pointer;
+  }
+  .pk-font select:focus-visible { outline:2px solid #6aa0ff; outline-offset:2px; }
+
   /* Smooth Theme-Wechsel, aber Reduced-Motion respektieren */
   @media (prefers-reduced-motion: reduce) {
     .pk-tab { transition: none; }
@@ -202,6 +217,17 @@
       <label for="pk-accent-input">CI-Akzent</label>
       <input type="color" id="pk-accent-input" value="#e8732a" title="Kundenfarbe (--cust-accent) live testen">
       <button type="button" id="pk-accent-reset">Reset</button>
+    </div>
+    <div class="pk-font">
+      <label for="pk-font-select">Schrift</label>
+      <select id="pk-font-select" title="Schriftart der Ueberschriften">
+        <option value="">Theme-Standard</option>
+        <option value="var(--font-fraunces)">Fraunces · Editorial-Serif</option>
+        <option value="var(--font-playfair)">Playfair · Luxus-Serif</option>
+        <option value="var(--font-space)">Space Grotesk · Modern</option>
+        <option value="var(--font-inter)">Inter · Neutral</option>
+        <option value="var(--font-oswald)">Oswald · Industrie</option>
+      </select>
     </div>
   </div>
   <div class="pk-info" aria-live="polite">
@@ -422,6 +448,17 @@
   accentReset.addEventListener("click", function () {
     customAccent = null;
     applyAccent(current);
+  });
+
+  // ----- Schrift-Auswahl: ueberschreibt die Headline-Schrift des Themes -----
+  var fontSelect = document.getElementById("pk-font-select");
+  var fontStyle  = document.getElementById("fontOverride");
+  var FONT_TARGETS = ".pv-title,.pv-brand,.pv-eyebrow,.pv-section-title,.pv-stat-num,.pv-card-t";
+  fontSelect.addEventListener("change", function () {
+    var stack = fontSelect.value;
+    fontStyle.textContent = stack
+      ? FONT_TARGETS + "{font-family:" + stack + " !important}"
+      : "";
   });
 
   // Initialzustand
