@@ -68,3 +68,6 @@ body{ background-image: var(--ds-texture, none); }
 
 /* Fokus-Ring braucht KEINE Extra-Regel: WERKHOF liest :focus-visible{outline:
    var(--accent)}, und --accent ist jetzt = var(--ds-accent). */
+/* ---- Politur: Ghost-Button-Kontrast (Werkhof .btn = Sekundaer) ---- */
+.btn{border-color:var(--ds-line-2)!important}
+.btn:hover{background:var(--ds-surface-2)!important;border-color:var(--ds-text-soft)!important}
