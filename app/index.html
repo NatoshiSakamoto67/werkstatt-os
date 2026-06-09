@@ -1365,7 +1365,8 @@ RENDER.kunden=async function(){
   if(all===null){$("#content").innerHTML=whOffline("Kunden");return;}
   const list=all.filter(k=>k.name);
   const byTyp=t=>list.filter(k=>k.typ===t).length;
-  let h=ph("Kunden · tmERIK","Echte Stammdaten live aus tmERIK. Klick auf eine Zeile = Fahrzeug-Akte mit HU-Fälligkeit.");
+  let h=ph("Kunden · tmERIK","Echte Stammdaten live aus tmERIK. Tippen Sie eine Zeile für die Fahrzeug-Akte.");
+  h+=infoBox("Woher kommen diese Daten?",'Die Kundenliste kommt <b>live aus tmERIK</b> (TOPMOTIVE) — kein Demo. Tippen Sie einen Kunden für seine <b>Fahrzeug-Akte</b>: Kontakt, Fahrzeuge und HU-/TÜV-Fälligkeit. Über „Angebot im Chat" erstellt Claude direkt einen Entwurf für diesen Kunden.');
   h+='<div class="grid g4" style="margin-bottom:15px">'
     +kpi("b",'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/>',list.length,"Kunden")
     +kpi("o",'<path d="M3 7h18M3 12h18M3 17h18"/>',byTyp("privat"),"Privat")
@@ -1627,6 +1628,7 @@ RENDER.rechnungen=async function(){
   if(list===null){$("#content").innerHTML=whOffline("Rechnungen");return;}
   const sum=list.reduce((s,r)=>s+(r.brutto||0),0);
   let h=ph("Rechnungen","Echte GoBD-Rechnungen mit PDF + DATEV-Export (aus dem Orchestrator).");
+  h+=infoBox("Wie entsteht eine Rechnung?",'Rechnungen entstehen am Ende des roten Fadens: aus einem freigegebenen <b>Angebot</b> wird auf Klick eine Rechnung. Jede bekommt eine fortlaufende Nummer (R-2026-…), ein <b>PDF</b> und einen <b>DATEV</b>-Buchungsstapel für den Steuerberater — <b>GoBD-sicher</b> (unveränderbar archiviert). Nichts wird ohne Ihre Freigabe geschrieben.');
   h+='<div class="grid g4" style="margin-bottom:15px">'
     +kpi("b",'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',list.length,"Rechnungen")
     +kpi("g",'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',eur(sum),"Summe brutto")+'</div>';
