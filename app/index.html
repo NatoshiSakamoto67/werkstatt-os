@@ -1531,10 +1531,10 @@ RENDER.sharing=async function(){
   if(list===null){$("#content").innerHTML=whOffline("Werkzeug-Sharing");return;}
   let h=ph("Werkzeug-Sharing","Dein eigener Spezialwerkzeug-Bestand. Werkstattübergreifendes Verleihen kommt als WerkLeih-Netzwerk.");
   h+='<div class="card" style="margin-bottom:14px;background:linear-gradient(135deg,var(--ink),#16202c);color:#fff;border:0"><div style="display:flex;align-items:center;gap:12px"><div style="background:rgba(255,255,255,.1);width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0">'+svg('<path d="M14 7l-1.5 1.5a3.5 3.5 0 0 1-4.6 4.6L4 17v3h3l3.9-3.9a3.5 3.5 0 0 1 4.6-4.6L17 10l3-3-3-3-3 3z"/>',1.8)+'</div><div style="min-width:0"><b style="font-size:15px">WerkLeih-Netzwerk</b><div style="color:#aeb4be;font-size:13px">Werkzeug mit anderen Werkstätten teilen/leihen — eigenes Modul in Entwicklung.</div></div></div></div>';
-  const stB=s=>'<span class="badge '+(s==="verfuegbar"?"ok":s==="ausgeliehen"?"warn":"")+'">'+esc((s||"").replace(/_/g," "))+'</span>';
-  h+='<div class="card" style="padding:10px 4px"><div class="card-h" style="padding:6px 12px 2px"><h3>Eigener Bestand ('+list.length+')</h3></div><table class="tbl"><thead><tr><th>Werkzeug</th><th>Ort</th><th>Status</th></tr></thead><tbody>';
-  list.forEach(w=>{h+='<tr><td><b>'+esc(w.name||"–")+'</b></td><td class="muted">'+esc(w.ort||"–")+'</td><td>'+stB(w.status)+'</td></tr>';});
-  h+='</tbody></table></div>';$("#content").innerHTML=h;
+  h+='<div class="card"><div class="card-h"><h3>Eigener Bestand</h3><span class="badge muted">'+list.length+'</span></div>';
+  if(!list.length)h+='<div class="rowitem"><div class="body"><small>Noch kein Werkzeug erfasst.</small></div></div>';
+  list.forEach(w=>{h+='<div class="rowitem"><div class="ic">'+svg('<path d="M3 7h4l2-2 4 4-2 2-4-4z"/><path d="M14 7l7 7-2 2-7-7"/><circle cx="6.5" cy="17.5" r="2.5"/>')+'</div><div class="body"><b>'+esc(w.name||"–")+'</b><small>'+esc(w.ort||"—")+'</small></div>'+spill(w.status||"verfuegbar")+'</div>';});
+  h+='</div>';$("#content").innerHTML=h;
 };
 
 RENDER.werkzeuge=async function(){
