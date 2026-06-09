@@ -388,7 +388,8 @@ html.dark .badge.done{background:var(--ink-3);color:#fff}
 .sidebar{
   background:var(--surface);border-right:1px solid var(--line);
   padding:16px 12px;position:sticky;top:var(--topbar-h);
-  height:calc(100vh - var(--topbar-h));overflow:auto;
+  height:calc(100vh - var(--topbar-h));overflow-y:auto;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;
 }
 /* Mono //-Gruppenlabel in Orange */
 .nav-group{
@@ -800,7 +801,7 @@ html.dark .lnk .li{background:var(--ink-3)}
 .empty{text-align:center;color:var(--grau);padding:40px 18px;font-size:14px}
 
 /* ------------------------------------------------------- DRAWER / OVERLAY    */
-.overlay{position:fixed;inset:0;z-index:150;background:rgba(11,13,16,.55);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--dur) var(--ease), visibility var(--dur) var(--ease)}
+.overlay{position:fixed;inset:0;z-index:150;background:rgba(11,13,16,.28);opacity:0;visibility:hidden;pointer-events:none;transition:opacity var(--dur) var(--ease), visibility var(--dur) var(--ease)}
 .overlay.on{opacity:1;visibility:visible;pointer-events:auto}
 .drawer{
   position:fixed;top:0;right:0;bottom:0;width:min(540px,100%);z-index:160;
@@ -905,7 +906,7 @@ html:not(.dark) .tabbar{background:rgba(252,251,248,.86)}
 @media(max-width:820px){
   .shell{grid-template-columns:1fr}
   .sidebar{
-    position:fixed;top:var(--topbar-h);left:0;bottom:0;width:250px;z-index:90;
+    position:fixed;top:var(--topbar-h);left:0;bottom:0;width:250px;z-index:155;
     transform:translateX(-100%);transition:transform var(--dur) var(--ease);
     box-shadow:20px 0 60px -30px rgba(0,0,0,.4);
   }
@@ -1352,7 +1353,7 @@ RENDER.sharing=function(){
   try{localStorage.setItem('wl-theme',document.documentElement.classList.contains('dark')?'dark':'light');}catch(e){}
   var src="werkleih/index.html?panel=kibot"; // KI-Bot als Default statt Auto-Suche
   $("#content").classList.add("bleed");
-  $("#content").innerHTML='<div class="wl-embed-full"><iframe title="WERKLEIH – Werkzeug-Sharing" src="'+src+'" allow="geolocation" loading="eager"></iframe><a class="wl-fs" href="'+src+'" target="_blank" rel="noopener">'+svg('<path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6v6M20 4l-9 9"/>')+'Vollbild ↗</a></div>';
+  $("#content").innerHTML='<div class="wl-embed-full"><iframe title="WERKLEIH – Werkzeug-Sharing" src="'+src+'" allow="geolocation" loading="eager"></iframe></div>';
 };
 
 RENDER.werkzeuge=function(){
@@ -1573,7 +1574,7 @@ RENDER.kundenportal=function(){
   try{localStorage.setItem('kfz_bw',document.documentElement.classList.contains('dark')?'1':'0');}catch(e){}
   var src="kundenportal.html";
   $("#content").classList.add("bleed");
-  $("#content").innerHTML='<div class="wl-embed-full"><iframe title="KFZ Gorski Kundenportal" src="'+src+'" loading="eager"></iframe><a class="wl-fs" href="'+src+'" target="_blank" rel="noopener">'+svg('<path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6v6M20 4l-9 9"/>')+'Vollbild ↗</a></div>';
+  $("#content").innerHTML='<div class="wl-embed-full"><iframe title="KFZ Gorski Kundenportal" src="'+src+'" loading="eager"></iframe></div>';
 };
 
 /* ---------- search ---------- */
