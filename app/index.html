@@ -471,7 +471,10 @@ html.dark .navitem.active{background:var(--ink-3);color:#fff}
 .kpi .l{color:var(--grau);font-size:12.5px;font-weight:500}
 
 /* ------------------------------------------------------------------ TABLE    */
-.tbl{width:100%;border-collapse:collapse}
+.tbl{min-width:100%;border-collapse:collapse}
+/* Responsive: breite Tabellen horizontal scrollen statt rechts abschneiden */
+.card:has(> table.tbl){overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl th,.tbl td{white-space:nowrap}
 .tbl th{
   text-align:left;font-family:var(--mono);font-size:10.5px;font-weight:600;
   letter-spacing:.7px;text-transform:uppercase;color:var(--grau-2);
@@ -496,8 +499,9 @@ html.dark .navitem.active{background:var(--ink-3);color:#fff}
 .rowitem .ic svg{width:18px;height:18px;color:var(--text)}
 .rowitem .ic .bebas{color:var(--ink)}
 .rowitem .body{flex:1;min-width:0}
-.rowitem .body b{font-size:14px;display:block;color:var(--ink)}
-.rowitem .body small{color:var(--grau);font-size:12.5px}
+.rowitem .body b{font-size:14px;display:block;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rowitem .body small{color:var(--grau);font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rowitem .badge{flex-shrink:0}
 
 /* ------------------------------------------------------------------ CHAT     */
 .chat{display:flex;flex-direction:column;height:calc(100vh - var(--topbar-h) - 104px);max-width:880px;margin:0 auto}
@@ -1304,12 +1308,16 @@ async function openKunde(id){
   $("#kAng")&&$("#kAng").addEventListener("click",()=>{closeD();nav("claude");setTimeout(()=>{const i=$("#hIn");if(i){i.value="Schreib ein Angebot für "+k.name+": ";i.focus();}},350);});
 }
 
-RENDER.auftraege=function(){
-  let h=ph("Aufträge","Status-Workflow je Auftrag. Fehlt ein Spezialwerkzeug → direkt im Sharing anfragen.");
-  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Auftrag</th><th>Kunde</th><th>Werkzeug</th><th>Status</th><th>Summe</th></tr></thead><tbody>';
-  T(DB.auftraege).forEach(a=>{h+='<tr><td><b>'+esc(a.titel)+'</b><div class="muted" style="font-size:12.5px">'+esc(a.fzg)+'</div></td><td class="muted">'+esc(a.kunde)+'</td><td>'+(a.werkzeug?(T(DB.werkzeuge).some(w=>w.name===a.werkzeug&&w.status==="verfügbar")?'<span class="badge ok">'+esc(a.werkzeug)+'</span>':'<button class="btn btn-sm" data-share="'+esc(a.werkzeug)+'">'+svg('<path d="M14 7l-1.5 1.5a3.5 3.5 0 0 1-4.6 4.6L4 17v3h3l3.9-3.9a3.5 3.5 0 0 1 4.6-4.6L17 10l3-3-3-3-3 3z"/>')+'anfragen</button>'):'<span class="muted">–</span>')+'</td><td>'+badge(a.status)+'</td><td style="font-weight:700">'+(a.summe?eur(a.summe):"–")+'</td></tr>';});
+RENDER.auftraege=async function(){
+  $("#content").innerHTML=whLoading("Aufträge");
+  const list=await WH.werkstatt("auftraege");
+  if(list===null){$("#content").innerHTML=whOffline("Aufträge");return;}
+  let h=ph("Aufträge","Werkstatt-Aufträge mit Status — echt gespeichert im Orchestrator.",canWrite()?'<button class="btn btn-primary" id="addA">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Auftrag</button>':"");
+  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Auftrag</th><th>Kunde</th><th>Status</th><th>Summe</th><th></th></tr></thead><tbody>';
+  list.forEach(a=>{h+='<tr><td><b>'+esc(a.titel||"–")+'</b><div class="muted" style="font-size:12.5px">'+esc(a.fzg||"")+'</div></td><td class="muted">'+esc(a.kunde||"")+'</td><td>'+badge(a.status||"")+'</td><td style="font-weight:700">'+(a.summe?eur(a.summe):"–")+'</td><td style="text-align:right">'+(canWrite()?'<button class="btn btn-sm" data-del="'+a.id+'">×</button>':'')+'</td></tr>';});
   h+='</tbody></table></div>';$("#content").innerHTML=h;
-  $$("#content [data-share]").forEach(b=>b.addEventListener("click",()=>{nav("sharing");setTimeout(()=>toast("Werkzeug-Anfrage: "+b.dataset.share),300);}));
+  $("#addA")&&$("#addA").addEventListener("click",async()=>{const titel=prompt("Auftrag-Titel?");if(!titel)return;const kunde=prompt("Kunde?")||"";await WH.wkAdd("auftraege",{titel,kunde,fzg:"",status:"offen",summe:0});toast("Auftrag angelegt");RENDER.auftraege();});
+  $$("#content [data-del]").forEach(b=>b.addEventListener("click",async()=>{await WH.del("/werkstatt/auftraege/"+b.dataset.del);toast("Gelöscht");RENDER.auftraege();}));
 };
 
 RENDER.termine=function(){
@@ -1387,11 +1395,17 @@ RENDER.sharing=function(){
   $("#content").innerHTML='<div class="wl-embed-full"><iframe title="WERKLEIH – Werkzeug-Sharing" src="'+src+'" allow="geolocation" loading="eager"></iframe></div>';
 };
 
-RENDER.werkzeuge=function(){
-  let h=ph("Werkzeuge","Eigener Bestand mit Kalibrier-Status. Teilen aktivieren = mandantenübergreifend verleihbar.",canWrite()?'<button class="btn btn-primary" id="addW">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Werkzeug</button>':"");
-  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Werkzeug</th><th>Hersteller</th><th>Kalibrierung</th><th>Status</th><th>Sharing</th></tr></thead><tbody>';
-  T(DB.werkzeuge).forEach(w=>{const m=w.kal.split("/"),due=(+m[1])<2027||((+m[1])===2027&&(+m[0])<6);const cls=due?(w.kal.indexOf("2026")>-1?"due":"soon"):"ok";h+='<tr><td><b>'+esc(w.name)+'</b></td><td class="muted">'+esc(w.hersteller)+'</td><td><span class="cal-pill '+cls+'">'+esc(w.kal)+'</span></td><td>'+badge(w.status)+'</td><td>'+(w.share?'<span class="badge ok">geteilt</span>':'<span class="badge muted">privat</span>')+'</td></tr>';});
-  h+='</tbody></table></div>';$("#content").innerHTML=h;$("#addW")&&$("#addW").addEventListener("click",()=>toast("Demo: Werkzeug hinzufügen"));
+RENDER.werkzeuge=async function(){
+  $("#content").innerHTML=whLoading("Werkzeuge");
+  const list=await WH.werkstatt("werkzeuge");
+  if(list===null){$("#content").innerHTML=whOffline("Werkzeuge");return;}
+  let h=ph("Werkzeuge","Eigener Bestand mit Verfügbarkeit/Kalibrierung — echt gespeichert.",canWrite()?'<button class="btn btn-primary" id="addW">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Werkzeug</button>':"");
+  const stB=s=>'<span class="badge '+(s==="verfuegbar"?"ok":s==="ausgeliehen"?"warn":"")+'">'+esc((s||"").replace(/_/g," "))+'</span>';
+  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Werkzeug</th><th>Ort</th><th>Kalibriert bis</th><th>Status</th><th></th></tr></thead><tbody>';
+  list.forEach(w=>{h+='<tr><td><b>'+esc(w.name||"–")+'</b></td><td class="muted">'+esc(w.ort||"–")+'</td><td class="muted">'+esc(w.kalibriert_bis||"–")+'</td><td>'+stB(w.status)+'</td><td style="text-align:right">'+(canWrite()?'<button class="btn btn-sm" data-del="'+w.id+'">×</button>':'')+'</td></tr>';});
+  h+='</tbody></table></div>';$("#content").innerHTML=h;
+  $("#addW")&&$("#addW").addEventListener("click",async()=>{const name=prompt("Werkzeug-Name?");if(!name)return;await WH.wkAdd("werkzeuge",{name,status:"verfuegbar",ort:""});toast("Werkzeug angelegt");RENDER.werkzeuge();});
+  $$("#content [data-del]").forEach(b=>b.addEventListener("click",async()=>{await WH.del("/werkstatt/werkzeuge/"+b.dataset.del);toast("Gelöscht");RENDER.werkzeuge();}));
 };
 
 RENDER.werkstaetten=function(){
@@ -1404,12 +1418,16 @@ RENDER.werkstaetten=function(){
   l+='</div>';$("#wsList").innerHTML=l;
 };
 
-RENDER.lieferanten=function(){
-  let h=ph("Lieferanten & Tools","Direkter Zugriff auf Teile-Portale, mit Bedarf-Export aus offenen Aufträgen.",'<button class="btn" id="expB">'+svg('<path d="M12 3v12M8 11l4 4 4-4M4 21h16"/>',1.8)+'Bedarf exportieren</button>');
-  h+='<div class="launch">';DB.lieferanten.forEach(l=>{h+='<a class="lnk" href="'+esc(l.url)+'"'+(l.url!=="#"?' target="_blank" rel="noopener"':'')+'><div class="li">'+esc(l.kz)+'</div><div><b>'+esc(l.name)+'</b><small>'+esc(l.typ)+'</small></div>'+svg('<path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6v6M20 4l-9 9"/>').replace("<svg ",'<svg class="ext" width="17" height="17" ')+'</a>';});
-  h+='</div><p style="color:var(--grau);font-size:13px;margin-top:16px">Wo eine API fehlt, übernimmt <b>Claude</b> (browser-gesteuert) das Heraussuchen – immer mit Ihrer Freigabe.</p>';
-  $("#content").innerHTML=h;
-  $("#expB").addEventListener("click",()=>exportSheet("teile-bedarf","Teile-Bedarf",["Kunde","Fahrzeug","Bedarf","Teil","Lieferant","Preis €"],T(DB.orchestra).map(o=>[o.kunde,o.fzg,o.bedarf,o.teil,o.lief,o.preis.toFixed(2)])));
+RENDER.lieferanten=async function(){
+  $("#content").innerHTML=whLoading("Lieferanten");
+  const list=await WH.werkstatt("lieferanten");
+  if(list===null){$("#content").innerHTML=whOffline("Lieferanten");return;}
+  let h=ph("Lieferanten","Teile-Lieferanten & Konditionen — echt gespeichert.",canWrite()?'<button class="btn btn-primary" id="addL">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Lieferant</button>':"");
+  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Lieferant</th><th>Typ</th><th>Konditionen</th><th></th></tr></thead><tbody>';
+  list.forEach(l=>{h+='<tr><td><b>'+esc(l.name||"–")+'</b></td><td class="muted">'+esc(l.typ||"")+'</td><td class="muted">'+esc(l.konditionen||"")+'</td><td style="text-align:right">'+(canWrite()?'<button class="btn btn-sm" data-del="'+l.id+'">×</button>':'')+'</td></tr>';});
+  h+='</tbody></table></div>';$("#content").innerHTML=h;
+  $("#addL")&&$("#addL").addEventListener("click",async()=>{const name=prompt("Lieferant?");if(!name)return;const typ=prompt("Typ (Teile/Technik/…)?")||"";await WH.wkAdd("lieferanten",{name,typ,konditionen:""});toast("Lieferant angelegt");RENDER.lieferanten();});
+  $$("#content [data-del]").forEach(b=>b.addEventListener("click",async()=>{await WH.del("/werkstatt/lieferanten/"+b.dataset.del);toast("Gelöscht");RENDER.lieferanten();}));
 };
 
 RENDER.rechnungen=async function(){
@@ -1538,6 +1556,7 @@ const WERKHOF_API = (window.WERKHOF_API || "").replace(/\/$/,"");
 const WH = {
   async get(p){try{const r=await fetch(WERKHOF_API+p);if(!r.ok)throw 0;return await r.json();}catch(e){return null;}},
   async post(p,b){try{const r=await fetch(WERKHOF_API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b||{})});return await r.json();}catch(e){return null;}},
+  async del(p){try{const r=await fetch(WERKHOF_API+p,{method:"DELETE"});return await r.json();}catch(e){return null;}},
   kunden(){return this.get("/portal/kunden");},
   kunde(id){return this.get("/portal/kunde/"+id);},
   approvals(s){return this.get("/approvals"+(s?("?status="+s):""));},
@@ -1545,6 +1564,8 @@ const WH = {
   rechnungAusAngebot(id){return this.post("/claude/rechnung-aus-angebot/"+id,{});},
   rechnungen(){return this.get("/faktura");},
   inbox(){return this.get("/whatsapp/inbox");},
+  werkstatt(coll){return this.get("/werkstatt/"+coll);},
+  wkAdd(coll,data){return this.post("/werkstatt/"+coll,{data});},
   health(){return this.get("/health");},
 };
 function whLoading(t){return '<div class="ph"><h2>'+esc(t)+'</h2></div><div class="card" style="text-align:center;padding:44px;color:var(--grau)"><div style="font-size:13px">Lade echte Daten aus dem Orchestrator …</div></div>';}
