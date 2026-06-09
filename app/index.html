@@ -294,6 +294,55 @@ html.dark .btn-primary{color:#fff}
 .badge.muted{background:var(--st-neutral-bg);color:var(--grau)}
 html.dark .badge.done{background:var(--ink-3);color:#fff}
 
+/* ---------- Status-Pills: klare, freundliche Statusanzeige (kein DB-Enum) --- */
+.spill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;
+  padding:4px 11px;border-radius:var(--radius-pill);white-space:nowrap;line-height:1.35}
+.spill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+.spill.s-green{background:var(--st-green-bg);color:var(--st-green)}
+.spill.s-amber{background:var(--st-amber-bg);color:var(--st-amber)}
+.spill.s-red{background:var(--st-red-bg);color:var(--st-red)}
+.spill.s-blue{background:var(--st-blue-bg);color:var(--st-blue)}
+.spill.s-gray{background:var(--st-neutral-bg);color:var(--grau)}
+
+/* ---------- Info-Box: aufklappbare Erklärung ("Wie funktioniert das?") ----- */
+.info-x{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);margin-bottom:15px;overflow:hidden}
+.info-x summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:11px;padding:13px 15px;font-size:13.5px;font-weight:600;color:var(--text)}
+.info-x summary::-webkit-details-marker{display:none}
+.info-x .ix-ic{width:30px;height:30px;border-radius:9px;background:var(--st-blue-bg);color:var(--st-blue);display:grid;place-items:center;flex-shrink:0}
+.info-x .ix-ic svg{width:17px;height:17px}
+.info-x .chev{margin-left:auto;color:var(--grau);transition:transform .2s;flex-shrink:0}
+.info-x .chev svg{width:18px;height:18px}
+.info-x[open] .chev{transform:rotate(90deg)}
+.info-x .ix-body{padding:2px 16px 16px;font-size:13px;line-height:1.62;color:var(--grau)}
+.info-x .ix-body b{color:var(--text)}
+.info-x .ix-body ol{margin:8px 0 0;padding-left:20px}
+.info-x .ix-body li{margin-bottom:6px}
+
+/* ---------- Flow-Stepper: der "rote Faden" durchs System --------------------*/
+.flow{display:flex;align-items:flex-start;gap:0;margin-bottom:16px;overflow-x:auto;padding:4px 2px;-webkit-overflow-scrolling:touch}
+.flow .step{flex:1 0 0;min-width:62px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;position:relative;padding:2px 1px}
+.flow .step .sd{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--paper-3);color:var(--grau);z-index:2;border:2px solid var(--paper-3)}
+.flow .step .sd svg{width:16px;height:16px}
+.flow .step.on .sd{background:var(--accent);color:#fff;border-color:var(--accent)}
+.flow .step.done-step .sd{background:var(--st-green-bg);color:var(--st-green);border-color:var(--st-green-bg)}
+.flow .step small{font-size:10px;color:var(--grau);line-height:1.25;max-width:74px}
+.flow .step.on small{color:var(--text);font-weight:700}
+.flow .step::after{content:"";position:absolute;top:17px;left:50%;width:100%;height:2px;background:var(--line);z-index:1}
+.flow .step:last-child::after{display:none}
+
+/* ---------- Vorgang-Karte + Ergebnis-Panel ("was ist passiert?") ----------- */
+.vcard{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:14px 15px;margin-bottom:11px}
+.vcard .vc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.vcard .vc-top .vc-t{flex:1;min-width:0;font-weight:700;font-size:14.5px;line-height:1.35}
+.vcard .vc-sum{font-weight:800;font-size:16px;white-space:nowrap;flex-shrink:0}
+.vcard .vc-meta{font-size:12.5px;color:var(--grau);margin-bottom:10px}
+.vresult{display:flex;gap:10px;align-items:flex-start;background:var(--st-green-bg);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--st-green);line-height:1.5}
+.vresult .vr-ic{flex-shrink:0;margin-top:1px}.vresult .vr-ic svg{width:16px;height:16px}
+.vresult b{color:var(--st-green)}
+.vact{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.vsplit{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--grau-2);margin:20px 2px 11px;display:flex;align-items:center;gap:8px}
+.vsplit .vs-n{background:var(--st-neutral-bg);color:var(--grau);border-radius:20px;padding:1px 9px;font-size:11px}
+
 /* ------------------------------------------------------------------ TOPBAR   */
 /* Glass-Topbar auf Ink — backdrop-blur. Weisser Text auf dunklem Glas: AA. */
 .topbar{
@@ -495,6 +544,7 @@ html.dark .navitem.active{background:var(--ink-3);color:#fff}
 .rowitem .body b{font-size:14px;display:block;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rowitem .body small{color:var(--grau);font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rowitem .badge{flex-shrink:0}
+.rowitem .spill{flex-shrink:0}
 
 /* ------------------------------------------------------------------ CHAT     */
 .chat{display:flex;flex-direction:column;height:calc(100vh - var(--topbar-h) - 104px);max-width:880px;margin:0 auto}
@@ -673,6 +723,19 @@ html.dark .map{background:linear-gradient(160deg,#1a2129,#11161c)}
 .mk .lbl{position:absolute;top:34px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:var(--mono);font-size:10.5px;font-weight:600;background:var(--surface);border:1px solid var(--line);padding:2px 8px;border-radius:6px;color:var(--text)}
 .map-legend{position:absolute;bottom:12px;left:12px;z-index:3;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-family:var(--mono);font-size:11px;letter-spacing:.3px;display:flex;gap:14px;color:var(--text)}
 .map-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+/* OpenStreetMap (Leaflet) – Two-Click-Datenschutz-Gate + echte Pins */
+.map-consent{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;text-align:center;padding:24px}
+.map-consent .mc-ic{color:var(--accent)}
+.map-consent .mc-ic svg{width:42px;height:42px}
+.map-consent p{max-width:330px;font-size:12.5px;line-height:1.55;color:var(--grau);margin:0}
+.map-consent p b{color:var(--text)}
+.map-consent .mc-note{font-size:11px;color:var(--grau);opacity:.75;font-family:var(--mono)}
+.map-cap{font-size:11.5px;color:var(--grau);margin:8px 2px 0;display:flex;align-items:center;gap:7px}
+.map-cap i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gruen)}
+.leaflet-container{height:100%;width:100%;font-family:inherit;background:var(--paper-3)}
+.lpin{width:30px;height:30px;border-radius:50% 50% 50% 2px;background:var(--accent);transform:rotate(45deg);border:2px solid var(--paper);box-shadow:0 4px 10px -3px rgba(0,0,0,.5)}
+.lpin.has{background:var(--gruen)}
+.lpin span{transform:rotate(-45deg);display:block;text-align:center;line-height:26px;color:#fff;font-weight:800;font-size:11px}
 
 /* ------------------------------------------------------- WERKLEIH / PORTAL EMBED */
 .wl-embed-full{position:relative;height:calc(100dvh - var(--topbar-h));background:var(--ink)}
@@ -1009,6 +1072,22 @@ const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
 function esc(t){const d=document.createElement("div");d.textContent=t==null?"":String(t);return d.innerHTML;}
 function ini(n){return (n||"").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();}
 function badge(s){const m={"offen":"warn","neu":"warn","wartet":"warn","angefragt":"warn","Vorschlag":"warn","in Arbeit":"info","in_arbeit":"info","bestätigt":"info","verliehen":"info","erledigt":"done","abgeschlossen":"done","bezahlt":"done","verfügbar":"ok","Stammkunde":"ok"};return '<span class="badge '+(m[s]||"muted")+'">'+esc(s)+'</span>';}
+// Klartext-Status statt roher DB-Werte (WARTET_TEILE -> "Wartet auf Teile") + Farbe.
+const ST={offen:["Offen","s-blue"],in_arbeit:["In Arbeit","s-amber"],wartet:["Wartet","s-amber"],
+  wartet_teile:["Wartet auf Teile","s-amber"],abgeschlossen:["Abgeschlossen","s-green"],fertig:["Fertig","s-green"],
+  angefragt:["Angefragt","s-amber"],bestaetigt:["Bestätigt","s-green"],"bestätigt":["Bestätigt","s-green"],
+  awaiting_approval:["Wartet auf Ihre Freigabe","s-amber"],approved:["Freigegeben","s-green"],rejected:["Abgelehnt","s-red"],
+  verarbeitet:["Von Claude bearbeitet","s-green"],neu:["Neu","s-blue"],eingegangen:["Eingegangen","s-blue"],
+  verfuegbar:["Verfügbar","s-green"],"verfügbar":["Verfügbar","s-green"],in_benutzung:["In Benutzung","s-amber"],
+  ausgeliehen:["Ausgeliehen","s-amber"],bezahlt:["Bezahlt","s-green"],erledigt:["Erledigt","s-green"]};
+function spill(s){const k=(s||"").toString().toLowerCase();const m=ST[k]||[(s||"").toString().replace(/_/g," "),"s-gray"];return '<span class="spill '+m[1]+'">'+esc(m[0])+'</span>';}
+// Pseudonymisierte Platzhalter (<NAME_1>) für die Anzeige entschärfen.
+function unmask(s){return (s||"").replace(/<NAME_\d+>/g,"Kunde").replace(/<EMAIL_\d+>/g,"E-Mail").replace(/<PHONE_\d+>/g,"Telefon").replace(/<IBAN_\d+>/g,"IBAN").replace(/<VIN_\d+>/g,"FIN").replace(/<KENNZEICHEN_\d+>/g,"Kennz.").replace(/Hermes EU-LLM via [a-z_]+/gi,"Claude").replace(/Hermes/gi,"Claude");}
+// Aufklappbare Erklärbox (natives <details>, barrierearm, kein JS nötig).
+function infoBox(title,bodyHtml,open){return '<details class="info-x"'+(open?" open":"")+'><summary><span class="ix-ic">'+svg('<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>',1.9)+'</span>'+esc(title)+'<span class="chev">'+svg('<path d="M9 6l6 6-6 6"/>',2.2)+'</span></summary><div class="ix-body">'+bodyHtml+'</div></details>';}
+// Der rote Faden: 5-Schritt-Stepper. active = Index 0..4, done = bis-Index grün.
+const FLOW=[["📩","Anfrage"],["🧠","Claude-Entwurf"],["✅","Ihre Freigabe"],["⚙️","Ausgeführt"],["🧾","Rechnung"]];
+function flowSteps(active){return '<div class="flow">'+FLOW.map((s,i)=>'<div class="step'+(i===active?" on":(i<active?" done-step":""))+'"><div class="sd">'+s[0]+'</div><small>'+esc(s[1])+'</small></div>').join("")+'</div>';}
 const waURL=t=>"https://wa.me/"+BRAND.wa+"?text="+encodeURIComponent(t);
 /* Sicherung: solange keine echte Nummer hinterlegt ist, keinen toten wa.me-Link auf die Platzhalter-Nummer öffnen */
 document.addEventListener("click",function(e){var a=e.target&&e.target.closest?e.target.closest('a[href*="wa.me/"]'):null;if(a&&!BRAND.waReady){e.preventDefault();toast("Demo · echte WhatsApp-Business-Nummer wird beim Go-Live hinterlegt");}},true);
@@ -1133,16 +1212,16 @@ function rechSt(r){return store.paid[r.id]?"bezahlt":r.status;}
 /* ---------- panels config ---------- */
 const PANELS=[
  {id:"dashboard",grp:"WERKSTATT",label:"Dashboard",icon:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>'},
- {id:"kunden",grp:"WERKSTATT",label:"Kunden",icon:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.5M20.5 20a5 5 0 0 0-4-4.9"/>',count:()=>T(DB.kunden).length},
- {id:"auftraege",grp:"WERKSTATT",label:"Aufträge",icon:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/>',count:()=>T(DB.auftraege).filter(a=>a.status!=="abgeschlossen").length},
- {id:"termine",grp:"WERKSTATT",label:"Termine",icon:'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/>',count:()=>T(DB.termine).filter(x=>x.status==="angefragt").length},
- {id:"inbox",grp:"WERKSTATT",label:"WhatsApp-Posteingang",icon:'<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/>',count:()=>T(DB.conv).filter(c=>c.status==="neu").length},
- {id:"orchestra",grp:"WERKSTATT",label:"Orchestra (KI)",icon:'<path d="M12 3v3M12 18v3M5 12H3M21 12h-2M6.3 6.3 4.9 4.9M19.1 19.1l-1.4-1.4M17.7 6.3l1.4-1.4M4.9 19.1l1.4-1.4"/><circle cx="12" cy="12" r="3.5"/>',count:()=>T(DB.orchestra).filter(o=>orchSt(o)!=="erledigt").length},
- {id:"freigaben",grp:"WERKSTATT",label:"Freigaben",icon:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',count:()=>T(DB.orchestra).filter(o=>o.cls!=="read"&&orchSt(o)!=="erledigt").length,cb:true},
+ {id:"kunden",grp:"WERKSTATT",label:"Kunden",icon:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.5M20.5 20a5 5 0 0 0-4-4.9"/>',count:()=>LIVE.kunden},
+ {id:"auftraege",grp:"WERKSTATT",label:"Aufträge",icon:'<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/>',count:()=>LIVE.auftraege},
+ {id:"termine",grp:"WERKSTATT",label:"Termine",icon:'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/>',count:()=>LIVE.termine},
+ {id:"inbox",grp:"WERKSTATT",label:"WhatsApp-Posteingang",icon:'<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/>',count:()=>LIVE.inbox},
+ {id:"orchestra",grp:"WERKSTATT",label:"Orchestra (KI)",icon:'<path d="M12 3v3M12 18v3M5 12H3M21 12h-2M6.3 6.3 4.9 4.9M19.1 19.1l-1.4-1.4M17.7 6.3l1.4-1.4M4.9 19.1l1.4-1.4"/><circle cx="12" cy="12" r="3.5"/>',count:()=>LIVE.orchestra},
+ {id:"freigaben",grp:"WERKSTATT",label:"Freigaben",icon:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',count:()=>LIVE.freigaben,cb:true},
  {id:"sharing",grp:"TEILE & WERKZEUG",label:"Werkzeug-Sharing",icon:'<path d="M14 7l-1.5 1.5a3.5 3.5 0 0 1-4.6 4.6L4 17v3h3l3.9-3.9a3.5 3.5 0 0 1 4.6-4.6L17 10l3-3-3-3-3 3z"/>'},
- {id:"werkzeuge",grp:"TEILE & WERKZEUG",label:"Werkzeuge",icon:'<path d="M3 7h4l2-2 4 4-2 2-4-4z" /><path d="M14 7l7 7-2 2-7-7"/><circle cx="6.5" cy="17.5" r="2.5"/>',count:()=>T(DB.werkzeuge).length},
+ {id:"werkzeuge",grp:"TEILE & WERKZEUG",label:"Werkzeuge",icon:'<path d="M3 7h4l2-2 4 4-2 2-4-4z" /><path d="M14 7l7 7-2 2-7-7"/><circle cx="6.5" cy="17.5" r="2.5"/>',count:()=>LIVE.werkzeuge},
  {id:"lieferanten",grp:"TEILE & WERKZEUG",label:"Lieferanten",icon:'<path d="M3 13l2-5a2 2 0 0 1 1.9-1.3h10.2A2 2 0 0 1 19 8l2 5M5 17h.01M19 17h.01"/><rect x="3" y="13" width="18" height="6" rx="2"/>'},
- {id:"rechnungen",grp:"BÜRO",label:"Rechnungen",icon:'<path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>',count:()=>T(DB.rechnungen).filter(r=>rechSt(r)==="offen").length},
+ {id:"rechnungen",grp:"BÜRO",label:"Rechnungen",icon:'<path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>',count:()=>LIVE.rechnungen},
  {id:"dokumente",grp:"BÜRO",label:"Dokumente",icon:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'},
  {id:"buchhaltung",grp:"BÜRO",label:"Buchhaltung",icon:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h2M8 17h2M14 13h2M14 17h2"/>'},
  {id:"wissen",grp:"BÜRO",label:"Wissen & Leitfäden",icon:'<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M9 7h6M9 11h6"/>'},
@@ -1155,6 +1234,28 @@ const TABS=["claude","inbox","auftraege","sharing","__more"];
 
 /* ---------- shell render ---------- */
 let CUR="dashboard";
+// Live-Zähler für die Navigations-Badges — echte Zahlen aus dem Orchestrator
+// (kein statisches Demo). Werden gecached und höchstens alle 15 s aktualisiert.
+let LIVE={kunden:0,auftraege:0,termine:0,inbox:0,orchestra:0,freigaben:0,werkzeuge:0,rechnungen:0};
+let _countsAt=0,_countsBusy=false;
+async function refreshCounts(force){
+  const now=(window.performance&&performance.now)?performance.now():0;
+  if(_countsBusy||(!force&&now-_countsAt<15000))return;
+  _countsBusy=true;_countsAt=now;
+  try{
+    const[ku,au,te,ib,ap,wz]=await Promise.all([
+      WH.kunden(),WH.werkstatt("auftraege"),WH.werkstatt("termine"),
+      WH.inbox(),WH.approvals(),WH.werkstatt("werkzeuge")]);
+    if(Array.isArray(ku))LIVE.kunden=ku.filter(k=>k.name).length;
+    if(Array.isArray(au))LIVE.auftraege=au.filter(a=>a.status!=="abgeschlossen").length;
+    if(Array.isArray(te))LIVE.termine=te.filter(x=>x.status==="angefragt").length;
+    if(Array.isArray(ib))LIVE.inbox=ib.filter(m=>m.status!=="verarbeitet").length;
+    if(Array.isArray(ap)){LIVE.freigaben=ap.filter(o=>o.status==="awaiting_approval").length;LIVE.orchestra=LIVE.freigaben;}
+    if(Array.isArray(wz))LIVE.werkzeuge=wz.length;
+  }catch(e){}
+  _countsBusy=false;
+  try{buildSidebar();buildTabs();}catch(e){}
+}
 function svg(p,sw){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'+(sw||1.8)+'" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';}
 function buildSidebar(){
   let groups={},order=[];
@@ -1167,7 +1268,7 @@ function buildSidebar(){
       h+='<button class="navitem'+(p.id===CUR?' active':'')+'" data-p="'+p.id+'">'+svg(p.icon)+esc(p.label)+'<span class="count'+(p.cb?' b':'')+'">'+(c||"")+'</span></button>';
     });
   });
-  h+='<div style="margin-top:18px;padding:12px 4px 0;border-top:1px solid var(--line)"><a class="btn btn-sm" style="width:100%;justify-content:center" href="../index.html">↗ Zur Website</a><div style="display:flex;gap:12px;justify-content:center;margin-top:10px;font-size:11.5px"><a href="../impressum.html" style="color:var(--grau);text-decoration:none">Impressum</a><a href="../datenschutz.html" style="color:var(--grau);text-decoration:none">Datenschutz</a></div><div style="text-align:center;font-size:10.5px;color:var(--grau-3);margin-top:8px">Demo · Daten nur im Browser</div></div>';
+  h+='<div style="margin-top:18px;padding:12px 4px 0;border-top:1px solid var(--line)"><a class="btn btn-sm" style="width:100%;justify-content:center" href="../index.html">↗ Zur Website</a><div style="display:flex;gap:12px;justify-content:center;margin-top:10px;font-size:11.5px"><a href="../impressum.html" style="color:var(--grau);text-decoration:none">Impressum</a><a href="../datenschutz.html" style="color:var(--grau);text-decoration:none">Datenschutz</a></div><div style="text-align:center;font-size:10.5px;color:var(--grau-3);margin-top:8px">Live · Orchestrator (Tailnet)</div></div>';
   $("#sidebar").innerHTML=h;
   $$("#sidebar .navitem").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.p)));
 }
@@ -1186,6 +1287,7 @@ function nav(id){
   $$("#tabbar .tab").forEach(b=>b.classList.toggle("active",b.dataset.t===id));
   RENDER[id]?RENDER[id]():($("#content").innerHTML='<div class="ph"><h2>'+esc(p?p.label:id)+'</h2></div><div class="empty">Modul folgt.</div>');
   window.scrollTo(0,0);$("#content").scrollTop=0;
+  refreshCounts();
 }
 function openMore(){
   let h='<div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--grau-2);padding:0 6px 8px">Alle Module</div>';
@@ -1239,15 +1341,17 @@ RENDER.dashboard=async function(){
    kpi("o",'<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/>',off,"offene Freigaben")+
    kpi("d",'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>',(rechn||[]).length,"Rechnungen")+
    kpi("g",'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',eur(ums),"Umsatz (Rechnungen)")+'</div>';
+  h+='<div class="card" style="margin-bottom:15px;padding:15px 15px 8px"><div class="card-h" style="margin-bottom:8px"><h3>So läuft jeder Vorgang</h3><button class="btn btn-sm" id="goFlow">Details</button></div>'+flowSteps(-1)+'<div style="font-size:12.5px;color:var(--grau);margin:-2px 2px 4px">Claude bereitet alles vor — <b>Sie</b> geben frei. Nichts geht ohne Ihren Klick raus.</div></div>';
   h+='<div class="grid g2"><div class="card"><div class="card-h"><h3>System-Status</h3></div>'+
    '<div class="rowitem"><div class="body"><b>tmERIK</b><small>Kunden- & Fahrzeug-Stammdaten</small></div>'+liveBadge(health&&health.tmerik)+'</div>'+
    '<div class="rowitem"><div class="body"><b>KI-Assistent (Claude)</b><small>liest tmERIK, schreibt Angebote/Rechnungen</small></div>'+liveBadge(health&&health.claude)+'</div></div>';
   h+='<div class="card"><div class="card-h"><h3>Offene Freigaben</h3><button class="btn btn-sm" id="goFr">Alle</button></div>';
   if(!off)h+='<div class="rowitem"><div class="body"><small>Keine offenen Vorgänge.</small></div></div>';
-  (offen||[]).slice(0,4).forEach(o=>{const p=o.payload||{};h+='<div class="rowitem"><div class="ic">'+svg('<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/>',1.7)+'</div><div class="body"><b>'+esc(o.titel||o.art)+'</b><small>'+esc(o.art)+(typeof p.brutto==="number"?' · '+eur(p.brutto):'')+'</small></div></div>';});
+  (offen||[]).slice(0,4).forEach(o=>{const p=o.payload||{};h+='<div class="rowitem"><div class="ic">'+svg('<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/>',1.7)+'</div><div class="body"><b>'+esc(unmask(o.titel||artLabel(o.art)))+'</b><small>'+esc(artLabel(o.art))+(typeof p.brutto==="number"?' · '+eur(p.brutto):'')+'</small></div></div>';});
   h+='</div></div>';
   $("#content").innerHTML=h;
   $("#goCh")&&$("#goCh").addEventListener("click",()=>nav("claude"));
+  $("#goFlow")&&$("#goFlow").addEventListener("click",()=>nav("freigaben"));
   $("#goFr")&&$("#goFr").addEventListener("click",()=>nav("freigaben"));
 };
 function kpi(c,ic,v,l){return '<div class="card kpi"><div class="ic '+c+'">'+svg(ic)+'</div><div class="v">'+esc(v)+'</div><div class="l">'+esc(l)+'</div></div>';}
@@ -1255,19 +1359,6 @@ function kpi(c,ic,v,l){return '<div class="card kpi"><div class="ic '+c+'">'+svg
 function huStatus(hu){const m=/(\d{1,2})\/(\d{4})/.exec(hu||"");if(!m)return{txt:"TÜV "+(hu||"?"),cls:"due",soon:true};const d=new Date(+m[2],+m[1]-1,1),now=new Date(2026,5,1);const mo=(d-now)/2592000000;if(mo<=0)return{txt:"TÜV "+hu,cls:"due",soon:true};if(mo<=2)return{txt:"TÜV "+hu,cls:"soon",soon:true};return{txt:"TÜV "+hu,cls:"ok",soon:false};}
 function inspFaellig(k){return k.inspektion==="fällig"||/^0[1-6]\/2026/.test(k.inspektion||"");}
 const WA_ICON='<path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2z"/>';
-function remind(id){
-  const k=T(DB.kunden).find(x=>x.id===id);if(!k)return;const hs=huStatus(k.hu);
-  const reason=hs.soon?("die Hauptuntersuchung (TÜV/HU) für Ihren "+k.fzg+" ist im "+k.hu+" fällig"):("die nächste Inspektion für Ihren "+k.fzg+" steht an");
-  const msg="Hallo "+k.name+", hier ist KFZ Gorski. Kleine Erinnerung: "+reason+". Sollen wir gleich einen Termin einplanen? Antworten Sie einfach hier.";
-  const subj="KFZ Gorski – Erinnerung "+(hs.soon?"TÜV/HU":"Inspektion")+" ("+k.kennz+")";
-  let h='<div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--grau-2);padding:0 6px 8px">Erinnerung an '+esc(k.name)+'</div>';
-  h+='<div style="background:var(--paper-2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;font-size:13.5px;margin-bottom:12px;color:var(--grau);line-height:1.55">'+esc(msg)+'</div>';
-  h+='<a class="sheet-item" href="'+waURL(msg)+'" target="_blank" rel="noopener">'+svg(WA_ICON,0).replace("<svg ",'<svg fill="var(--wa)" ')+'WhatsApp senden</a>';
-  h+='<a class="sheet-item" href="mailto:'+esc(k.email)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(msg)+'">'+svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>')+'E-Mail entwerfen · '+esc(k.email)+'</a>';
-  h+='<button class="sheet-item" data-orch="1">'+svg('<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/><path d="M9 18a3 3 0 0 0 6 0"/>')+'An Orchestra → Freigabe-Queue</button>';
-  openSheet(h);
-  const ob=$("#sheetC [data-orch]");ob&&ob.addEventListener("click",()=>{closeSheet();audit("Erinnerung an Orchestra",k.name+" ("+(hs.soon?"TÜV":"Inspektion")+")");toast("In die Freigabe-Queue gelegt – Claude bereitet den Versand vor");});
-}
 RENDER.kunden=async function(){
   $("#content").innerHTML=whLoading("Kunden");
   const all=await WH.kunden();
@@ -1304,10 +1395,20 @@ RENDER.auftraege=async function(){
   $("#content").innerHTML=whLoading("Aufträge");
   const list=await WH.werkstatt("auftraege");
   if(list===null){$("#content").innerHTML=whOffline("Aufträge");return;}
-  let h=ph("Aufträge","Werkstatt-Aufträge mit Status — echt gespeichert im Orchestrator.",canWrite()?'<button class="btn btn-primary" id="addA">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Auftrag</button>':"");
-  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Auftrag</th><th>Kunde</th><th>Status</th><th>Summe</th><th></th></tr></thead><tbody>';
-  list.forEach(a=>{h+='<tr><td><b>'+esc(a.titel||"–")+'</b><div class="muted" style="font-size:12.5px">'+esc(a.fzg||"")+'</div></td><td class="muted">'+esc(a.kunde||"")+'</td><td>'+badge(a.status||"")+'</td><td style="font-weight:700">'+(a.summe?eur(a.summe):"–")+'</td><td style="text-align:right">'+(canWrite()?'<button class="btn btn-sm" data-del="'+a.id+'">×</button>':'')+'</td></tr>';});
-  h+='</tbody></table></div>';$("#content").innerHTML=h;
+  let h=ph("Aufträge","Jeder Job in der Werkstatt mit klarem Status — echt im Orchestrator gespeichert.",canWrite()?'<button class="btn btn-primary" id="addA">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Auftrag</button>':"");
+  h+=infoBox("Was bedeutet der Status?",
+    'Ein <b>Auftrag</b> ist ein Job am Fahrzeug. Der Status zeigt auf einen Blick, wo er gerade steht:'
+    +'<ol><li>'+spill("offen")+' — angenommen, noch nicht begonnen</li>'
+    +'<li>'+spill("in_arbeit")+' — wird gerade gemacht</li>'
+    +'<li>'+spill("wartet_teile")+' — wartet auf bestellte Teile</li>'
+    +'<li>'+spill("abgeschlossen")+' — fertig, kann abgerechnet werden</li></ol>');
+  if(!list.length)h+='<div class="card" style="padding:24px;text-align:center;color:var(--grau)">Noch keine Aufträge. Mit „+ Auftrag" anlegen.</div>';
+  list.forEach(a=>{
+    h+='<div class="vcard"><div class="vc-top"><div class="vc-t">'+esc(a.titel||"–")+'</div>'+(a.summe?'<div class="vc-sum">'+eur(a.summe)+'</div>':'')+'</div>';
+    h+='<div class="vc-meta">'+esc(a.kunde||"—")+(a.fzg?' · '+esc(a.fzg):'')+'</div>';
+    h+='<div style="display:flex;align-items:center;gap:8px">'+spill(a.status||"offen")+(canWrite()?'<button class="btn btn-sm" data-del="'+a.id+'" style="margin-left:auto">Löschen</button>':'')+'</div></div>';
+  });
+  $("#content").innerHTML=h;
   $("#addA")&&$("#addA").addEventListener("click",async()=>{const titel=prompt("Auftrag-Titel?");if(!titel)return;const kunde=prompt("Kunde?")||"";await WH.wkAdd("auftraege",{titel,kunde,fzg:"",status:"offen",summe:0});toast("Auftrag angelegt");RENDER.auftraege();});
   $$("#content [data-del]").forEach(b=>b.addEventListener("click",async()=>{await WH.del("/werkstatt/auftraege/"+b.dataset.del);toast("Gelöscht");RENDER.auftraege();}));
 };
@@ -1316,58 +1417,97 @@ RENDER.termine=async function(){
   $("#content").innerHTML=whLoading("Termine");
   const list=await WH.werkstatt("termine");
   if(list===null){$("#content").innerHTML=whOffline("Termine");return;}
-  let h=ph("Termine","Heutige & anstehende Termine — echt gespeichert. Anfragen bestätigen.",canWrite()?'<button class="btn btn-primary" id="addT">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Termin</button>':"");
+  let h=ph("Termine","Heutige & anstehende Termine — echt gespeichert. Anfragen mit einem Tipp bestätigen.",canWrite()?'<button class="btn btn-primary" id="addT">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Termin</button>':"");
+  h+=infoBox("Angefragt oder bestätigt?",'Ein '+spill("angefragt")+' Termin wartet auf Ihre Bestätigung — tippen Sie <b>OK</b>, dann wird er '+spill("bestaetigt")+'. Termine entstehen auch automatisch aus WhatsApp-Anfragen über die Freigabe-Queue.');
   h+='<div class="card">';
   if(!list.length)h+='<div class="rowitem"><div class="body"><small>Keine Termine.</small></div></div>';
-  list.forEach(t=>{h+='<div class="rowitem"><div class="ic"><b class="bebas" style="font-size:14px">'+esc(t.zeit||"--")+'</b></div><div class="body"><b>'+esc(t.titel||"–")+'</b><small>'+esc(t.kunde||"")+(t.fzg?' · '+esc(t.fzg):'')+'</small></div>'+badge(t.status||"")+(t.status==="angefragt"&&canWrite()?'<button class="btn btn-primary btn-sm" data-ok="'+t.id+'" style="margin-left:8px;flex-shrink:0">OK</button>':'')+'</div>';});
+  list.forEach(t=>{h+='<div class="rowitem"><div class="ic"><b class="bebas" style="font-size:14px">'+esc(t.zeit||"--")+'</b></div><div class="body"><b>'+esc(t.titel||"–")+'</b><small>'+esc(t.kunde||"")+(t.fzg?' · '+esc(t.fzg):'')+'</small></div>'+spill(t.status||"")+(t.status==="angefragt"&&canWrite()?'<button class="btn btn-primary btn-sm" data-ok="'+t.id+'" style="margin-left:8px;flex-shrink:0">OK</button>':'')+'</div>';});
   h+='</div>';$("#content").innerHTML=h;
   $("#addT")&&$("#addT").addEventListener("click",async()=>{const titel=prompt("Termin (Leistung)?");if(!titel)return;const zeit=prompt("Uhrzeit (z.B. 10:00)?")||"";const kunde=prompt("Kunde?")||"";await WH.wkAdd("termine",{titel,zeit,kunde,fzg:"",status:"angefragt"});toast("Termin angelegt");RENDER.termine();});
   $$("#content [data-ok]").forEach(b=>b.addEventListener("click",async()=>{const t=list.find(x=>x.id===b.dataset.ok);if(t){const{id,...rest}=t;await WH.del("/werkstatt/termine/"+id);await WH.wkAdd("termine",{...rest,status:"bestaetigt"});}toast("Bestätigt");RENDER.termine();}));
 };
 
-let activeConv=null;
 RENDER.inbox=async function(){
   $("#content").innerHTML=whLoading("WhatsApp-Posteingang");
   const list=await WH.inbox();
   if(list===null){$("#content").innerHTML=whOffline("WhatsApp-Posteingang");return;}
-  let h=ph("WhatsApp-Posteingang","Eingegangene Kundennachrichten — Claude wertet aus und legt Angebote in die Freigabe-Queue (nie automatisch raus).");
+  let h=ph("WhatsApp-Posteingang","Schritt 1 des roten Fadens: hier kommen Kundennachrichten an.");
+  h+=infoBox("Was passiert mit einer Nachricht?",'Kommt eine WhatsApp rein, liest <b>Claude</b> mit und macht einen <b>Entwurf</b> (z. B. ein Angebot). Status '+spill("verarbeitet")+' heißt: Claude ist fertig — der Entwurf liegt jetzt unter <b>Freigaben</b> und wartet auf Sie. <b>Nie</b> geht etwas ohne Ihren Klick raus. Über „→ Freigabe" springen Sie direkt dorthin.');
   if(!list.length){h+='<div class="card" style="padding:30px;text-align:center;color:var(--grau)">Noch keine Nachrichten.<br><small>Echte Anbindung: WhatsApp Business → Webhook. Testen ohne Account: Orchestrator-Endpunkt <code>/whatsapp/simulate</code>.</small></div>';$("#content").innerHTML=h;return;}
   h+='<div class="card">';
-  list.forEach(m=>{const ok=m.status==="verarbeitet";
-    h+='<div class="rowitem"><div class="ic">'+svg('<path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2z"/>',0).replace("<svg ",'<svg fill="var(--wa)" ')+'</div><div class="body"><b>'+esc(m.wa_from||"?")+'</b><small>'+esc((m.text||"").slice(0,90))+'</small></div><span class="badge '+(ok?"ok":"")+'">'+esc(m.status)+'</span>'+(m.approval_id?'<button class="btn btn-sm" data-go="freigaben" style="margin-left:8px">→ Freigabe</button>':'')+'</div>';});
+  list.forEach(m=>{
+    h+='<div class="rowitem"><div class="ic">'+svg('<path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2z"/>',0).replace("<svg ",'<svg fill="var(--wa)" ')+'</div><div class="body"><b>'+esc(m.wa_from||"?")+'</b><small>'+esc((m.text||"").slice(0,90))+'</small></div>'+spill(m.status||"")+(m.approval_id?'<button class="btn btn-sm" data-go="freigaben" style="margin-left:8px;flex-shrink:0">→ Freigabe</button>':'')+'</div>';});
   h+='</div>';$("#content").innerHTML=h;
   $$("#content [data-go]").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.go)));
 };
-function renderCL(){
-  let h="";T(DB.conv).forEach(c=>{const last=c.msgs[c.msgs.length-1];h+='<div class="conv'+(activeConv===c.id?' active':'')+'" data-id="'+c.id+'"><div class="av">'+ini(c.kunde)+'</div><div class="cb"><div class="tp"><b>'+esc(c.kunde)+'</b><span class="wn">'+esc(c.when)+'</span></div><small>'+(last.d==="out"?"Sie: ":"")+esc(last.x)+'</small></div>'+(c.unread?'<span class="unr"></span>':'')+'</div>';});
-  $("#cl").innerHTML=h;$$("#cl .conv").forEach(el=>el.addEventListener("click",()=>openC(el.dataset.id)));
-}
-function openC(id){const c=T(DB.conv).find(x=>x.id===id);if(!c)return;activeConv=id;c.unread=false;renderCL();$("#cAv").textContent=ini(c.kunde);$("#cName").textContent=c.kunde;$("#cSub").textContent="WhatsApp · "+c.status;const ex=store.sent[id]||[];$("#cScroll").innerHTML=c.msgs.concat(ex).map(m=>'<div class="wb '+(m.d==="out"?"out":"in")+'">'+esc(m.x)+'<span class="t">'+esc(m.t)+(m.d==="out"?" · Sie ✓✓":"")+'</span></div>').join("");$("#cScroll").scrollTop=$("#cScroll").scrollHeight;}
-function sendC(){if(!activeConv||!canWrite())return;const v=$("#cIn").value.trim();if(!v)return;store.sent[activeConv]=(store.sent[activeConv]||[]).concat([{d:"out",t:"jetzt",x:v}]);save();audit("WhatsApp-Antwort gesendet","Konversation "+activeConv);$("#cIn").value="";openC(activeConv);}
 
-async function renderFreigaben(titel,sub,statusFilter){
-  $("#content").innerHTML=whLoading(titel);
-  const items=await WH.approvals(statusFilter);
-  if(items===null){$("#content").innerHTML=whOffline(titel);return;}
-  let h=ph(titel,sub);
-  if(!items.length){h+='<div class="card" style="padding:30px;text-align:center;color:var(--grau)">Aktuell keine '+(statusFilter==="awaiting_approval"?"offenen":"")+' Vorgänge.</div>';$("#content").innerHTML=h;return;}
-  items.forEach(it=>{const p=it.payload||{};const offen=it.status==="awaiting_approval";
-    const brutto=typeof p.brutto==="number"?eur(p.brutto):"";
-    const pos=Array.isArray(p.positionen)?p.positionen:[];
-    h+='<div class="card" style="margin-bottom:11px"><div class="card-h"><h3 style="display:flex;align-items:center;gap:8px">'+badge(it.art)+'<span>'+esc(it.titel||"(ohne Titel)")+'</span></h3>'+(brutto?'<b class="bebas" style="font-size:17px">'+brutto+'</b>':'')+'</div>';
-    if(pos.length)h+='<div class="muted" style="font-size:12.5px;margin:2px 0 8px">'+pos.length+' Positionen · netto '+eur(p.netto||0)+'</div>';
-    if(p.ki_hinweis)h+='<div class="muted" style="font-size:12px;margin-bottom:9px">💬 '+esc(p.ki_hinweis)+'</div>';
-    if(offen&&canWrite())h+='<div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" data-appr="'+it.id+'">'+svg('<path d="M20 6L9 17l-5-5"/>',2)+'Freigeben</button><button class="btn btn-sm" data-rej="'+it.id+'">Ablehnen</button>'+(it.art==="angebot"?'<button class="btn btn-sm" data-rech="'+it.id+'" style="margin-left:auto">＋ Rechnung</button>':'')+'</div>';
-    else h+='<span class="badge '+(it.status==="approved"?"ok":"")+'">'+esc(it.status)+(it.result&&it.result.rechnungsnummer?" · "+it.result.rechnungsnummer:"")+'</span>';
-    h+='</div>';});
-  $("#content").innerHTML=h;
-  const reload=()=>renderFreigaben(titel,sub,statusFilter);
-  $$("#content [data-appr]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;await WH.decide(b.dataset.appr,"approve");audit("Freigegeben",b.dataset.appr);toast("✓ Freigegeben & ausgeführt");reload();}));
-  $$("#content [data-rej]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;await WH.decide(b.dataset.rej,"reject");toast("Abgelehnt");reload();}));
-  $$("#content [data-rech]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;const r=await WH.rechnungAusAngebot(b.dataset.rech);toast("Rechnungsentwurf erstellt");reload();}));
+const ART={angebot:"Angebot",rechnung:"Rechnung",kunde:"Neuer Kunde",termin:"Termin"};
+function artLabel(a){return ART[a]||(a||"Vorgang");}
+// Was ist nach der Freigabe konkret passiert? — als Klartext-Satz.
+function resultText(it){
+  const r=it.result||{};
+  if(it.status==="rejected")return "Abgelehnt — nichts ausgeführt, <b>keine</b> Rechnung erstellt.";
+  if(r.rechnungsnummer)return "Rechnung <b>"+esc(r.rechnungsnummer)+"</b> erstellt"+(r.pdf?" · PDF":"")+(r.datev?" + DATEV":"")+(r.gobd?" · GoBD-sicher archiviert":"")+".";
+  if(it.art==="termin")return "Termin im Kalender eingetragen.";
+  if(it.art==="kunde")return "Kunde in den Stammdaten angelegt.";
+  if(it.art==="angebot")return "Angebot freigegeben — bereit, daraus eine Rechnung zu erstellen.";
+  return "Freigegeben und ausgeführt.";
 }
-RENDER.orchestra=function(){renderFreigaben("Orchestra · KI-Vorgänge","Was die KI vorbereitet hat — Sie bestätigen, die KI handelt nie allein.","");};
-RENDER.freigaben=function(){renderFreigaben("Freigaben","Alle KI-Aktionen warten hier auf Ihre Freigabe (Human-in-the-Loop).","awaiting_approval");};
+function vorgangCard(it){
+  const p=it.payload||{},offen=it.status==="awaiting_approval";
+  const brutto=typeof p.brutto==="number"?p.brutto:(typeof it.result?.brutto==="number"?it.result.brutto:null);
+  const pos=Array.isArray(p.positionen)?p.positionen:[];
+  let h='<div class="vcard"><div class="vc-top"><span class="spill s-blue" style="background:var(--st-neutral-bg);color:var(--grau)">'+esc(artLabel(it.art))+'</span><div class="vc-t">'+esc(unmask(it.titel||artLabel(it.art)))+'</div>'+(brutto!=null?'<div class="vc-sum">'+eur(brutto)+'</div>':'')+'</div>';
+  if(pos.length)h+='<div class="vc-meta">'+pos.length+' Position'+(pos.length>1?'en':'')+' · netto '+eur(p.netto||0)+'</div>';
+  if(offen&&p.ki_hinweis)h+='<div class="vc-meta">💬 '+esc(unmask(p.ki_hinweis))+'</div>';
+  if(offen){
+    h+='<div style="margin:4px 0 2px">'+spill("awaiting_approval")+'</div>';
+    if(canWrite())h+='<div class="vact"><button class="btn btn-primary btn-sm" data-appr="'+it.id+'">'+svg('<path d="M20 6L9 17l-5-5"/>',2)+'Freigeben</button><button class="btn btn-sm" data-rej="'+it.id+'">Ablehnen</button>'+(it.art==="angebot"?'<button class="btn btn-sm" data-rech="'+it.id+'" style="margin-left:auto">＋ Rechnung</button>':'')+'</div>';
+    else h+='<div class="vc-meta" style="margin-top:6px">Nur Lese-Rechte — Freigabe durch den Meister.</div>';
+  } else {
+    const ok=it.status!=="rejected";
+    h+='<div class="vresult"'+(ok?'':' style="background:var(--st-red-bg);color:var(--st-red)"')+'><span class="vr-ic">'+svg(ok?'<path d="M20 6L9 17l-5-5"/>':'<path d="M18 6L6 18M6 6l12 12"/>',2.2)+'</span><div>'+resultText(it)+'</div></div>';
+  }
+  return h+'</div>';
+}
+async function renderVorgaenge(focus){
+  const titel=focus==="freigaben"?"Freigaben":"Orchestra · KI-Vorgänge";
+  $("#content").innerHTML=whLoading(titel);
+  const all=await WH.approvals();
+  if(all===null){$("#content").innerHTML=whOffline(titel);return;}
+  const pend=all.filter(x=>x.status==="awaiting_approval");
+  const done=all.filter(x=>x.status!=="awaiting_approval").sort((a,b)=>(b.updated_at||0)-(a.updated_at||0));
+  const sub=focus==="freigaben"
+    ?"Hier entscheiden Sie. Claude bereitet alles vor — nichts passiert ohne Ihren Klick."
+    :"Der komplette Ablauf: was Claude erkannt, vorbereitet und nach Ihrer Freigabe ausgeführt hat.";
+  let h=ph(titel,sub);
+  h+=flowSteps(focus==="freigaben"?2:1);
+  h+=infoBox("Wie funktioniert das? Der rote Faden in 5 Schritten",
+    '<b>Jeder Vorgang läuft immer gleich ab:</b>'
+    +'<ol><li><b>📩 Anfrage</b> kommt rein (WhatsApp, Telefon, Kundenportal).</li>'
+    +'<li><b>🧠 Claude</b> liest mit, erkennt was zu tun ist und legt einen <b>Entwurf</b> an (Angebot, Rechnung, Termin).</li>'
+    +'<li><b>✅ Sie geben frei</b> oder lehnen ab — Claude handelt <b>nie</b> allein.</li>'
+    +'<li><b>⚙️ Nach der Freigabe</b> führt das System es aus, z. B. die Rechnung schreiben.</li>'
+    +'<li><b>🧾 Das Ergebnis</b> ist sofort sichtbar: Rechnungsnummer, PDF und DATEV — GoBD-sicher archiviert.</li></ol>'
+    +'Deshalb „verschwindet" ein Vorgang nach dem Freigeben nicht — er wandert nach unten zu <b>„Erledigt"</b> und zeigt dort genau, was passiert ist.',
+    focus==="freigaben");
+  h+='<div class="vsplit">'+svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',1.9).replace("<svg ",'<svg style="width:15px;height:15px;color:var(--st-amber)" ')+'Wartet auf Ihre Freigabe <span class="vs-n">'+pend.length+'</span></div>';
+  if(!pend.length)h+='<div class="card" style="padding:22px;text-align:center;color:var(--grau)">✓ Alles freigegeben — gerade nichts offen.</div>';
+  else pend.forEach(it=>h+=vorgangCard(it));
+  if(done.length){
+    const show=done.slice(0,12);
+    h+='<div class="vsplit">'+svg('<path d="M20 6L9 17l-5-5"/>',2.2).replace("<svg ",'<svg style="width:15px;height:15px;color:var(--st-green)" ')+'Erledigt — von Claude ausgeführt <span class="vs-n">'+done.length+'</span></div>';
+    show.forEach(it=>h+=vorgangCard(it));
+    if(done.length>show.length)h+='<div class="vc-meta" style="text-align:center;margin-top:4px">… und '+(done.length-show.length)+' weitere erledigte Vorgänge</div>';
+  }
+  $("#content").innerHTML=h;
+  const reload=()=>renderVorgaenge(focus);
+  $$("#content [data-appr]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;b.textContent="…";const res=await WH.decide(b.dataset.appr,"approve");audit("Freigegeben",b.dataset.appr);const rn=res&&res.result&&res.result.rechnungsnummer;toast(rn?("✓ Freigegeben — Rechnung "+rn+" erstellt"):"✓ Freigegeben & ausgeführt");refreshCounts(true);reload();}));
+  $$("#content [data-rej]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;await WH.decide(b.dataset.rej,"reject");audit("Abgelehnt",b.dataset.rej);toast("Abgelehnt — nichts ausgeführt");refreshCounts(true);reload();}));
+  $$("#content [data-rech]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;await WH.rechnungAusAngebot(b.dataset.rech);toast("Rechnungsentwurf erstellt — wartet auf Ihre Freigabe");refreshCounts(true);reload();}));
+}
+RENDER.orchestra=function(){renderVorgaenge("orchestra");};
+RENDER.freigaben=function(){renderVorgaenge("freigaben");};
 function renderTasks(title,sub,list,banner){
   let h=ph(title,sub);
   if(banner)h+='<div class="task" style="border-left-color:var(--accent);background:linear-gradient(135deg,var(--ink),#16202c);color:#fff;border-color:transparent"><div style="display:flex;align-items:center;gap:14px"><div class="s" style="background:rgba(255,255,255,.1)">'+svg('<circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3"/>',1.8).replace('stroke="currentColor"','stroke="#FBAF3A"')+'</div><div style="flex:1"><b style="font-size:16px">Heute Nacht: Anfragen + Belege analysiert</b><div style="color:#aeb4be;font-size:13px">Teile-Bedarfe, 1 Rechnungsentwurf, Dokumenten-Ablage und ein DATEV-Buchungsstapel vorbereitet.</div></div><div style="font-size:12px;color:#cfd3d8;display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:var(--gruen)"></span>Claude aktiv</div></div></div>';
@@ -1401,23 +1541,72 @@ RENDER.werkzeuge=async function(){
   $("#content").innerHTML=whLoading("Werkzeuge");
   const list=await WH.werkstatt("werkzeuge");
   if(list===null){$("#content").innerHTML=whOffline("Werkzeuge");return;}
-  let h=ph("Werkzeuge","Eigener Bestand mit Verfügbarkeit/Kalibrierung — echt gespeichert.",canWrite()?'<button class="btn btn-primary" id="addW">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Werkzeug</button>':"");
-  const stB=s=>'<span class="badge '+(s==="verfuegbar"?"ok":s==="ausgeliehen"?"warn":"")+'">'+esc((s||"").replace(/_/g," "))+'</span>';
-  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Werkzeug</th><th>Ort</th><th>Kalibriert bis</th><th>Status</th><th></th></tr></thead><tbody>';
-  list.forEach(w=>{h+='<tr><td><b>'+esc(w.name||"–")+'</b></td><td class="muted">'+esc(w.ort||"–")+'</td><td class="muted">'+esc(w.kalibriert_bis||"–")+'</td><td>'+stB(w.status)+'</td><td style="text-align:right">'+(canWrite()?'<button class="btn btn-sm" data-del="'+w.id+'">×</button>':'')+'</td></tr>';});
-  h+='</tbody></table></div>';$("#content").innerHTML=h;
+  let h=ph("Werkzeuge","Eigener Bestand mit Verfügbarkeit & Kalibrierung — echt gespeichert.",canWrite()?'<button class="btn btn-primary" id="addW">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Werkzeug</button>':"");
+  h+=infoBox("Verfügbarkeit auf einen Blick",spill("verfuegbar")+' = frei einsetzbar, '+spill("in_benutzung")+' = gerade im Einsatz, '+spill("ausgeliehen")+' = an eine Partner-Werkstatt verliehen. Verliehenes Werkzeug sehen Sie auch auf der <b>Werkstätten-Karte</b>.');
+  h+='<div class="card">';
+  if(!list.length)h+='<div class="rowitem"><div class="body"><small>Noch kein Werkzeug erfasst.</small></div></div>';
+  list.forEach(w=>{const meta=[w.ort,w.kalibriert_bis?("kalibriert bis "+w.kalibriert_bis):""].filter(Boolean).join(" · ");
+    h+='<div class="rowitem"><div class="ic">'+svg('<path d="M3 7h4l2-2 4 4-2 2-4-4z"/><path d="M14 7l7 7-2 2-7-7"/><circle cx="6.5" cy="17.5" r="2.5"/>')+'</div><div class="body"><b>'+esc(w.name||"–")+'</b><small>'+esc(meta||"—")+'</small></div>'+spill(w.status||"verfuegbar")+(canWrite()?'<button class="btn btn-sm" data-del="'+w.id+'" style="margin-left:8px;flex-shrink:0">×</button>':'')+'</div>';});
+  h+='</div>';$("#content").innerHTML=h;
   $("#addW")&&$("#addW").addEventListener("click",async()=>{const name=prompt("Werkzeug-Name?");if(!name)return;await WH.wkAdd("werkzeuge",{name,status:"verfuegbar",ort:""});toast("Werkzeug angelegt");RENDER.werkzeuge();});
   $$("#content [data-del]").forEach(b=>b.addEventListener("click",async()=>{await WH.del("/werkstatt/werkzeuge/"+b.dataset.del);toast("Gelöscht");RENDER.werkzeuge();}));
 };
 
-RENDER.werkstaetten=function(){
-  let h=ph("Werkstätten – Karte","Standorte im WERKHOF-Netzwerk mit verfügbarem Spezialwerkzeug. DSGVO-konform: OpenStreetMap, kein Google.");
-  h+='<div class="map" id="map"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M10 70 Q30 50 50 65 T90 55" stroke="rgba(20,109,171,.25)" stroke-width="1" fill="none"/><path d="M20 20 Q40 40 60 25 T95 35" stroke="rgba(20,109,171,.18)" stroke-width="1" fill="none"/></svg><div class="map-legend"><span><i style="background:var(--gruen)"></i>teilt Werkzeug</span><span><i style="background:var(--accent)"></i>Standort</span></div></div>';
-  h+='<div style="margin-top:16px" id="wsList"></div>';$("#content").innerHTML=h;
-  const map=$("#map");DB.werkstaetten.forEach(w=>{const el=document.createElement("div");el.className="mk"+(w.tools.length?" has":"");el.style.left=w.x+"%";el.style.top=w.y+"%";el.innerHTML='<div class="pin"><span>'+w.tools.length+'</span></div><div class="lbl">'+esc(w.name)+'</div>';el.addEventListener("click",()=>toast(w.name+": "+w.tools.join(", ")));map.appendChild(el);});
-  let l='<div class="card"><div class="card-h"><h3>'+T(DB.werkstaetten).length+' Werkstätten</h3></div>';
-  DB.werkstaetten.forEach(w=>{l+='<div class="rowitem"><div class="ic">'+svg('<path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>')+'</div><div class="body"><b>'+esc(w.name)+'</b><small>'+esc(w.ort)+' · '+(w.tools.length?esc(w.tools.join(", ")):"kein Sharing-Werkzeug")+'</small></div>'+(w.tools.length?'<span class="badge ok">'+w.tools.length+' teilbar</span>':'')+'</div>';});
+// Leaflet erst bei Bedarf laden (Two-Click), mit SRI-Integritätsprüfung.
+let _leafletP=null;
+function loadLeaflet(){
+  if(_leafletP)return _leafletP;
+  _leafletP=new Promise((res,rej)=>{
+    const css=document.createElement("link");
+    css.rel="stylesheet";css.href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    css.integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";css.crossOrigin="";
+    document.head.appendChild(css);
+    const s=document.createElement("script");
+    s.src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    s.integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";s.crossOrigin="";
+    s.onload=()=>res(window.L);s.onerror=()=>rej(new Error("leaflet"));
+    document.head.appendChild(s);
+  });
+  return _leafletP;
+}
+RENDER.werkstaetten=async function(){
+  $("#content").innerHTML=whLoading("Werkstätten");
+  const list=await WH.werkstatt("werkstaetten");
+  if(list===null){$("#content").innerHTML=whOffline("Werkstätten");return;}
+  const teilbar=list.filter(w=>(w.tools||[]).length).length;
+  let h=ph("Werkstätten – Karte","Standorte im WERKHOF-Netzwerk mit verfügbarem Spezialwerkzeug. DSGVO-konform über OpenStreetMap — die Karte lädt erst nach Ihrem Klick, vorher keine Daten an Dritte.");
+  h+='<div class="map" id="map"><div class="map-consent" id="mapConsent">'
+    +'<div class="mc-ic">'+svg('<path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',1.6)+'</div>'
+    +'<p><b>Karte aus Datenschutzgründen nicht automatisch geladen.</b><br>Beim Laden werden Kartenkacheln von OpenStreetMap (openstreetmap.org) abgerufen — erst nach Ihrer Einwilligung.</p>'
+    +'<button class="btn btn-primary" id="mapLoad">'+svg('<path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',2)+'Karte laden</button>'
+    +'<div class="mc-note">© OpenStreetMap-Mitwirkende</div>'
+    +'</div></div>';
+  h+='<div class="map-cap"><i></i>Grüne Markierung = Werkstatt teilt Spezialwerkzeug im Netzwerk.</div>';
+  h+='<div style="margin-top:16px" id="wsList"></div>';
+  $("#content").innerHTML=h;
+  let l='<div class="card"><div class="card-h"><h3>'+list.length+' Werkstätten</h3>'+(teilbar?'<span class="badge ok">'+teilbar+' teilen Werkzeug</span>':'')+'</div>';
+  list.forEach(w=>{const tools=w.tools||[];l+='<div class="rowitem"><div class="ic">'+svg('<path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>')+'</div><div class="body"><b>'+esc(w.name||"–")+'</b><small>'+esc(w.ort||"")+' · '+(tools.length?esc(tools.join(", ")):"kein Sharing-Werkzeug")+'</small></div>'+(tools.length?'<span class="badge ok">'+tools.length+' teilbar</span>':'')+'</div>';});
   l+='</div>';$("#wsList").innerHTML=l;
+  const btn=$("#mapLoad");
+  btn&&btn.addEventListener("click",async()=>{
+    btn.disabled=true;btn.textContent="Lade Karte …";
+    let L;try{L=await loadLeaflet();}catch(e){toast("Karte nicht verfügbar (offline?)");btn.disabled=false;btn.textContent="Erneut versuchen";return;}
+    const pts=list.filter(w=>typeof w.lat==="number"&&typeof w.lon==="number");
+    const mc=$("#mapConsent");if(mc)mc.remove();
+    const map=L.map("map",{scrollWheelZoom:false});
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    const ll=[];
+    pts.forEach(w=>{const tools=w.tools||[];const green=tools.length>0;
+      const ic=L.divIcon({className:"",html:'<div class="lpin'+(green?" has":"")+'"><span>'+tools.length+'</span></div>',iconSize:[30,30],iconAnchor:[15,30],popupAnchor:[0,-28]});
+      L.marker([w.lat,w.lon],{icon:ic}).addTo(map)
+        .bindPopup('<b>'+esc(w.name||"")+'</b><br><span style="color:#777">'+esc(w.ort||"")+'</span>'+(tools.length?'<br>'+tools.map(t=>esc(t)).join("<br>"):'<br><i>kein Sharing-Werkzeug</i>'));
+      ll.push([w.lat,w.lon]);
+    });
+    if(ll.length>1)map.fitBounds(ll,{padding:[40,40]});
+    else if(ll.length===1)map.setView(ll[0],12);
+    else map.setView([52.3,10.5],9);
+    setTimeout(()=>map.invalidateSize(),60);
+  });
 };
 
 RENDER.lieferanten=async function(){
@@ -1659,9 +1848,10 @@ RENDER.einstellungen=function(){
   $("#esTenant").addEventListener("click",()=>$("#tenantPill").click());
   $("#esTheme").addEventListener("click",()=>$("#themeBtn").click());
   $$("#content [data-notif]").forEach(s=>s.addEventListener("click",()=>{if(!canWrite()){toast("Nur Lese-Rechte");return;}const k=s.dataset.notif;store.notif[k]=!s.classList.contains("on");s.classList.toggle("on",store.notif[k]);save();audit("Benachrichtigung "+(store.notif[k]?"an":"aus"),k);}));
-  $("#exK").addEventListener("click",()=>exportSheet("kunden","Kunden",["Name","Telefon","Fahrzeug","Kennzeichen","Status","Offen"],T(DB.kunden).map(k=>[k.name,k.tel,k.fzg,k.kennz,k.status,k.offen])));
-  $("#exA").addEventListener("click",()=>exportSheet("auftraege","Aufträge",["Titel","Kunde","Fahrzeug","Status","Summe €"],T(DB.auftraege).map(a=>[a.titel,a.kunde,a.fzg,a.status,a.summe.toFixed(2)])));
-  $("#exR").addEventListener("click",()=>exportSheet("rechnungen","Rechnungen",["Nr.","Kunde","Betrag €","Status"],T(DB.rechnungen).map(r=>[r.id,r.kunde,r.betrag.toFixed(2),rechSt(r)])));
+  // Daten-Export aus ECHTEN Orchestrator-Daten (kein Demo-Dump).
+  $("#exK").addEventListener("click",async()=>{const ks=await WH.kunden();if(!ks){toast("Orchestrator nicht erreichbar");return;}exportSheet("kunden","Kunden",["Kundennr.","Name","Typ"],ks.filter(k=>k.name).map(k=>[k.kundennummer||"",k.name,k.typ||""]));});
+  $("#exA").addEventListener("click",async()=>{const as=await WH.werkstatt("auftraege");if(!as){toast("Orchestrator nicht erreichbar");return;}exportSheet("auftraege","Aufträge",["Titel","Kunde","Fahrzeug","Status","Summe €"],as.map(a=>[a.titel||"",a.kunde||"",a.fzg||"",a.status||"",(typeof a.summe==="number"?a.summe.toFixed(2):"")]));});
+  $("#exR").addEventListener("click",async()=>{const rs=await WH.rechnungen();if(!rs){toast("Orchestrator nicht erreichbar");return;}exportSheet("rechnungen","Rechnungen",["Nr.","Betrag €","Datum"],rs.map(r=>[r.nummer||"",(typeof r.brutto==="number"?r.brutto.toFixed(2):""),r.created_at?new Date(r.created_at*1000).toLocaleDateString("de-DE"):""]));});
 };
 RENDER.kundenportal=function(){
   // Theme an WERKHOF angleichen (Portal liest kfz_bw beim Boot, gleiche Origin)
@@ -1681,6 +1871,7 @@ $("#search").addEventListener("input",e=>{const q=e.target.value;if(q&&CUR!=="ku
   buildSidebar();buildTabs();
   const start=(location.hash||"").slice(1);
   nav(PANELS.some(p=>p.id===start)?start:"dashboard");
+  refreshCounts(true);
   window.addEventListener("hashchange",()=>{const id=(location.hash||"").slice(1);if(id&&id!==CUR&&PANELS.some(p=>p.id===id))nav(id);});
   if("serviceWorker"in navigator&&location.protocol!=="file:"){navigator.serviceWorker.register("sw.js").catch(()=>{});}
 })();
