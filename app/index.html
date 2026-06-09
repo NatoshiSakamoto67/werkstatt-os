@@ -1472,8 +1472,10 @@ RENDER.claude=function(){
   $("#hChips").innerHTML=chips.map(c=>'<button class="chip">'+svg('<path d="M9 18l6-6-6-6"/>',2)+esc(c)+'</button>').join("");
   $$("#hChips .chip").forEach((b,i)=>b.addEventListener("click",()=>askClaude(chips[i])));
   const ta=$("#hIn");ta.addEventListener("input",()=>{ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight,120)+"px";});
-  ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askClaude(ta.value);}});
-  $("#hSend").addEventListener("click",()=>askClaude(ta.value));
+  // Eingabefeld SOFORT leeren (vor dem Senden), damit nichts stehen bleibt / doppelt rausgeht.
+  const fire=()=>{const v=ta.value.trim();if(!v)return;ta.value="";ta.style.height="auto";askClaude(v);};
+  ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();fire();}});
+  $("#hSend").addEventListener("click",fire);
   // Live-Status der Gateway-Leiste aus dem Orchestrator (ehrlich: Claude vs. Demo)
   (async()=>{const gw=$("#hGw");if(!gw)return;try{
     const h=await(await fetch(WERKHOF_API+"/health")).json();
@@ -1491,8 +1493,10 @@ function claudeAnswer(q){
   if(/termin/.test(q))return{a:"Heute: 08:00 Bremsen-Check (Mustermann), 09:30 Klimaservice (Köhler, <b>angefragt</b>), 11:00 HU/AU (Bauer), 13:30 Reifen (Wagner). Soll ich 09:30 bestätigen?",s:["Termine"]};
   return{a:"Ich bin Claude, Ihr Werkstatt-Assistent. Ich kann Werkzeug-Verfügbarkeit prüfen, Nachrichten auswerten, Reparaturleitfäden zeigen und Aufträge vorbereiten – schreibende Aktionen immer mit Ihrer Freigabe. <i>(Demo: Antworten lokal. Im Vollausbau über das EU-KI-Gateway.)</i>",s:[]};
 }
-// Orchestra-Backend (Claude-Gehirn). Override per window.WERKHOF_API möglich.
-const WERKHOF_API = (window.WERKHOF_API || "http://127.0.0.1:8200").replace(/\/$/,"");
+// Orchestra-Backend (Claude-Gehirn): standardmäßig SAME-ORIGIN (relativ).
+// Die App wird vom Orchestrator unter /os/app/ ausgeliefert → /claude/chat ist
+// dann same-origin erreichbar (kein CORS/Mixed-Content). Override per window.WERKHOF_API.
+const WERKHOF_API = (window.WERKHOF_API || "").replace(/\/$/,"");
 async function askClaude(q){
   q=(q||"").trim();if(!q)return;
   const sc=$("#hScroll");if(sc.querySelector(".welcome"))sc.innerHTML="";
