@@ -1320,12 +1320,17 @@ RENDER.auftraege=async function(){
   $$("#content [data-del]").forEach(b=>b.addEventListener("click",async()=>{await WH.del("/werkstatt/auftraege/"+b.dataset.del);toast("Gelöscht");RENDER.auftraege();}));
 };
 
-RENDER.termine=function(){
-  let h=ph("Termine","Anfragen bestätigen oder absagen. Termin-Konfigurator für Kunden liegt auf der Website.");
-  h+='<div class="card"><div class="card-h"><h3>Heute & anstehend</h3></div>';
-  T(DB.termine).forEach(t=>{h+='<div class="rowitem"><div class="ic"><b class="bebas" style="font-size:14px">'+esc(t.zeit)+'</b></div><div class="body"><b>'+esc(t.titel)+'</b><small>'+esc(t.kunde)+' · '+esc(t.fzg)+'</small></div>'+badge(t.status)+(t.status==="angefragt"&&canWrite()?'<button class="btn btn-primary btn-sm" data-ok="'+t.id+'" style="margin-left:10px">Bestätigen</button>':"")+'</div>';});
+RENDER.termine=async function(){
+  $("#content").innerHTML=whLoading("Termine");
+  const list=await WH.werkstatt("termine");
+  if(list===null){$("#content").innerHTML=whOffline("Termine");return;}
+  let h=ph("Termine","Heutige & anstehende Termine — echt gespeichert. Anfragen bestätigen.",canWrite()?'<button class="btn btn-primary" id="addT">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Termin</button>':"");
+  h+='<div class="card">';
+  if(!list.length)h+='<div class="rowitem"><div class="body"><small>Keine Termine.</small></div></div>';
+  list.forEach(t=>{h+='<div class="rowitem"><div class="ic"><b class="bebas" style="font-size:14px">'+esc(t.zeit||"--")+'</b></div><div class="body"><b>'+esc(t.titel||"–")+'</b><small>'+esc(t.kunde||"")+(t.fzg?' · '+esc(t.fzg):'')+'</small></div>'+badge(t.status||"")+(t.status==="angefragt"&&canWrite()?'<button class="btn btn-primary btn-sm" data-ok="'+t.id+'" style="margin-left:8px;flex-shrink:0">OK</button>':'')+'</div>';});
   h+='</div>';$("#content").innerHTML=h;
-  $$("#content [data-ok]").forEach(b=>b.addEventListener("click",()=>{const t=DB.termine.find(x=>x.id===b.dataset.ok);t.status="bestätigt";audit("Termin bestätigt",t.titel);RENDER.termine();toast("Termin bestätigt");}));
+  $("#addT")&&$("#addT").addEventListener("click",async()=>{const titel=prompt("Termin (Leistung)?");if(!titel)return;const zeit=prompt("Uhrzeit (z.B. 10:00)?")||"";const kunde=prompt("Kunde?")||"";await WH.wkAdd("termine",{titel,zeit,kunde,fzg:"",status:"angefragt"});toast("Termin angelegt");RENDER.termine();});
+  $$("#content [data-ok]").forEach(b=>b.addEventListener("click",async()=>{const t=list.find(x=>x.id===b.dataset.ok);if(t){const{id,...rest}=t;await WH.del("/werkstatt/termine/"+id);await WH.wkAdd("termine",{...rest,status:"bestaetigt"});}toast("Bestätigt");RENDER.termine();}));
 };
 
 let activeConv=null;
@@ -1445,20 +1450,34 @@ RENDER.rechnungen=async function(){
   h+='</tbody></table></div>';$("#content").innerHTML=h;
 };
 
-RENDER.dokumente=function(){
-  let h=ph("Dokumente","Servicehefte, HU-Berichte, Rechnungen – je Fahrzeug/Kunde.",canWrite()?'<button class="btn btn-primary" onclick="toast(\'Demo: Upload (FileReader→localStorage)\')">'+svg('<path d="M12 3v12M8 7l4-4 4 4M4 21h16"/>',2)+'Hochladen</button>':"");
-  h+='<div class="card">';T(DB.dokumente).forEach(d=>{h+='<div class="rowitem"><div class="ic">'+svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>')+'</div><div class="body"><b>'+esc(d.name)+'</b><small>'+esc(d.kind)+' · '+esc(d.fzg)+'</small></div><button class="btn btn-sm" onclick="toast(\'Demo: Dokument öffnen\')">öffnen</button></div>';});
+RENDER.dokumente=async function(){
+  $("#content").innerHTML=whLoading("Dokumente");
+  const list=await WH.werkstatt("dokumente");
+  if(list===null){$("#content").innerHTML=whOffline("Dokumente");return;}
+  let h=ph("Dokumente","Servicehefte, HU-Berichte, Belege — echt gespeichert.",canWrite()?'<button class="btn btn-primary" id="addDok">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Dokument</button>':"");
+  h+='<div class="card">';
+  if(!list.length)h+='<div class="rowitem"><div class="body"><small>Noch keine Dokumente.</small></div></div>';
+  list.forEach(d=>{h+='<div class="rowitem"><div class="ic">'+svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>')+'</div><div class="body"><b>'+esc(d.name||"–")+'</b><small>'+esc(d.kind||"")+(d.fzg?' · '+esc(d.fzg):'')+'</small></div>'+(canWrite()?'<button class="btn btn-sm" data-del="'+d.id+'" style="flex-shrink:0">×</button>':'')+'</div>';});
   h+='</div>';$("#content").innerHTML=h;
+  $("#addDok")&&$("#addDok").addEventListener("click",async()=>{const name=prompt("Dokument-Name?");if(!name)return;const kind=prompt("Art (Serviceheft/HU/Rechnung)?")||"";await WH.wkAdd("dokumente",{name,kind,fzg:""});toast("Dokument angelegt");RENDER.dokumente();});
+  $$("#content [data-del]").forEach(b=>b.addEventListener("click",async()=>{await WH.del("/werkstatt/dokumente/"+b.dataset.del);toast("Gelöscht");RENDER.dokumente();}));
 };
 
-RENDER.buchhaltung=function(){
-  const offen=T(DB.rechnungen).filter(r=>rechSt(r)==="offen").length,bez=T(DB.rechnungen).filter(r=>rechSt(r)==="bezahlt").reduce((s,r)=>s+r.betrag,0);
-  let h=ph("Buchhaltung","Rechnungen, Export und Anbindung an Ihre Software.");
-  h+='<div class="grid g3" style="margin-bottom:15px"><div class="card"><div class="card-h"><h3>Anbindung</h3><span class="badge warn">nicht verbunden</span></div><p style="color:var(--grau);font-size:13px;margin-bottom:12px">lexoffice · sevDesk · DATEV verbinden → Rechnungen fließen automatisch.</p>'+(canWrite()?'<button class="btn btn-primary btn-sm" onclick="toast(\'Demo: OAuth-Connector der Buchhaltungssoftware\')">Software verbinden</button>':'')+'</div>'+kpi("o",'<path d="M6 2h9l5 5v13H6z"/>',offen,"offene Rechnungen")+kpi("g",'<path d="M20 6L9 17l-5-5"/>',eur(bez),"bezahlt (Juni)")+'</div>';
-  h+='<div class="card"><div class="card-h"><h3>Letzte Rechnungen</h3><button class="btn btn-sm" id="datev">'+svg('<path d="M12 3v12M8 11l4 4 4-4M4 21h16"/>',1.8)+'Export (DATEV/CSV/Excel/PDF)</button></div><table class="tbl"><thead><tr><th>Nr.</th><th>Kunde</th><th>Betrag</th><th>Status</th></tr></thead><tbody>';
-  T(DB.rechnungen).forEach(r=>{h+='<tr><td><b>'+esc(r.id)+'</b></td><td class="muted">'+esc(r.kunde)+'</td><td style="font-weight:700">'+eur(r.betrag)+'</td><td>'+badge(rechSt(r))+'</td></tr>';});
+RENDER.buchhaltung=async function(){
+  $("#content").innerHTML=whLoading("Buchhaltung");
+  const list=await WH.rechnungen();
+  if(list===null){$("#content").innerHTML=whOffline("Buchhaltung");return;}
+  const sum=list.reduce((s,r)=>s+(r.brutto||0),0);
+  let h=ph("Buchhaltung","Echte Rechnungen + DATEV-Export (GoBD). Konten mit Steuerberater abstimmen.");
+  h+='<div class="grid g3" style="margin-bottom:15px">'
+    +kpi("b",'<path d="M6 2h9l5 5v13H6z"/>',list.length,"Rechnungen")
+    +kpi("g",'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',eur(sum),"Summe brutto")
+    +'<div class="card"><div class="card-h"><h3>DATEV</h3><span class="badge ok">EXTF bereit</span></div><p style="color:var(--grau);font-size:13px">Jede Rechnung: PDF + DATEV-Buchungsstapel (cp1252) — pro Rechnung herunterladbar.</p></div>'
+    +'</div>';
+  if(!list.length){h+='<div class="card" style="padding:24px;text-align:center;color:var(--grau)">Noch keine Rechnungen.</div>';$("#content").innerHTML=h;return;}
+  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Nr.</th><th>Betrag</th><th>DATEV</th></tr></thead><tbody>';
+  list.forEach(r=>{h+='<tr><td><b>'+esc(r.nummer)+'</b></td><td style="font-weight:700">'+eur(r.brutto||0)+'</td><td><a class="btn btn-sm" href="'+WERKHOF_API+'/faktura/'+r.approval_id+'/datev" target="_blank" rel="noopener">EXTF</a></td></tr>';});
   h+='</tbody></table></div>';$("#content").innerHTML=h;
-  $("#datev").addEventListener("click",()=>exportSheet("buchhaltung-datev","Buchhaltung (DATEV)",["Beleg-Nr.","Kunde","Betrag €","Status"],T(DB.rechnungen).map(r=>[r.id,r.kunde,r.betrag.toFixed(2),rechSt(r)])));
 };
 
 const WISSEN=[
@@ -1512,12 +1531,18 @@ RENDER.wissen=function(){
   renderBody("");
 };
 
-RENDER.automatisierung=function(){
-  let h=ph("Automatisierung","Eigene leichte Workflow-Engine (kein n8n): Trigger → Plan → Freigabe-Queue. Schreibende/sendende Aktionen brauchen immer eine Freigabe.");
-  h+=demoBanner("Demo · Regeln laufen im Vollausbau über agent-core (ARQ-Cron + Plan + Human-Gate).");
-  T(DB.rules).forEach(r=>{const on=store.rules[r.id]!==undefined?store.rules[r.id]:r.on;h+='<div class="rule"><div class="ri">'+svg(r.trig.indexOf("cron")>-1?'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>':'<path d="M13 2L3 14h7l-1 8 10-12h-7z"/>',1.8)+'</div><div class="rb"><b>'+esc(r.titel)+'</b><small>'+esc(r.desc)+'</small><div style="margin-top:6px"><span class="badge muted" style="font-size:10.5px">'+esc(r.trig)+'</span> <span class="act-badge '+r.cls+'">'+r.cls+'</span></div></div><div class="sw'+(on?' on':'')+'" data-r="'+r.id+'" role="switch" aria-checked="'+on+'"></div></div>';});
-  h+='<button class="btn" style="margin-top:6px" onclick="toast(\'Demo: neue Regel anlegen\')">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Regel hinzufügen</button>';$("#content").innerHTML=h;
-  $$("#content .sw").forEach(s=>s.addEventListener("click",()=>{if(!canWrite()){toast("Nur Lese-Rechte");return;}const id=s.dataset.r,cur=s.classList.toggle("on");store.rules[id]=cur;save();audit("Automatisierung "+(cur?"aktiviert":"deaktiviert"),id);}));
+RENDER.automatisierung=async function(){
+  $("#content").innerHTML=whLoading("Automatisierung");
+  const health=await WH.health();
+  let h=ph("Automatisierung","Aktive, echte Automatisierungen — schreibende Aktionen immer mit Freigabe (Human-in-the-Loop).");
+  const item=(on,titel,desc)=>'<div class="rule"><div class="ri">'+svg('<path d="M13 2L3 14h7l-1 8 10-12h-7z"/>',1.8)+'</div><div class="rb"><b>'+esc(titel)+'</b><small>'+esc(desc)+'</small></div><div class="sw'+(on?' on':'')+'" style="pointer-events:none"></div></div>';
+  h+=item(health&&health.tmerik==="live","tmERIK-Anbindung","Kunden/Fahrzeuge/HU live · Status: "+((health&&health.tmerik)||"?"));
+  h+=item(health&&health.claude==="live","KI-Assistent (Claude)","Versteht Anfragen, erstellt Angebote/Rechnungen → Freigabe-Queue");
+  h+=item(true,"WhatsApp → Claude → Freigabe","Eingehende Nachricht wird ausgewertet, Angebot vorbereitet (Posteingang)");
+  h+=item(true,"Angebot → Rechnung → PDF/DATEV","Bei Freigabe einer Rechnung: GoBD-PDF + DATEV-Export automatisch");
+  h+=item(true,"EuroShield-Routing","EU-Default, US fail-closed · PII-Maskierung vor jeder KI-Verarbeitung");
+  h+='<p style="color:var(--grau);font-size:12.5px;margin-top:14px">Diese Automatisierungen laufen echt über den Orchestrator. Weitere Regeln (z. B. HU-Erinnerungen per WhatsApp) folgen.</p>';
+  $("#content").innerHTML=h;
 };
 
 RENDER.claude=function(){
