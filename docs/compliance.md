@@ -44,7 +44,7 @@
 | Kundenportal | Self-Service | Kunden | Login-/Sitzungsdaten | IONOS | nein | Kontodauer | Art. 6 I b |
 | Service-Erinnerung (TÜV/HU) | Kundenbindung/Service | Kunden | Kontakt, Fahrzeug, Fälligkeit | IONOS, 360dialog/Meta | (WA: ja) | bis Widerspruch | Art. 6 I b/f |
 | WhatsApp-Kommunikation | Kontakt | Kunden | Tel., Nachrichtinhalt | 360dialog, Meta | ja (DPF/SCC) | bis Erledigung | Art. 6 I b |
-| KI-Assistent (Hermes) | Effizienz | Kunden (pseudonym.) | maskierte Vorgangsdaten | AWS-Bedrock-EU | nein (EU) | keine Speicherung b. Provider | Art. 6 I f |
+| KI-Assistent (Claude) | Effizienz | Kunden (pseudonym.) | maskierte Vorgangsdaten | AWS-Bedrock-EU | nein (EU) | keine Speicherung b. Provider | Art. 6 I f |
 
 > Hinweis: PII (Name/Tel/IBAN) wird vor KI-Aufrufen pseudonymisiert/tokenisiert (PII-Service).
 

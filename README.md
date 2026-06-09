@@ -1,6 +1,6 @@
 # WERKHOF — Das Betriebssystem für die Werkstatt
 
-White-Label-Werkstatt-OS (Prototyp). Bündelt Aufträge, WhatsApp, KI-Assistent **Hermes**,
+White-Label-Werkstatt-OS (Prototyp). Bündelt Aufträge, WhatsApp, KI-Assistent **Claude**,
 Werkzeug-Sharing, Rechnungen, Buchhaltung, Wissens­basis und ein **Kundenportal** in einer App.
 Pilot/Erstkunde: **KFZ Gorski**, Braunschweig. Pro Werkstatt umbrandbar (Multi-Tenant).
 

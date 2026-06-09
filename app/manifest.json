@@ -1,7 +1,7 @@
 {
   "name": "WERKHOF – Werkstatt-OS",
   "short_name": "WERKHOF",
-  "description": "Das Betriebssystem für die Werkstatt: Aufträge, WhatsApp, KI-Assistent Hermes, Werkzeug-Sharing.",
+  "description": "Das Betriebssystem für die Werkstatt: Aufträge, WhatsApp, KI-Assistent Claude, Werkzeug-Sharing.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -16,7 +16,7 @@
     { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "KI-Bot Hermes", "url": "./index.html#hermes" },
+    { "name": "KI-Bot Claude", "url": "./index.html#claude" },
     { "name": "Posteingang", "url": "./index.html#inbox" },
     { "name": "Aufträge", "url": "./index.html#auftraege" },
     { "name": "Werkzeug-Sharing", "url": "./index.html#sharing" }

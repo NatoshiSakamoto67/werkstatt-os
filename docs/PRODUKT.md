@@ -9,7 +9,7 @@ ersetzen wollen, ohne ein teures DMS einzuführen.
 
 **Alleinstellung:**
 - **Ein** System statt Flickenteppich; WhatsApp als Hauptkanal (wo Kunden eh sind).
-- **KI „Hermes"** bereitet Teile, Rechnungen, Erinnerungen vor — **Mensch gibt frei** (kein Blindflug).
+- **KI „Claude"** bereitet Teile, Rechnungen, Erinnerungen vor — **Mensch gibt frei** (kein Blindflug).
 - **Werkzeug-Sharing** zwischen Werkstätten (teures Spezialwerkzeug teilen statt doppelt kaufen).
 - **DSGVO/EU**: kein US-Cloud-Lock-in, kein Google, KI über EU-Gateway, PII-Maskierung.
 - **Eigenes Kundenportal** pro Werkstatt (Rechnungen/Termine/TÜV) — Kundenbindung.
@@ -28,7 +28,7 @@ ersetzen wollen, ohne ein teures DMS einzuführen.
 1. `onboarding.html` → CI/Name/Nummer eingeben → `tenant.js` generiert (Kontrast-Check inkl.).
 2. Logo + PWA-Icons einsetzen, Impressum/Datenschutz mit Kundendaten füllen.
 3. Auf den EU-Server deployen (eine Subdomain je Werkstatt).
-**Ziel: < 1 h pro Neukunde, danach selbsterklärend (In-App-Hilfe + Hermes).**
+**Ziel: < 1 h pro Neukunde, danach selbsterklärend (In-App-Hilfe + Claude).**
 
 ## Betriebsmodell (so wenig Wartung wie möglich)
 - Eine Codebasis, viele Mandanten (tenant.js + Postgres-RLS).

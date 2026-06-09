@@ -37,7 +37,7 @@ Reihenfolge vom Prototyp zum Echtbetrieb mit echten Kundendaten. ☐ = offen, �
 
 ## 5. Betrieb (Low-Touch)
 - ☐ „Push once → deploy all"-Deploy mit `verify.mjs` als Gate.
-- ☐ In-App-Hilfe (Wissen + Hermes) aktiv → minimiert Support.
+- ☐ In-App-Hilfe (Wissen + Claude) aktiv → minimiert Support.
 - ☐ Preis-/Vertragsmodell + Muster-AVV als Vertriebsbeilage.
 
 ---

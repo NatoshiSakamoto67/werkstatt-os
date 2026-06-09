@@ -26,7 +26,7 @@ Werkzeug-Sharing / WERKLEIH) und baut konzeptionell auf der **XDAB-Plattform** a
 | 9 | Buchhaltungsanbindung | `Buchhaltung` (Connector-Stubs + DATEV-CSV) | ✅ Stub |
 | 10 | Mobile App | PWA (`manifest.json` + `sw.js`) | ✅ |
 | 11 | Web-App | App-Shell | ✅ |
-| 12 | KI-Assistent (Hermes) | `KI-Assistent` (Chat) | ✅ Demo |
+| 12 | KI-Assistent (Claude) | `KI-Assistent` (Chat) | ✅ Demo |
 | 13 | RAG-Unternehmenswissen | `Wissen` (Keyword-Suche) | ✅ Demo** |
 | 14 | Reparaturleitfäden | `Wissen` (source_type leitfaden) | ✅ Demo |
 | 15 | Lieferantenanbindungen | `Lieferanten` (Launcher + CSV) | ✅ Stub |
@@ -47,7 +47,7 @@ Werkzeug-Sharing / WERKLEIH) und baut konzeptionell auf der **XDAB-Plattform** a
   FastAPI  ──►  Postgres (Row-Level-Security, Multi-Tenant, pgvector)
         │
         ├─►  PII-Service (Maskierung E-Mail/Telefon/IBAN vor KI)
-        ├─►  LiteLLM KI-Gateway ──► AWS Bedrock-EU (Frankfurt)  [+ Hermes/Ollama lokal]
+        ├─►  LiteLLM KI-Gateway ──► AWS Bedrock-EU (Frankfurt)  [+ Claude/Ollama lokal]
         └─►  agent-core (ARQ-Worker): Trigger → PLAN → action_class(read/write/send)
                                        → awaiting_approval → Freigabe-Queue → Pub/Sub + SSE
 ```
@@ -63,10 +63,10 @@ persistenter Queue-Eintrag mit Freigabe. ARQ-`cron` deckt Zeit-Trigger ab.
 2. **Backend:** FastAPI + Postgres (Kunden/Aufträge/Rechnungen/Audit), JWT-Login.
 3. **WhatsApp Business API:** Provider → Webhook → echter 2-Wege-Posteingang.
 4. **Orchestra/KI:** Nacht-Workflow liest Nachrichten → LiteLLM extrahiert Bedarf → Queue.
-5. **Lieferanten/Hermes + Buchhaltung:** echte APIs / Browser-Worker; Buchhaltungs-Connector.
+5. **Lieferanten/Claude + Buchhaltung:** echte APIs / Browser-Worker; Buchhaltungs-Connector.
 
 ## Offene Entscheidungen (für den Vollausbau)
 - Buchhaltungssoftware: lexoffice / sevDesk / DATEV?
 - WhatsApp Business API: Meta Cloud direkt oder 360dialog? Welche Nummer?
-- Hermes-Hosting: XDAB-Server (Hetzner) oder lokale GPU in der Werkstatt?
+- Claude-Hosting: XDAB-Server (Hetzner) oder lokale GPU in der Werkstatt?
 - Werkzeug-Sharing-Reichweite: nur KFZ-Gorski-Netzwerk oder offenes Mandanten-Netz?

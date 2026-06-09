@@ -1149,11 +1149,11 @@ const PANELS=[
  {id:"buchhaltung",grp:"BÜRO",label:"Buchhaltung",icon:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h2M8 17h2M14 13h2M14 17h2"/>'},
  {id:"wissen",grp:"BÜRO",label:"Wissen & Leitfäden",icon:'<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M9 7h6M9 11h6"/>'},
  {id:"automatisierung",grp:"BÜRO",label:"Automatisierung",icon:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'},
- {id:"hermes",grp:"SYSTEM",label:"KI-Assistent (Hermes)",icon:'<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/><path d="M9 18a3 3 0 0 0 6 0"/>'},
+ {id:"claude",grp:"SYSTEM",label:"KI-Assistent (Claude)",icon:'<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/><path d="M9 18a3 3 0 0 0 6 0"/>'},
  {id:"einstellungen",grp:"SYSTEM",label:"Einstellungen & DSGVO",icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.66.07 1.18.63 1.18 1.31"/>'},
  {id:"kundenportal",grp:"SYSTEM",label:"Kundenportal",icon:'<path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6v6M20 4l-9 9"/>'}
 ];
-const TABS=["hermes","inbox","auftraege","sharing","__more"];
+const TABS=["claude","inbox","auftraege","sharing","__more"];
 
 /* ---------- shell render ---------- */
 let CUR="dashboard";
@@ -1174,7 +1174,7 @@ function buildSidebar(){
   $$("#sidebar .navitem").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.p)));
 }
 function buildTabs(){
-  const labels={hermes:["KI-Bot",PANELS.find(p=>p.id==="hermes").icon],inbox:["Posteingang",PANELS.find(p=>p.id==="inbox").icon],auftraege:["Aufträge",PANELS.find(p=>p.id==="auftraege").icon],sharing:["Sharing",PANELS.find(p=>p.id==="sharing").icon],__more:["Mehr",'<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>']};
+  const labels={claude:["KI-Bot",PANELS.find(p=>p.id==="claude").icon],inbox:["Posteingang",PANELS.find(p=>p.id==="inbox").icon],auftraege:["Aufträge",PANELS.find(p=>p.id==="auftraege").icon],sharing:["Sharing",PANELS.find(p=>p.id==="sharing").icon],__more:["Mehr",'<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>']};
   let h="";TABS.forEach(id=>{const[l,ic]=labels[id];const cnt=(id!=="__more"&&PANELS.find(p=>p.id===id).count)?PANELS.find(p=>p.id===id).count():0;h+='<button class="tab'+((id===CUR)?' active':'')+'" data-t="'+id+'">'+svg(ic)+'<span>'+l+'</span><span class="tb">'+(cnt||"")+'</span></button>';});
   $("#tabbar").innerHTML=h;
   $$("#tabbar .tab").forEach(b=>b.addEventListener("click",()=>{b.dataset.t==="__more"?openMore():nav(b.dataset.t);}));
@@ -1262,7 +1262,7 @@ function remind(id){
   h+='<a class="sheet-item" href="mailto:'+esc(k.email)+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(msg)+'">'+svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>')+'E-Mail entwerfen · '+esc(k.email)+'</a>';
   h+='<button class="sheet-item" data-orch="1">'+svg('<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/><path d="M9 18a3 3 0 0 0 6 0"/>')+'An Orchestra → Freigabe-Queue</button>';
   openSheet(h);
-  const ob=$("#sheetC [data-orch]");ob&&ob.addEventListener("click",()=>{closeSheet();audit("Erinnerung an Orchestra",k.name+" ("+(hs.soon?"TÜV":"Inspektion")+")");toast("In die Freigabe-Queue gelegt – Hermes bereitet den Versand vor");});
+  const ob=$("#sheetC [data-orch]");ob&&ob.addEventListener("click",()=>{closeSheet();audit("Erinnerung an Orchestra",k.name+" ("+(hs.soon?"TÜV":"Inspektion")+")");toast("In die Freigabe-Queue gelegt – Claude bereitet den Versand vor");});
 }
 RENDER.kunden=function(){
   const list=T(DB.kunden),hsOf=k=>huStatus(k.hu);
@@ -1333,7 +1333,7 @@ RENDER.orchestra=function(){renderTasks("Orchestra · KI-Assistent","Wertet What
 RENDER.freigaben=function(){renderTasks("Freigaben","Alle schreibenden/sendenden KI-Aktionen warten hier auf Ihre Freigabe (Human-in-the-Loop).",T(DB.orchestra).filter(o=>o.cls!=="read"),false);};
 function renderTasks(title,sub,list,banner){
   let h=ph(title,sub);
-  if(banner)h+='<div class="task" style="border-left-color:var(--accent);background:linear-gradient(135deg,var(--ink),#16202c);color:#fff;border-color:transparent"><div style="display:flex;align-items:center;gap:14px"><div class="s" style="background:rgba(255,255,255,.1)">'+svg('<circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3"/>',1.8).replace('stroke="currentColor"','stroke="#FBAF3A"')+'</div><div style="flex:1"><b style="font-size:16px">Heute Nacht: Anfragen + Belege analysiert</b><div style="color:#aeb4be;font-size:13px">Teile-Bedarfe, 1 Rechnungsentwurf, Dokumenten-Ablage und ein DATEV-Buchungsstapel vorbereitet.</div></div><div style="font-size:12px;color:#cfd3d8;display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:var(--gruen)"></span>Hermes aktiv</div></div></div>';
+  if(banner)h+='<div class="task" style="border-left-color:var(--accent);background:linear-gradient(135deg,var(--ink),#16202c);color:#fff;border-color:transparent"><div style="display:flex;align-items:center;gap:14px"><div class="s" style="background:rgba(255,255,255,.1)">'+svg('<circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3"/>',1.8).replace('stroke="currentColor"','stroke="#FBAF3A"')+'</div><div style="flex:1"><b style="font-size:16px">Heute Nacht: Anfragen + Belege analysiert</b><div style="color:#aeb4be;font-size:13px">Teile-Bedarfe, 1 Rechnungsentwurf, Dokumenten-Ablage und ein DATEV-Buchungsstapel vorbereitet.</div></div><div style="font-size:12px;color:#cfd3d8;display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:var(--gruen)"></span>Claude aktiv</div></div></div>';
   if(!list.length)h+='<div class="empty">Nichts offen – alles freigegeben.</div>';
   list.forEach(o=>{const st=orchSt(o),done=st==="erledigt";
     h+='<div class="task'+(done?' done':'')+'"><div class="task-top"><div class="s">'+svg('<path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 20l1-3.5A8.4 8.4 0 1 1 21 11.5z"/>',1.7)+'</div><div class="m"><b>'+esc(o.kunde)+'</b><small>'+esc(o.fzg)+' · '+esc(o.zeit)+'</small></div>'+(o.kat?'<span class="badge info" style="margin-right:6px">'+esc(o.kat)+'</span>':'')+'<span class="act-badge '+o.cls+'">'+o.cls+'</span>&nbsp;'+badge(st)+'</div>'+
@@ -1375,7 +1375,7 @@ RENDER.werkstaetten=function(){
 RENDER.lieferanten=function(){
   let h=ph("Lieferanten & Tools","Direkter Zugriff auf Teile-Portale, mit Bedarf-Export aus offenen Aufträgen.",'<button class="btn" id="expB">'+svg('<path d="M12 3v12M8 11l4 4 4-4M4 21h16"/>',1.8)+'Bedarf exportieren</button>');
   h+='<div class="launch">';DB.lieferanten.forEach(l=>{h+='<a class="lnk" href="'+esc(l.url)+'"'+(l.url!=="#"?' target="_blank" rel="noopener"':'')+'><div class="li">'+esc(l.kz)+'</div><div><b>'+esc(l.name)+'</b><small>'+esc(l.typ)+'</small></div>'+svg('<path d="M10 6H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M14 4h6v6M20 4l-9 9"/>').replace("<svg ",'<svg class="ext" width="17" height="17" ')+'</a>';});
-  h+='</div><p style="color:var(--grau);font-size:13px;margin-top:16px">Wo eine API fehlt, übernimmt <b>Hermes</b> (browser-gesteuert) das Heraussuchen – immer mit Ihrer Freigabe.</p>';
+  h+='</div><p style="color:var(--grau);font-size:13px;margin-top:16px">Wo eine API fehlt, übernimmt <b>Claude</b> (browser-gesteuert) das Heraussuchen – immer mit Ihrer Freigabe.</p>';
   $("#content").innerHTML=h;
   $("#expB").addEventListener("click",()=>exportSheet("teile-bedarf","Teile-Bedarf",["Kunde","Fahrzeug","Bedarf","Teil","Lieferant","Preis €"],T(DB.orchestra).map(o=>[o.kunde,o.fzg,o.bedarf,o.teil,o.lief,o.preis.toFixed(2)])));
 };
@@ -1465,30 +1465,59 @@ RENDER.automatisierung=function(){
   $$("#content .sw").forEach(s=>s.addEventListener("click",()=>{if(!canWrite()){toast("Nur Lese-Rechte");return;}const id=s.dataset.r,cur=s.classList.toggle("on");store.rules[id]=cur;save();audit("Automatisierung "+(cur?"aktiviert":"deaktiviert"),id);}));
 };
 
-RENDER.hermes=function(){
-  let h='<div class="chat"><div class="chat-scroll" id="hScroll"><div class="welcome"><div class="wm">W</div><h1>Hermes – Ihr Werkstatt-Assistent</h1><p>Fragen Sie zu Werkzeug-Verfügbarkeit, Aufträgen, Reparaturen oder lassen Sie die Nacht-Nachrichten auswerten.</p><div class="chips" id="hChips"></div></div></div><div class="gw-bar"><span class="pdot"></span>EU-Gateway aktiv · LiteLLM → Bedrock-EU (Frankfurt) · DSGVO-konform</div><div class="chat-input"><div class="iw"><textarea id="hIn" rows="1" placeholder="Hermes fragen …"></textarea></div><button class="send" id="hSend">'+svg('<path d="M3 11l18-8-8 18-2-7-8-3z"/>',0).replace("<svg ",'<svg fill="currentColor" ')+'</button></div></div>';
+RENDER.claude=function(){
+  let h='<div class="chat"><div class="chat-scroll" id="hScroll"><div class="welcome"><div class="wm">W</div><h1>Claude – Ihr Werkstatt-Assistent</h1><p>Fragen Sie zu Werkzeug-Verfügbarkeit, Aufträgen, Reparaturen oder lassen Sie die Nacht-Nachrichten auswerten.</p><div class="chips" id="hChips"></div></div></div><div class="gw-bar" id="hGw"><span class="pdot"></span>Verbinde mit Orchestra …</div><div class="chat-input"><div class="iw"><textarea id="hIn" rows="1" placeholder="Claude fragen …"></textarea></div><button class="send" id="hSend">'+svg('<path d="M3 11l18-8-8 18-2-7-8-3z"/>',0).replace("<svg ",'<svg fill="currentColor" ')+'</button></div></div>';
   $("#content").innerHTML=h;
   const chips=["Welches Spezialwerkzeug für BMW N57 ist wo verfügbar?","Werte die Nachrichten der Nacht aus → Teile-Bedarf","Reparaturleitfaden: Injektor-Ausbau N47","Welche Termine habe ich heute?"];
   $("#hChips").innerHTML=chips.map(c=>'<button class="chip">'+svg('<path d="M9 18l6-6-6-6"/>',2)+esc(c)+'</button>').join("");
-  $$("#hChips .chip").forEach((b,i)=>b.addEventListener("click",()=>askHermes(chips[i])));
+  $$("#hChips .chip").forEach((b,i)=>b.addEventListener("click",()=>askClaude(chips[i])));
   const ta=$("#hIn");ta.addEventListener("input",()=>{ta.style.height="auto";ta.style.height=Math.min(ta.scrollHeight,120)+"px";});
-  ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askHermes(ta.value);}});
-  $("#hSend").addEventListener("click",()=>askHermes(ta.value));
+  ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();askClaude(ta.value);}});
+  $("#hSend").addEventListener("click",()=>askClaude(ta.value));
+  // Live-Status der Gateway-Leiste aus dem Orchestrator (ehrlich: Claude vs. Demo)
+  (async()=>{const gw=$("#hGw");if(!gw)return;try{
+    const h=await(await fetch(WERKHOF_API+"/health")).json();
+    const live=h.claude==="live";
+    gw.innerHTML='<span class="pdot"></span>'+(live
+      ?'Orchestra verbunden · Claude als Gehirn · PII-maskiert · Freigabe-Pflicht'
+      :'Orchestra verbunden · Demo-Modus (kein LLM-Schlüssel)');
+  }catch(e){gw.innerHTML='<span class="pdot" style="background:var(--grau-3)"></span>Offline · Demo-Antworten (Backend nicht erreichbar)';}})();
 };
-function hermesAnswer(q){
+function claudeAnswer(q){
   q=q.toLowerCase();
   if(/n57|arretier|spezialwerk|werkzeug/.test(q))return{a:"Das Arretierwerkzeug N57 ist <b>verfügbar bei KFZ Gorski (Braunschweig)</b> – kalibriert bis 11/2026. Soll ich es für den Audi-A6-Auftrag reservieren? Ich lege dann eine Sharing-Anfrage an (Freigabe nötig).",s:["Werkzeug-Register","Sharing"]};
   if(/nacht|bedarf|auswert|nachricht/.test(q))return{a:"In den 4 Nachrichten der Nacht erkenne ich: <b>Bremsbeläge+Scheiben (Müller)</b>, <b>Klimaservice (Köhler)</b> und einen <b>Rechnungsentwurf (Wagner)</b>. Drei Vorschläge liegen unter <b>Freigaben</b> – schreibende Aktionen führe ich erst nach Ihrer Bestätigung aus.",s:["Orchestra","Freigaben"]};
   if(/injektor|leitfaden|n47|reparatur/.test(q))return{a:"<b>Injektor-Ausbau BMW N47:</b> Motorabdeckung ab, Hochdruckleitungen lösen, Injektor mit Auszieher ziehen, Kupferring tauschen, Anzugsmomente beachten. Vollständiger Leitfaden unter <b>Wissen & Leitfäden</b>.",s:["Wissensbasis (RAG)"]};
   if(/termin/.test(q))return{a:"Heute: 08:00 Bremsen-Check (Mustermann), 09:30 Klimaservice (Köhler, <b>angefragt</b>), 11:00 HU/AU (Bauer), 13:30 Reifen (Wagner). Soll ich 09:30 bestätigen?",s:["Termine"]};
-  return{a:"Ich bin Hermes, Ihr Werkstatt-Assistent. Ich kann Werkzeug-Verfügbarkeit prüfen, Nachrichten auswerten, Reparaturleitfäden zeigen und Aufträge vorbereiten – schreibende Aktionen immer mit Ihrer Freigabe. <i>(Demo: Antworten lokal. Im Vollausbau über das EU-KI-Gateway.)</i>",s:[]};
+  return{a:"Ich bin Claude, Ihr Werkstatt-Assistent. Ich kann Werkzeug-Verfügbarkeit prüfen, Nachrichten auswerten, Reparaturleitfäden zeigen und Aufträge vorbereiten – schreibende Aktionen immer mit Ihrer Freigabe. <i>(Demo: Antworten lokal. Im Vollausbau über das EU-KI-Gateway.)</i>",s:[]};
 }
-function askHermes(q){
+// Orchestra-Backend (Claude-Gehirn). Override per window.WERKHOF_API möglich.
+const WERKHOF_API = (window.WERKHOF_API || "http://127.0.0.1:8200").replace(/\/$/,"");
+async function askClaude(q){
   q=(q||"").trim();if(!q)return;
   const sc=$("#hScroll");if(sc.querySelector(".welcome"))sc.innerHTML="";
   sc.innerHTML+='<div class="bub me">'+esc(q)+'</div>';$("#hIn").value="";$("#hIn").style.height="auto";
-  sc.scrollTop=sc.scrollHeight;audit("Hermes-Anfrage",q.slice(0,40));
-  setTimeout(()=>{const r=hermesAnswer(q);sc.innerHTML+='<div class="bub ai">'+r.a+(r.s.length?'<div class="src">'+r.s.map(x=>'<span>'+esc(x)+'</span>').join("")+'</div>':'')+'</div>';sc.scrollTop=sc.scrollHeight;},420);
+  const tid="t"+Date.now();
+  sc.innerHTML+='<div class="bub ai" id="'+tid+'"><i style="opacity:.6">Claude denkt …</i></div>';
+  sc.scrollTop=sc.scrollHeight;audit("Claude-Anfrage",q.slice(0,40));
+  const bub=()=>document.getElementById(tid);
+  try{
+    const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),35000);
+    const res=await fetch(WERKHOF_API+"/claude/chat",{method:"POST",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q}),signal:ctrl.signal});
+    clearTimeout(to);
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const d=await res.json();
+    const live=d.mode&&d.mode.indexOf("mock")<0;
+    const src=live?'<div class="src"><span>🧠 Claude · '+esc(d.mode)+'</span><span>PII-maskiert</span></div>':'';
+    bub().innerHTML=esc(d.antwort||"(keine Antwort)").replace(/\n/g,"<br>")+src;
+  }catch(e){
+    // Fallback: lokale Demo-Antwort (Backend nicht erreichbar)
+    const r=claudeAnswer(q);
+    bub().innerHTML=r.a+(r.s.length?'<div class="src">'+r.s.map(x=>'<span>'+esc(x)+'</span>').join("")+'</div>':'')
+      +'<div class="src"><span style="opacity:.6">offline · Demo-Antwort</span></div>';
+  }
+  sc.scrollTop=sc.scrollHeight;
 }
 
 RENDER.einstellungen=function(){
