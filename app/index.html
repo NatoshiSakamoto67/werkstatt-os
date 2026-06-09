@@ -1230,22 +1230,29 @@ $("#roleName").textContent=ROLES[ROLE].split(" ")[0];
 
 /* ---------- RENDER per panel ---------- */
 const RENDER={};
-RENDER.dashboard=function(){
-  const off=T(DB.conv).filter(c=>c.status==="neu").length, oo=T(DB.orchestra).filter(o=>orchSt(o)!=="erledigt").length;
-  const ums=T(DB.rechnungen).reduce((s,r)=>s+r.betrag,0)+1840;
-  let h=ph("Guten Morgen, Marco 👋","Dienstag, 09.06.2026 · "+T(DB.termine).length+" Termine heute",'<button class="btn btn-primary" id="goOrch">'+svg('<circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3"/>',2)+'Orchestra ('+oo+')</button>');
+RENDER.dashboard=async function(){
+  $("#content").innerHTML=whLoading("Werkhof-Cockpit");
+  const [kunden,offen,rechn,health]=await Promise.all([WH.kunden(),WH.approvals("awaiting_approval"),WH.rechnungen(),WH.health()]);
+  if(kunden===null&&health===null){$("#content").innerHTML=whOffline("Werkhof-Cockpit");return;}
+  const kn=(kunden||[]).filter(k=>k.name).length, off=(offen||[]).length;
+  const ums=(rechn||[]).reduce((s,r)=>s+(r.brutto||0),0);
+  const liveBadge=(v)=>'<span class="badge '+(v==="live"?"ok":"warn")+'">'+esc(v||"?")+'</span>';
+  let h=ph("Werkhof-Cockpit","KFZ Gorski · live aus tmERIK + Orchestrator",'<button class="btn btn-primary" id="goCh">'+svg('<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/>',2)+'KI-Assistent</button>');
   h+='<div class="grid g4" style="margin-bottom:15px">'+
-   kpi("b",'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/>',T(DB.kunden).length,"Kunden")+
-   kpi("o",'<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.4 8.7 8.7 0 0 1-4-.9L3 20l1-3.5a8.3 8.3 0 0 1-1-4A8.4 8.4 0 0 1 11.5 4 8.4 8.4 0 0 1 21 11.5z"/>',off,"offene Anfragen")+
-   kpi("d",'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18"/>',T(DB.termine).length,"Termine heute")+
-   kpi("g",'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',eur(ums),"Umsatz Juni")+'</div>';
-  h+='<div class="grid g2"><div class="card"><div class="card-h"><h3>Orchestra – wartet auf Freigabe</h3><button class="btn btn-sm" id="goOrch2">Alle</button></div>';
-  T(DB.orchestra).slice(0,3).forEach(o=>{h+='<div class="rowitem"><div class="ic">'+svg('<path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 20l1-3.5A8.4 8.4 0 1 1 21 11.5z"/>',1.7)+'</div><div class="body"><b>'+esc(o.kunde)+'</b><small>'+esc(o.bedarf)+'</small></div>'+badge(orchSt(o))+'</div>';});
-  h+='</div><div class="card"><div class="card-h"><h3>Heutige Termine</h3></div>';
-  T(DB.termine).forEach(t=>{h+='<div class="rowitem"><div class="ic"><b class="bebas" style="font-size:14px">'+esc(t.zeit)+'</b></div><div class="body"><b>'+esc(t.titel)+'</b><small>'+esc(t.kunde)+' · '+esc(t.fzg)+'</small></div></div>';});
+   kpi("b",'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/>',kn,"Kunden (tmERIK)")+
+   kpi("o",'<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/>',off,"offene Freigaben")+
+   kpi("d",'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>',(rechn||[]).length,"Rechnungen")+
+   kpi("g",'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',eur(ums),"Umsatz (Rechnungen)")+'</div>';
+  h+='<div class="grid g2"><div class="card"><div class="card-h"><h3>System-Status</h3></div>'+
+   '<div class="rowitem"><div class="body"><b>tmERIK</b><small>Kunden- & Fahrzeug-Stammdaten</small></div>'+liveBadge(health&&health.tmerik)+'</div>'+
+   '<div class="rowitem"><div class="body"><b>KI-Assistent (Claude)</b><small>liest tmERIK, schreibt Angebote/Rechnungen</small></div>'+liveBadge(health&&health.claude)+'</div></div>';
+  h+='<div class="card"><div class="card-h"><h3>Offene Freigaben</h3><button class="btn btn-sm" id="goFr">Alle</button></div>';
+  if(!off)h+='<div class="rowitem"><div class="body"><small>Keine offenen Vorgänge.</small></div></div>';
+  (offen||[]).slice(0,4).forEach(o=>{const p=o.payload||{};h+='<div class="rowitem"><div class="ic">'+svg('<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/>',1.7)+'</div><div class="body"><b>'+esc(o.titel||o.art)+'</b><small>'+esc(o.art)+(typeof p.brutto==="number"?' · '+eur(p.brutto):'')+'</small></div></div>';});
   h+='</div></div>';
   $("#content").innerHTML=h;
-  $("#goOrch")&&$("#goOrch").addEventListener("click",()=>nav("orchestra"));$("#goOrch2")&&$("#goOrch2").addEventListener("click",()=>nav("orchestra"));
+  $("#goCh")&&$("#goCh").addEventListener("click",()=>nav("claude"));
+  $("#goFr")&&$("#goFr").addEventListener("click",()=>nav("freigaben"));
 };
 function kpi(c,ic,v,l){return '<div class="card kpi"><div class="ic '+c+'">'+svg(ic)+'</div><div class="v">'+esc(v)+'</div><div class="l">'+esc(l)+'</div></div>';}
 
@@ -1265,38 +1272,36 @@ function remind(id){
   openSheet(h);
   const ob=$("#sheetC [data-orch]");ob&&ob.addEventListener("click",()=>{closeSheet();audit("Erinnerung an Orchestra",k.name+" ("+(hs.soon?"TÜV":"Inspektion")+")");toast("In die Freigabe-Queue gelegt – Claude bereitet den Versand vor");});
 }
-RENDER.kunden=function(){
-  const list=T(DB.kunden),hsOf=k=>huStatus(k.hu);
-  const due=list.filter(k=>hsOf(k).soon||inspFaellig(k));
-  let h=ph("Kunden · Fahrzeug-Akte","Wie ein OEM-Portal (z. B. BMW): TÜV/HU-Fälligkeit, Service-Historie, nächste Inspektion – mit automatischen Erinnerungen per E-Mail/WhatsApp.",canWrite()?'<button class="btn btn-primary" id="addK">'+svg('<path d="M12 5v14M5 12h14"/>',2)+'Neuer Kunde</button>':"");
+RENDER.kunden=async function(){
+  $("#content").innerHTML=whLoading("Kunden");
+  const all=await WH.kunden();
+  if(all===null){$("#content").innerHTML=whOffline("Kunden");return;}
+  const list=all.filter(k=>k.name);
+  const byTyp=t=>list.filter(k=>k.typ===t).length;
+  let h=ph("Kunden · tmERIK","Echte Stammdaten live aus tmERIK. Klick auf eine Zeile = Fahrzeug-Akte mit HU-Fälligkeit.");
   h+='<div class="grid g4" style="margin-bottom:15px">'
-    +kpi("o",'<circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/>',list.filter(k=>hsOf(k).soon).length,"TÜV fällig (≤2 Mon.)")
-    +kpi("o",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',list.filter(inspFaellig).length,"Inspektion fällig")
     +kpi("b",'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/>',list.length,"Kunden")
-    +kpi("g",'<path d="M20 6L9 17l-5-5"/>',list.filter(k=>k.status==="Stammkunde").length,"Stammkunden")+'</div>';
-  if(due.length){h+='<div class="card" style="margin-bottom:15px"><div class="card-h"><h3>Anstehend – Erinnerungen versenden</h3><span class="badge warn">'+due.length+'</span></div>';
-    due.forEach(k=>{const hs=hsOf(k);h+='<div class="rowitem"><div class="ic">'+svg('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>')+'</div><div class="body"><b>'+esc(k.name)+'</b><small>'+esc(k.fzg)+' · '+esc(k.kennz)+(hs.soon?' · <span style="color:var(--orange-deep);font-weight:600">'+esc(hs.txt)+'</span>':'')+(inspFaellig(k)?' · <span style="color:var(--orange-deep);font-weight:600">Inspektion fällig</span>':'')+'</small></div>'+(canWrite()?'<button class="btn btn-primary btn-sm" data-remind="'+k.id+'">'+svg('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>')+'Erinnern</button>':'')+'</div>';});
-    h+='</div>';}
-  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Kunde</th><th>Fahrzeug</th><th>TÜV/HU</th><th>Letzter Service</th><th>km</th><th>Status</th></tr></thead><tbody>';
-  list.forEach(k=>{const hs=hsOf(k);h+='<tr data-id="'+k.id+'"><td><span class="kav">'+ini(k.name)+'</span><b>'+esc(k.name)+'</b></td><td class="muted">'+esc(k.fzg)+' · '+esc(k.kennz)+'</td><td><span class="cal-pill '+hs.cls+'">'+esc(hs.txt)+'</span></td><td class="muted">'+esc(k.service)+'</td><td class="muted">'+esc(k.km)+' km</td><td>'+badge(k.status)+'</td></tr>';});
+    +kpi("o",'<path d="M3 7h18M3 12h18M3 17h18"/>',byTyp("privat"),"Privat")
+    +kpi("d",'<path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/>',byTyp("gewerblich"),"Gewerblich")
+    +kpi("g",'<path d="M12 1l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>',byTyp("versicherung"),"Versicherung")+'</div>';
+  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Nr.</th><th>Name</th><th>Typ</th></tr></thead><tbody>';
+  list.forEach(k=>{h+='<tr data-id="'+k.id+'"><td class="muted">'+esc(k.kundennummer||"")+'</td><td><span class="kav">'+ini(k.name)+'</span><b>'+esc(k.name)+'</b></td><td>'+badge(k.typ||"")+'</td></tr>';});
   h+='</tbody></table></div>';$("#content").innerHTML=h;
-  $("#addK")&&$("#addK").addEventListener("click",()=>toast("Demo: neuen Kunden anlegen"));
-  $$("#content [data-remind]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();remind(b.dataset.remind);}));
   $$("#content tr[data-id]").forEach(tr=>tr.addEventListener("click",()=>openKunde(tr.dataset.id)));
 };
-function openKunde(id){
-  const k=T(DB.kunden).find(x=>x.id===id);if(!k)return;const note=store.notes[id]||"";const hs=huStatus(k.hu);
-  const auf=T(DB.auftraege).filter(a=>a.kunde===k.name);
-  let b='<div class="sec"><div style="display:flex;gap:13px;align-items:center"><div class="avatar" style="width:46px;height:46px;font-size:16px">'+ini(k.name)+'</div><div><div style="font-size:18px;font-weight:800">'+esc(k.name)+'</div>'+badge(k.status)+'</div></div></div>';
-  b+='<div class="sec"><h4>Kontakt & Fahrzeug</h4><dl class="kv"><dt>Telefon</dt><dd>'+esc(k.tel)+'</dd><dt>E-Mail</dt><dd>'+esc(k.email)+'</dd><dt>Fahrzeug</dt><dd>'+esc(k.fzg)+'</dd><dt>Kennzeichen</dt><dd>'+esc(k.kennz)+'</dd><dt>Laufleistung</dt><dd>'+esc(k.km)+' km</dd></dl></div>';
-  b+='<div class="sec"><h4>Wartung & TÜV</h4><dl class="kv"><dt>TÜV / HU</dt><dd><span class="cal-pill '+hs.cls+'">'+esc(hs.txt)+'</span></dd><dt>Letzter Service</dt><dd>'+esc(k.service)+'</dd><dt>Nächste Inspektion</dt><dd>'+esc(k.inspektion)+(inspFaellig(k)?' <span class="badge warn">fällig</span>':'')+'</dd></dl></div>';
-  b+='<div class="sec"><h4>Aufträge</h4>'+(auf.length?auf.map(a=>'<span class="tag">'+esc(a.titel)+' '+badge(a.status)+'</span>').join(""):'<span class="muted" style="font-size:13px">keine</span>')+'</div>';
-  b+='<div class="sec"><h4>Interne Notiz'+(canWrite()?"":" (nur Lesen)")+'</h4><textarea id="kn" '+(canWrite()?"":"disabled")+' style="width:100%;min-height:64px;border:1.5px solid var(--line);border-radius:11px;padding:10px 13px;font:inherit;font-size:14px;resize:vertical;background:var(--surface);color:inherit">'+esc(note)+'</textarea></div>';
-  let f='<button class="btn btn-primary" id="kRemind">'+svg('<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>',2)+'Erinnern</button><a class="btn btn-wa" target="_blank" rel="noopener" href="'+waURL("Hallo "+k.name+", hier KFZ Gorski:")+'">'+svg(WA_ICON,0)+'WhatsApp</a>';
-  if(canWrite())f+='<button class="btn" id="kSave">Notiz speichern</button>';
-  openD("Fahrzeug-Akte",b,f);
-  $("#kRemind").addEventListener("click",()=>{closeD();remind(id);});
-  $("#kSave")&&$("#kSave").addEventListener("click",()=>{store.notes[id]=$("#kn").value;save();audit("Notiz gespeichert","Kunde "+k.name);closeD();toast("Gespeichert");});
+async function openKunde(id){
+  const d=await WH.kunde(id);
+  if(!d||!d.kunde){toast("Kunde nicht gefunden");return;}
+  const k=d.kunde,fz=d.fahrzeuge||[];
+  let b='<div class="sec"><div style="display:flex;gap:13px;align-items:center"><div class="avatar" style="width:46px;height:46px;font-size:16px">'+ini(k.name)+'</div><div><div style="font-size:18px;font-weight:800">'+esc(k.name)+'</div>'+badge(k.typ||"")+'</div></div></div>';
+  b+='<div class="sec"><h4>Kontakt</h4><dl class="kv"><dt>Kundennr.</dt><dd>'+esc(k.kundennummer||"–")+'</dd><dt>Telefon</dt><dd>'+esc(k.telefon||"–")+'</dd><dt>E-Mail</dt><dd>'+esc(k.email||"–")+'</dd><dt>Ort</dt><dd>'+esc([k.plz,k.ort].filter(Boolean).join(" ")||"–")+'</dd><dt>Straße</dt><dd>'+esc(k.strasse||"–")+'</dd></dl></div>';
+  b+='<div class="sec"><h4>Fahrzeuge ('+fz.length+')</h4>';
+  if(!fz.length)b+='<span class="muted" style="font-size:13px">keine Fahrzeuge hinterlegt</span>';
+  fz.forEach(v=>{const hu=v.hu||{};const cls=hu.status==="faellig"?"due":hu.status==="bald"?"soon":"ok";
+    b+='<div class="rowitem"><div class="body"><b>'+esc(v.kennzeichen||"–")+' · '+esc(v.modell||"")+'</b><small>'+(v.kmStand!=null?Number(v.kmStand).toLocaleString("de-DE")+" km":"")+(v.kraftstoff?' · '+esc(v.kraftstoff):'')+(hu.faellig?' · <span class="cal-pill '+cls+'">HU '+esc(hu.faellig)+'</span>':'')+'</small></div></div>';});
+  b+='</div>';
+  openD("Fahrzeug-Akte",b,'<button class="btn btn-primary" id="kAng">'+svg('<path d="M12 2a7 7 0 0 0-7 7v3l-2 3h18l-2-3V9a7 7 0 0 0-7-7z"/>',2)+'Angebot im Chat</button>');
+  $("#kAng")&&$("#kAng").addEventListener("click",()=>{closeD();nav("claude");setTimeout(()=>{const i=$("#hIn");if(i){i.value="Schreib ein Angebot für "+k.name+": ";i.focus();}},350);});
 }
 
 RENDER.auftraege=function(){
@@ -1316,12 +1321,17 @@ RENDER.termine=function(){
 };
 
 let activeConv=null;
-RENDER.inbox=function(){
-  let h=ph("WhatsApp-Posteingang","Kundenanfragen direkt beantworten – ein Kanal fürs ganze Team.");
-  h+=demoBanner("Demo · echter 2-Wege-Chat via WhatsApp Business API (Meta Cloud / 360dialog) → Webhook ins Portal.");
-  h+='<div class="inbox"><div class="inbox-list" id="cl"></div><div class="cpane"><div class="chd"><div class="av" id="cAv">–</div><div><b id="cName">Konversation wählen</b><small id="cSub">—</small></div>'+svg('<path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2z"/>',0).replace("<svg ",'<svg class="wa" fill="currentColor" ')+'</div><div class="cscroll" id="cScroll"><div class="empty">Links eine Konversation wählen.</div></div><div class="cin"><input id="cIn" placeholder="Antwort schreiben …" '+(canWrite()?"":"disabled")+'><button class="btn btn-primary" id="cSend" '+(canWrite()?"":"disabled")+'>'+svg('<path d="M3 11l18-8-8 18-2-7-8-3z"/>',0).replace("<svg ",'<svg fill="currentColor" ')+'</button></div></div></div>';
-  $("#content").innerHTML=h;renderCL();
-  $("#cSend").addEventListener("click",sendC);$("#cIn").addEventListener("keydown",e=>{if(e.key==="Enter")sendC();});
+RENDER.inbox=async function(){
+  $("#content").innerHTML=whLoading("WhatsApp-Posteingang");
+  const list=await WH.inbox();
+  if(list===null){$("#content").innerHTML=whOffline("WhatsApp-Posteingang");return;}
+  let h=ph("WhatsApp-Posteingang","Eingegangene Kundennachrichten — Claude wertet aus und legt Angebote in die Freigabe-Queue (nie automatisch raus).");
+  if(!list.length){h+='<div class="card" style="padding:30px;text-align:center;color:var(--grau)">Noch keine Nachrichten.<br><small>Echte Anbindung: WhatsApp Business → Webhook. Testen ohne Account: Orchestrator-Endpunkt <code>/whatsapp/simulate</code>.</small></div>';$("#content").innerHTML=h;return;}
+  h+='<div class="card">';
+  list.forEach(m=>{const ok=m.status==="verarbeitet";
+    h+='<div class="rowitem"><div class="ic">'+svg('<path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.3A10 10 0 1 0 12 2z"/>',0).replace("<svg ",'<svg fill="var(--wa)" ')+'</div><div class="body"><b>'+esc(m.wa_from||"?")+'</b><small>'+esc((m.text||"").slice(0,90))+'</small></div><span class="badge '+(ok?"ok":"")+'">'+esc(m.status)+'</span>'+(m.approval_id?'<button class="btn btn-sm" data-go="freigaben" style="margin-left:8px">→ Freigabe</button>':'')+'</div>';});
+  h+='</div>';$("#content").innerHTML=h;
+  $$("#content [data-go]").forEach(b=>b.addEventListener("click",()=>nav(b.dataset.go)));
 };
 function renderCL(){
   let h="";T(DB.conv).forEach(c=>{const last=c.msgs[c.msgs.length-1];h+='<div class="conv'+(activeConv===c.id?' active':'')+'" data-id="'+c.id+'"><div class="av">'+ini(c.kunde)+'</div><div class="cb"><div class="tp"><b>'+esc(c.kunde)+'</b><span class="wn">'+esc(c.when)+'</span></div><small>'+(last.d==="out"?"Sie: ":"")+esc(last.x)+'</small></div>'+(c.unread?'<span class="unr"></span>':'')+'</div>';});
@@ -1330,8 +1340,29 @@ function renderCL(){
 function openC(id){const c=T(DB.conv).find(x=>x.id===id);if(!c)return;activeConv=id;c.unread=false;renderCL();$("#cAv").textContent=ini(c.kunde);$("#cName").textContent=c.kunde;$("#cSub").textContent="WhatsApp · "+c.status;const ex=store.sent[id]||[];$("#cScroll").innerHTML=c.msgs.concat(ex).map(m=>'<div class="wb '+(m.d==="out"?"out":"in")+'">'+esc(m.x)+'<span class="t">'+esc(m.t)+(m.d==="out"?" · Sie ✓✓":"")+'</span></div>').join("");$("#cScroll").scrollTop=$("#cScroll").scrollHeight;}
 function sendC(){if(!activeConv||!canWrite())return;const v=$("#cIn").value.trim();if(!v)return;store.sent[activeConv]=(store.sent[activeConv]||[]).concat([{d:"out",t:"jetzt",x:v}]);save();audit("WhatsApp-Antwort gesendet","Konversation "+activeConv);$("#cIn").value="";openC(activeConv);}
 
-RENDER.orchestra=function(){renderTasks("Orchestra · KI-Assistent","Wertet WhatsApp-Anfragen aus und bereitet <b style='color:var(--text)'>Teile-Bestellungen, Rechnungen, Dokumente und Buchungen</b> vor. <b style='color:var(--text);font-weight:600'>Sie bestätigen – die KI handelt nie allein.</b>",T(DB.orchestra),true);};
-RENDER.freigaben=function(){renderTasks("Freigaben","Alle schreibenden/sendenden KI-Aktionen warten hier auf Ihre Freigabe (Human-in-the-Loop).",T(DB.orchestra).filter(o=>o.cls!=="read"),false);};
+async function renderFreigaben(titel,sub,statusFilter){
+  $("#content").innerHTML=whLoading(titel);
+  const items=await WH.approvals(statusFilter);
+  if(items===null){$("#content").innerHTML=whOffline(titel);return;}
+  let h=ph(titel,sub);
+  if(!items.length){h+='<div class="card" style="padding:30px;text-align:center;color:var(--grau)">Aktuell keine '+(statusFilter==="awaiting_approval"?"offenen":"")+' Vorgänge.</div>';$("#content").innerHTML=h;return;}
+  items.forEach(it=>{const p=it.payload||{};const offen=it.status==="awaiting_approval";
+    const brutto=typeof p.brutto==="number"?eur(p.brutto):"";
+    const pos=Array.isArray(p.positionen)?p.positionen:[];
+    h+='<div class="card" style="margin-bottom:11px"><div class="card-h"><h3 style="display:flex;align-items:center;gap:8px">'+badge(it.art)+'<span>'+esc(it.titel||"(ohne Titel)")+'</span></h3>'+(brutto?'<b class="bebas" style="font-size:17px">'+brutto+'</b>':'')+'</div>';
+    if(pos.length)h+='<div class="muted" style="font-size:12.5px;margin:2px 0 8px">'+pos.length+' Positionen · netto '+eur(p.netto||0)+'</div>';
+    if(p.ki_hinweis)h+='<div class="muted" style="font-size:12px;margin-bottom:9px">💬 '+esc(p.ki_hinweis)+'</div>';
+    if(offen&&canWrite())h+='<div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" data-appr="'+it.id+'">'+svg('<path d="M20 6L9 17l-5-5"/>',2)+'Freigeben</button><button class="btn btn-sm" data-rej="'+it.id+'">Ablehnen</button>'+(it.art==="angebot"?'<button class="btn btn-sm" data-rech="'+it.id+'" style="margin-left:auto">＋ Rechnung</button>':'')+'</div>';
+    else h+='<span class="badge '+(it.status==="approved"?"ok":"")+'">'+esc(it.status)+(it.result&&it.result.rechnungsnummer?" · "+it.result.rechnungsnummer:"")+'</span>';
+    h+='</div>';});
+  $("#content").innerHTML=h;
+  const reload=()=>renderFreigaben(titel,sub,statusFilter);
+  $$("#content [data-appr]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;await WH.decide(b.dataset.appr,"approve");audit("Freigegeben",b.dataset.appr);toast("✓ Freigegeben & ausgeführt");reload();}));
+  $$("#content [data-rej]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;await WH.decide(b.dataset.rej,"reject");toast("Abgelehnt");reload();}));
+  $$("#content [data-rech]").forEach(b=>b.addEventListener("click",async()=>{b.disabled=true;const r=await WH.rechnungAusAngebot(b.dataset.rech);toast("Rechnungsentwurf erstellt");reload();}));
+}
+RENDER.orchestra=function(){renderFreigaben("Orchestra · KI-Vorgänge","Was die KI vorbereitet hat — Sie bestätigen, die KI handelt nie allein.","");};
+RENDER.freigaben=function(){renderFreigaben("Freigaben","Alle KI-Aktionen warten hier auf Ihre Freigabe (Human-in-the-Loop).","awaiting_approval");};
 function renderTasks(title,sub,list,banner){
   let h=ph(title,sub);
   if(banner)h+='<div class="task" style="border-left-color:var(--accent);background:linear-gradient(135deg,var(--ink),#16202c);color:#fff;border-color:transparent"><div style="display:flex;align-items:center;gap:14px"><div class="s" style="background:rgba(255,255,255,.1)">'+svg('<circle cx="12" cy="12" r="3.5"/><path d="M12 3v3M12 18v3"/>',1.8).replace('stroke="currentColor"','stroke="#FBAF3A"')+'</div><div style="flex:1"><b style="font-size:16px">Heute Nacht: Anfragen + Belege analysiert</b><div style="color:#aeb4be;font-size:13px">Teile-Bedarfe, 1 Rechnungsentwurf, Dokumenten-Ablage und ein DATEV-Buchungsstapel vorbereitet.</div></div><div style="font-size:12px;color:#cfd3d8;display:flex;align-items:center;gap:7px"><span style="width:9px;height:9px;border-radius:50%;background:var(--gruen)"></span>Claude aktiv</div></div></div>';
@@ -1381,14 +1412,19 @@ RENDER.lieferanten=function(){
   $("#expB").addEventListener("click",()=>exportSheet("teile-bedarf","Teile-Bedarf",["Kunde","Fahrzeug","Bedarf","Teil","Lieferant","Preis €"],T(DB.orchestra).map(o=>[o.kunde,o.fzg,o.bedarf,o.teil,o.lief,o.preis.toFixed(2)])));
 };
 
-RENDER.rechnungen=function(){
-  let h=ph("Rechnungen","Entwürfe aus Aufträgen, Status, echter Export als PDF / CSV / Excel / Word.",'<button class="btn" id="recExp">'+svg('<path d="M12 3v12M8 11l4 4 4-4M4 21h16"/>',1.8)+'Liste exportieren</button>');
-  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Nr.</th><th>Kunde</th><th>Betrag</th><th>Status</th><th></th></tr></thead><tbody>';
-  T(DB.rechnungen).forEach(r=>{h+='<tr><td><b>'+esc(r.id)+'</b></td><td class="muted">'+esc(r.kunde)+'</td><td style="font-weight:800">'+eur(r.betrag)+'</td><td>'+badge(rechSt(r))+'</td><td style="text-align:right;white-space:nowrap">'+(rechSt(r)==="offen"&&canWrite()?'<button class="btn btn-sm" data-pay="'+r.id+'">bezahlt</button> ':'')+'<button class="btn btn-sm" data-pdf="'+r.id+'">'+svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>')+'PDF</button></td></tr>';});
+RENDER.rechnungen=async function(){
+  $("#content").innerHTML=whLoading("Rechnungen");
+  const list=await WH.rechnungen();
+  if(list===null){$("#content").innerHTML=whOffline("Rechnungen");return;}
+  const sum=list.reduce((s,r)=>s+(r.brutto||0),0);
+  let h=ph("Rechnungen","Echte GoBD-Rechnungen mit PDF + DATEV-Export (aus dem Orchestrator).");
+  h+='<div class="grid g4" style="margin-bottom:15px">'
+    +kpi("b",'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',list.length,"Rechnungen")
+    +kpi("g",'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',eur(sum),"Summe brutto")+'</div>';
+  if(!list.length){h+='<div class="card" style="padding:30px;text-align:center;color:var(--grau)">Noch keine Rechnungen. Sag im Chat „schreib eine Rechnung für …" oder gib in Freigaben ein Angebot → Rechnung frei.</div>';$("#content").innerHTML=h;return;}
+  h+='<div class="card" style="padding:10px 4px"><table class="tbl"><thead><tr><th>Nr.</th><th>Betrag</th><th></th></tr></thead><tbody>';
+  list.forEach(r=>{h+='<tr><td><b>'+esc(r.nummer)+'</b></td><td style="font-weight:800">'+eur(r.brutto||0)+'</td><td style="text-align:right;white-space:nowrap"><a class="btn btn-sm" href="'+WERKHOF_API+'/faktura/'+r.approval_id+'/pdf" target="_blank" rel="noopener">'+svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>')+'PDF</a> <a class="btn btn-sm" href="'+WERKHOF_API+'/faktura/'+r.approval_id+'/datev" target="_blank" rel="noopener">DATEV</a></td></tr>';});
   h+='</tbody></table></div>';$("#content").innerHTML=h;
-  $("#recExp").addEventListener("click",()=>exportSheet("rechnungen","Rechnungen",["Nr.","Kunde","Betrag €","Status"],T(DB.rechnungen).map(r=>[r.id,r.kunde,r.betrag.toFixed(2),rechSt(r)])));
-  $$("#content [data-pay]").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();store.paid[b.dataset.pay]=true;save();audit("Rechnung als bezahlt markiert",b.dataset.pay);RENDER.rechnungen();buildSidebar();}));
-  $$("#content [data-pdf]").forEach(b=>b.addEventListener("click",()=>{const r=T(DB.rechnungen).find(x=>x.id===b.dataset.pdf);const net=r.betrag/1.19;printDoc("Rechnung "+r.id,'<p><b>'+esc(r.kunde)+'</b> &middot; Status: '+esc(rechSt(r))+'</p>'+tableOf(["Position","Betrag €"],[["Leistung (netto)",net.toFixed(2)],["MwSt 19%",(r.betrag-net).toFixed(2)],["Gesamtbetrag",r.betrag.toFixed(2)]]));audit("Rechnung-PDF",r.id);}));
 };
 
 RENDER.dokumente=function(){
@@ -1498,6 +1534,21 @@ function claudeAnswer(q){
 // Die App wird vom Orchestrator unter /os/app/ ausgeliefert → /claude/chat ist
 // dann same-origin erreichbar (kein CORS/Mixed-Content). Override per window.WERKHOF_API.
 const WERKHOF_API = (window.WERKHOF_API || "").replace(/\/$/,"");
+// ---- Echter Orchestrator-Client (tmERIK + Freigaben + Faktura + WhatsApp) ----
+const WH = {
+  async get(p){try{const r=await fetch(WERKHOF_API+p);if(!r.ok)throw 0;return await r.json();}catch(e){return null;}},
+  async post(p,b){try{const r=await fetch(WERKHOF_API+p,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b||{})});return await r.json();}catch(e){return null;}},
+  kunden(){return this.get("/portal/kunden");},
+  kunde(id){return this.get("/portal/kunde/"+id);},
+  approvals(s){return this.get("/approvals"+(s?("?status="+s):""));},
+  decide(id,d){return this.post("/approvals/"+id+"/decision",{decision:d,by:"meister"});},
+  rechnungAusAngebot(id){return this.post("/claude/rechnung-aus-angebot/"+id,{});},
+  rechnungen(){return this.get("/faktura");},
+  inbox(){return this.get("/whatsapp/inbox");},
+  health(){return this.get("/health");},
+};
+function whLoading(t){return '<div class="ph"><h2>'+esc(t)+'</h2></div><div class="card" style="text-align:center;padding:44px;color:var(--grau)"><div style="font-size:13px">Lade echte Daten aus dem Orchestrator …</div></div>';}
+function whOffline(t,extra){return ph(t,"")+'<div class="card" style="padding:24px;color:var(--grau)">⚠️ Orchestrator nicht erreichbar. '+(extra||"Bitte sicherstellen, dass der Werkhof-Dienst läuft.")+'</div>';}
 async function askClaude(q){
   q=(q||"").trim();if(!q)return;
   const sc=$("#hScroll");if(sc.querySelector(".welcome"))sc.innerHTML="";
